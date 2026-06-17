@@ -12,7 +12,9 @@
 # (the SDK uses in-memory fixtures + MinIO for payloads).
 # ─────────────────────────────────────────────────────────────────────────────
 
-name: casperproof
+# Unique compose project name so this stack's containers/network/volumes don't share a
+# namespace with any other "casperproof" project on the host (matches the unique 29xxx ports).
+name: casperproof-com
 
 networks:
   casperproof:
