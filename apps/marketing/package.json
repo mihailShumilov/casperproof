@@ -1,0 +1,34 @@
+{
+  "name": "@casperproof/marketing",
+  "version": "0.1.0",
+  "description": "CasperProof marketing website (Next.js static export) — casperproof.com.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev -p 3001",
+    "start": "next start -p 3001",
+    "clean": "rm -rf .next out coverage .turbo",
+    "lint": "next lint",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@casperproof/casper-sdk": "workspace:*",
+    "@casperproof/ui": "workspace:*",
+    "clsx": "^2.1.1",
+    "next": "^14.2.23",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@casperproof/config": "workspace:*",
+    "@types/node": "^22.10.5",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

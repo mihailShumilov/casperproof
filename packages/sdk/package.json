@@ -1,0 +1,37 @@
+{
+  "name": "@casperproof/casper-sdk",
+  "version": "0.1.0",
+  "description": "Typed CasperProof client over CSPR.cloud + Casper deploys (attest, verify, policy, claim, stake, challenge, resolve).",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist coverage .turbo *.tsbuildinfo",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@casperproof/commitment": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@casperproof/config": "workspace:*",
+    "@vitest/coverage-v8": "^2.1.8",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
+    "@types/node": "^22.10.5"
+  }
+}
