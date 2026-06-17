@@ -33,24 +33,24 @@ Common targets (run `make` / `make help` for the full list):
 
 Defined in `docker-compose.yml`. All env values are sourced from `.env`.
 
-| Service       | Image / build                                         | Host port                     | Role                                                                                                            |
-| ------------- | ----------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `ollama`      | `ollama/ollama`                                       | `11434`                       | Local LLM backend (zero-cost agent runtime). Pulls `OLLAMA_MODEL` on first run.                                 |
-| `minio`       | `minio/minio`                                         | `9000` (S3), `9001` (console) | S3-compatible payload store.                                                                                    |
-| `minio-init`  | `minio/mc`                                            | —                             | One-shot: creates the payload bucket, sets public-read, then exits.                                             |
-| `deployer`    | `docker/Dockerfile.contracts`                         | —                             | One-shot: WASM build + testnet deploy (mock unless keys present); writes hashes to a shared volume, then exits. |
-| `agent`       | `docker/Dockerfile.node` (`@casperproof/agent`)       | —                             | Zero-cost runtime: risk-scorer, attestor, verifier, Ollama loop.                                                |
-| `x402-server` | `docker/Dockerfile.node` (`@casperproof/x402-server`) | `8402`                        | x402-gated resource server (Fastify).                                                                           |
-| `mcp-server`  | `docker/Dockerfile.node` (`@casperproof/mcp-server`)  | `8405`                        | MCP tools (HTTP transport in compose).                                                                          |
-| `web`         | `docker/Dockerfile.web`                               | `3000`                        | Next.js dApp dashboard.                                                                                         |
-| `marketing`   | `docker/Dockerfile.marketing`                         | `3001` (→ container `80`)     | Static marketing site (nginx).                                                                                  |
+| Service       | Image / build                                         | Host port                       | Role                                                                                                            |
+| ------------- | ----------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `ollama`      | `ollama/ollama`                                       | `29434`                         | Local LLM backend (zero-cost agent runtime). Pulls `OLLAMA_MODEL` on first run.                                 |
+| `minio`       | `minio/minio`                                         | `29900` (S3), `29901` (console) | S3-compatible payload store.                                                                                    |
+| `minio-init`  | `minio/mc`                                            | —                               | One-shot: creates the payload bucket, sets public-read, then exits.                                             |
+| `deployer`    | `docker/Dockerfile.contracts`                         | —                               | One-shot: WASM build + testnet deploy (mock unless keys present); writes hashes to a shared volume, then exits. |
+| `agent`       | `docker/Dockerfile.node` (`@casperproof/agent`)       | —                               | Zero-cost runtime: risk-scorer, attestor, verifier, Ollama loop.                                                |
+| `x402-server` | `docker/Dockerfile.node` (`@casperproof/x402-server`) | `29402`                         | x402-gated resource server (Fastify).                                                                           |
+| `mcp-server`  | `docker/Dockerfile.node` (`@casperproof/mcp-server`)  | `29405`                         | MCP tools (HTTP transport in compose).                                                                          |
+| `web`         | `docker/Dockerfile.web`                               | `29300`                         | Next.js dApp dashboard.                                                                                         |
+| `marketing`   | `docker/Dockerfile.marketing`                         | `29301` (→ container `80`)      | Static marketing site (nginx).                                                                                  |
 
 Quick links after `make up`:
 
-- dApp → http://localhost:3000
-- Marketing → http://localhost:3001
-- x402 server → http://localhost:8402 (`/health` for a readiness probe)
-- MinIO console → http://localhost:9001
+- dApp → http://localhost:29300
+- Marketing → http://localhost:29301
+- x402 server → http://localhost:29402 (`/health` for a readiness probe)
+- MinIO console → http://localhost:29901
 
 Startup ordering uses health/completion conditions: `agent` waits for `ollama` healthy and
 `minio-init` complete; `x402-server`/`mcp-server` wait for `minio-init`; `web` waits for the
@@ -154,14 +154,14 @@ Every value has a working local default (from `.env.example`); only the secrets 
 | `X402_FACILITATOR_URL` | `https://facilitator.testnet.casper.network` | Empty ⇒ mock verifier.                                            |
 | `X402_PRICE_USD`       | `0.01`                                       | Price per gated request (string).                                 |
 | `X402_PAY_TO`          | `casperproof-treasury`                       | Account that receives the micropayment.                           |
-| `X402_SERVER_PORT`     | `8402`                                       |                                                                   |
+| `X402_SERVER_PORT`     | `29402`                                      |                                                                   |
 | `X402_MOCK`            | _(unset)_                                    | `true` forces the mock verifier even if a facilitator URL is set. |
 
 ### MCP server
 
 | Var               | Default | Notes                                              |
 | ----------------- | ------- | -------------------------------------------------- |
-| `MCP_SERVER_PORT` | `8405`  |                                                    |
+| `MCP_SERVER_PORT` | `29405` |                                                    |
 | `MCP_TRANSPORT`   | `stdio` | Set to `http` in compose so the dApp can reach it. |
 
 ### Agent runtime (zero-cost)
@@ -175,23 +175,23 @@ Every value has a working local default (from `.env.example`); only the secrets 
 
 ### S3-compatible payload store
 
-| Var                   | Default                 | Notes                                      |
-| --------------------- | ----------------------- | ------------------------------------------ |
-| `S3_ENDPOINT`         | `http://minio:9000`     | Unset ⇒ in-memory backend (offline/tests). |
-| `S3_REGION`           | `us-east-1`             |                                            |
-| `S3_BUCKET`           | `casperproof-payloads`  |                                            |
-| `S3_ACCESS_KEY`       | `casperproof`           |                                            |
-| `S3_SECRET_KEY`       | `casperproof-secret`    |                                            |
-| `S3_FORCE_PATH_STYLE` | `true`                  | Required by MinIO.                         |
-| `S3_PUBLIC_URL`       | `http://localhost:9000` |                                            |
+| Var                   | Default                  | Notes                                      |
+| --------------------- | ------------------------ | ------------------------------------------ |
+| `S3_ENDPOINT`         | `http://minio:9000`      | Unset ⇒ in-memory backend (offline/tests). |
+| `S3_REGION`           | `us-east-1`              |                                            |
+| `S3_BUCKET`           | `casperproof-payloads`   |                                            |
+| `S3_ACCESS_KEY`       | `casperproof`            |                                            |
+| `S3_SECRET_KEY`       | `casperproof-secret`     |                                            |
+| `S3_FORCE_PATH_STYLE` | `true`                   | Required by MinIO.                         |
+| `S3_PUBLIC_URL`       | `http://localhost:29900` |                                            |
 
 ### Web / marketing
 
 | Var                           | Default                   | Notes |
 | ----------------------------- | ------------------------- | ----- |
-| `NEXT_PUBLIC_APP_URL`         | `http://localhost:3000`   |       |
-| `NEXT_PUBLIC_MARKETING_URL`   | `http://localhost:3001`   |       |
-| `NEXT_PUBLIC_X402_SERVER_URL` | `http://localhost:8402`   |       |
+| `NEXT_PUBLIC_APP_URL`         | `http://localhost:29300`  |       |
+| `NEXT_PUBLIC_MARKETING_URL`   | `http://localhost:29301`  |       |
+| `NEXT_PUBLIC_X402_SERVER_URL` | `http://localhost:29402`  |       |
 | `NEXT_PUBLIC_SITE_URL`        | `https://casperproof.com` |       |
 
 ## API documentation generation

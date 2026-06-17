@@ -13,25 +13,25 @@ make up        # build + start every service in the foreground
 
 What boots (all on one bridge network, `.env`-driven):
 
-| Service       | Image / Dockerfile            | Host port   | Role                                                                      |
-| ------------- | ----------------------------- | ----------- | ------------------------------------------------------------------------- |
-| `ollama`      | `ollama/ollama`               | 11434       | Local LLM backend; pulls `${OLLAMA_MODEL}` on first run.                  |
-| `minio`       | `minio/minio`                 | 9000 / 9001 | S3-compatible payload store (+ web console).                              |
-| `minio-init`  | `minio/mc`                    | —           | One-shot: creates `${S3_BUCKET}`, then exits.                             |
-| `deployer`    | `docker/Dockerfile.contracts` | —           | One-shot: builds wasm + deploys contracts (mock unless keys), then exits. |
-| `agent`       | `docker/Dockerfile.node`      | —           | Zero-cost runtime (risk-scorer, attestor, verifier, Ollama loop).         |
-| `x402-server` | `docker/Dockerfile.node`      | 8402        | Pay-per-request resource server.                                          |
-| `mcp-server`  | `docker/Dockerfile.node`      | 8405        | Agent ↔ chain MCP tools (HTTP transport in compose).                      |
-| `web`         | `docker/Dockerfile.web`       | 3000        | Next.js dApp dashboard (standalone).                                      |
-| `marketing`   | `docker/Dockerfile.marketing` | 3001        | Static marketing site served by nginx.                                    |
+| Service       | Image / Dockerfile            | Host port     | Role                                                                      |
+| ------------- | ----------------------------- | ------------- | ------------------------------------------------------------------------- |
+| `ollama`      | `ollama/ollama`               | 29434         | Local LLM backend; pulls `${OLLAMA_MODEL}` on first run.                  |
+| `minio`       | `minio/minio`                 | 29900 / 29901 | S3-compatible payload store (+ web console).                              |
+| `minio-init`  | `minio/mc`                    | —             | One-shot: creates `${S3_BUCKET}`, then exits.                             |
+| `deployer`    | `docker/Dockerfile.contracts` | —             | One-shot: builds wasm + deploys contracts (mock unless keys), then exits. |
+| `agent`       | `docker/Dockerfile.node`      | —             | Zero-cost runtime (risk-scorer, attestor, verifier, Ollama loop).         |
+| `x402-server` | `docker/Dockerfile.node`      | 29402         | Pay-per-request resource server.                                          |
+| `mcp-server`  | `docker/Dockerfile.node`      | 29405         | Agent ↔ chain MCP tools (HTTP transport in compose).                      |
+| `web`         | `docker/Dockerfile.web`       | 29300         | Next.js dApp dashboard (standalone).                                      |
+| `marketing`   | `docker/Dockerfile.marketing` | 29301         | Static marketing site served by nginx.                                    |
 
 Open:
 
-- dApp → http://localhost:3000
-- Marketing → http://localhost:3001
-- x402 server → http://localhost:8402
-- MCP server → http://localhost:8405
-- MinIO console → http://localhost:9001 (user/pass = `S3_ACCESS_KEY` / `S3_SECRET_KEY`)
+- dApp → http://localhost:29300
+- Marketing → http://localhost:29301
+- x402 server → http://localhost:29402
+- MCP server → http://localhost:29405
+- MinIO console → http://localhost:29901 (user/pass = `S3_ACCESS_KEY` / `S3_SECRET_KEY`)
 
 Stop with `Ctrl-C`, or `make down` from another shell.
 

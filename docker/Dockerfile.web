@@ -28,9 +28,9 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
 # ── builder: build the web app + its workspace deps via turbo ────────────────
 FROM deps AS builder
 # Public env baked at build time (Next inlines NEXT_PUBLIC_* into the bundle).
-ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
-ARG NEXT_PUBLIC_MARKETING_URL=http://localhost:3001
-ARG NEXT_PUBLIC_X402_SERVER_URL=http://localhost:8402
+ARG NEXT_PUBLIC_APP_URL=http://localhost:29300
+ARG NEXT_PUBLIC_MARKETING_URL=http://localhost:29301
+ARG NEXT_PUBLIC_X402_SERVER_URL=http://localhost:29402
 ARG NEXT_PUBLIC_SITE_URL=https://casperproof.com
 ARG NEXT_PUBLIC_CSPR_CLICK_APP_ID=casperproof
 ARG NEXT_PUBLIC_CSPR_CLICK_APP_NAME=CasperProof

@@ -3,14 +3,14 @@
  *
  * The suite drives the dApp (`@casperproof/web`) which runs fully offline against
  * the SDK mock backend — no secrets, no network. `webServer` builds the app and
- * serves the production build on :3000 so the same config runs locally and in CI.
+ * serves the production build on :29300 so the same config runs locally and in CI.
  *
  * Browser binaries are downloaded with:
  *   pnpm --filter @casperproof/e2e exec playwright install chromium
  */
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 3000;
+const PORT = 29300;
 const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
@@ -41,7 +41,7 @@ export default defineConfig({
 
   webServer: {
     // Build then serve the production build. `reuseExistingServer` lets a dev
-    // run reuse an already-running `next start` on :3000.
+    // run reuse an already-running `next start` on :29300.
     command: 'pnpm --filter @casperproof/web build && pnpm --filter @casperproof/web start',
     url: baseURL,
     reuseExistingServer: !process.env.CI,

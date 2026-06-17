@@ -19,7 +19,7 @@ serves as flat files.
 ## Commands
 
 ```bash
-pnpm --filter @casperproof/marketing dev        # http://localhost:3001
+pnpm --filter @casperproof/marketing dev        # http://localhost:29301
 pnpm --filter @casperproof/marketing typecheck  # tsc --noEmit
 pnpm --filter @casperproof/marketing build       # static export → out/
 pnpm --filter @casperproof/marketing test        # vitest run
@@ -96,7 +96,7 @@ time, so the figures are baked into the static HTML — zero client fetch.
 | Var                         | Default                   | Used for                             |
 | --------------------------- | ------------------------- | ------------------------------------ |
 | `NEXT_PUBLIC_SITE_URL`      | `https://casperproof.com` | canonical, OG, sitemap, robots       |
-| `NEXT_PUBLIC_APP_URL`       | `http://localhost:3000`   | "Launch app" CTA                     |
+| `NEXT_PUBLIC_APP_URL`       | `http://localhost:29300`  | "Launch app" CTA                     |
 | `NEXT_PUBLIC_CSPR_FANS_URL` | `https://cspr.fans`       | "Vote on CSPR.fans" CTA              |
 | `CSPR_CLOUD_TOKEN`          | _(unset)_                 | flips the SDK to live mode for stats |
 
@@ -118,7 +118,7 @@ time, so the figures are baked into the static HTML — zero client fetch.
   brand placeholder. Swap in a final designed asset (PNG/JPG also fine; update
   the `type` in `app/layout.tsx` if you change the format). OG/Twitter/canonical
   URLs already resolve to the production origin, not localhost.
-- **`NEXT_PUBLIC_APP_URL`** — defaults to `http://localhost:3000` for local dev;
+- **`NEXT_PUBLIC_APP_URL`** — defaults to `http://localhost:29300` for local dev;
   set the production dApp URL for deploys (otherwise the three "Launch app" CTAs
   point at localhost).
 - **Live testnet stats** — set `CSPR_CLOUD_TOKEN` to source the live-numbers

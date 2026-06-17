@@ -21,7 +21,7 @@ export function stripTrailingSlash(url: string): string {
 export const SITE_URL = stripTrailingSlash(env('NEXT_PUBLIC_SITE_URL', 'https://casperproof.com'));
 
 /** The dApp the "Launch app" CTA points to. */
-export const APP_URL = stripTrailingSlash(env('NEXT_PUBLIC_APP_URL', 'http://localhost:3000'));
+export const APP_URL = stripTrailingSlash(env('NEXT_PUBLIC_APP_URL', 'http://localhost:29300'));
 
 /**
  * The CSPR.fans community-vote listing.

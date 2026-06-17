@@ -61,8 +61,8 @@ cp .env.example .env
 make up          # boots ollama, minio, agent, x402, mcp, web, marketing
 ```
 
-- dApp → http://localhost:3000 · Marketing → http://localhost:3001
-- x402 server → http://localhost:8402 · MinIO console → http://localhost:9001
+- dApp → http://localhost:29300 · Marketing → http://localhost:29301
+- x402 server → http://localhost:29402 · MinIO console → http://localhost:29901
 
 Deploy contracts to Casper Testnet and seed the demo:
 

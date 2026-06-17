@@ -61,8 +61,8 @@ jobs:
         run: |
           echo "waiting for web + x402 to answer..."
           for i in $(seq 1 60); do
-            if curl -sf http://localhost:3000/ >/dev/null \
-               && curl -sf http://localhost:8402/health >/dev/null; then
+            if curl -sf http://localhost:29300/ >/dev/null \
+               && curl -sf http://localhost:29402/health >/dev/null; then
               echo "stack is up"; exit 0
             fi
             sleep 5
@@ -71,7 +71,7 @@ jobs:
 
       - name: Run Playwright e2e
         env:
-          E2E_BASE_URL: http://localhost:3000
+          E2E_BASE_URL: http://localhost:29300
         run: pnpm --filter @casperproof/e2e test
 
       - name: Dump compose logs on failure

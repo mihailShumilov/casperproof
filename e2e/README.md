@@ -41,7 +41,7 @@ pnpm --filter @casperproof/e2e test
 ```
 
 The Playwright `webServer` builds the dApp and serves the production build on
-`http://localhost:3000` automatically before the tests run:
+`http://localhost:29300` automatically before the tests run:
 
 ```
 pnpm --filter @casperproof/web build && pnpm --filter @casperproof/web start

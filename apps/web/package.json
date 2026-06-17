@@ -7,8 +7,8 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev -p 3000",
-    "start": "next start -p 3000",
+    "dev": "next dev -p 29300",
+    "start": "next start -p 29300",
     "clean": "rm -rf .next out coverage .turbo",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",

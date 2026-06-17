@@ -29,7 +29,8 @@ services:
     image: ollama/ollama:0.5.4
     networks: [casperproof]
     ports:
-      - "11434:11434"
+      # Unique host port (in-container stays 11434, used by OLLAMA_HOST on the network).
+      - "${OLLAMA_PORT:-29434}:11434"
     volumes:
       - ollama-models:/root/.ollama
     environment:
@@ -59,8 +60,9 @@ services:
     image: minio/minio:RELEASE.2024-12-18T13-15-44Z
     networks: [casperproof]
     ports:
-      - "9000:9000" # S3 API
-      - "9001:9001" # web console
+      # Unique host ports (in-container stays 9000/9001, used by S3_ENDPOINT on the network).
+      - "${MINIO_API_PORT:-29900}:9000" # S3 API
+      - "${MINIO_CONSOLE_PORT:-29901}:9001" # web console
     volumes:
       - minio-data:/data
     environment:
@@ -250,7 +252,8 @@ services:
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
     ports:
-      - "3000:3000"
+      # Unique host port (in-container Next listens on 3000).
+      - "${WEB_PORT:-29300}:3000"
     depends_on:
       - x402-server
       - mcp-server
@@ -274,7 +277,8 @@ services:
     image: casperproof/marketing:local
     networks: [casperproof]
     ports:
-      - "3001:80"
+      # Unique host port (in-container nginx listens on 80).
+      - "${MARKETING_PORT:-29301}:80"
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/healthz"]
       interval: 30s

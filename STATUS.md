@@ -33,7 +33,7 @@ make seed               # runs the full demo arc through the SDK + agent
 make test               # contracts (cargo test) + TS (turbo) suites
 ```
 
-- dApp → http://localhost:3000 · Marketing → http://localhost:3001 · x402 → http://localhost:8402
+- dApp → http://localhost:29300 · Marketing → http://localhost:29301 · x402 → http://localhost:29402
 
 ## Tests & coverage
 

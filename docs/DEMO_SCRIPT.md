@@ -13,7 +13,7 @@ make up                 # boots ollama, minio, agent, x402, mcp, web, marketing
 make seed               # seeds demo attestations + insurance policies (deployer container)
 ```
 
-- dApp: http://localhost:3000 · Marketing: http://localhost:3001 · x402: http://localhost:8402
+- dApp: http://localhost:29300 · Marketing: http://localhost:29301 · x402: http://localhost:29402
 - Wallet: click **Connect** in the nav — the mock CSPR.click connector returns a deterministic
   test account, so no extension is needed.
 
@@ -27,7 +27,7 @@ make seed               # seeds demo attestations + insurance policies (deployer
 > "Autonomous agents produce outputs nobody can verify, and the capital they manage is
 > uninsured."
 
-Open the marketing site (http://localhost:3001) or the dApp home (`/`). The home hero states the
+Open the marketing site (http://localhost:29301) or the dApp home (`/`). The home hero states the
 one-liner and the three steps (Attest · Verify · Slash) with the live event feed already visible.
 
 ### 2 · One-liner (0:15–0:25)
