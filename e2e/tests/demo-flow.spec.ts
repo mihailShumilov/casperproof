@@ -29,11 +29,19 @@ import {
   expectVerifyPass,
   expectVerifyFail,
 } from './helpers';
-import { ORACLE_DEFAULTS, INSURANCE_DEFAULTS, SLASH_DEFAULTS, prettyJson } from '../fixtures/demo-data';
+import {
+  ORACLE_DEFAULTS,
+  INSURANCE_DEFAULTS,
+  SLASH_DEFAULTS,
+  prettyJson,
+} from '../fixtures/demo-data';
 
 /** Click an in-app nav link (preserves the singleton SDK store across views). */
 async function navTo(page: import('@playwright/test').Page, label: string, heading: string) {
-  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: label }).click();
+  await page
+    .getByRole('navigation', { name: 'Primary' })
+    .getByRole('link', { name: label })
+    .click();
   await expect(page.getByRole('heading', { name: heading, level: 1 })).toBeVisible();
 }
 

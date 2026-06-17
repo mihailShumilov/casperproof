@@ -6,19 +6,8 @@
  * The on-chain registry stores/compares the resulting bytes only.
  */
 export * from './types.js';
-export {
-  canonicalize,
-  canonicalBytes,
-  CanonicalizationError,
-} from './canonical.js';
-export {
-  blake2b256,
-  toHex,
-  fromHex,
-  leU64,
-  concatBytes,
-  HASH_LENGTH,
-} from './hash.js';
+export { canonicalize, canonicalBytes, CanonicalizationError } from './canonical.js';
+export { blake2b256, toHex, fromHex, leU64, concatBytes, HASH_LENGTH } from './hash.js';
 export {
   hashPayload,
   commitmentFromHashes,

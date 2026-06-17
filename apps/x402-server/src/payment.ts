@@ -67,13 +67,25 @@ export class FacilitatorPaymentVerifier implements PaymentVerifier {
   }
 }
 
-/** Pick a verifier based on config (mock by default / offline). */
+/** Fail-closed verifier: rejects every payment. Used in production when neither a facilitator
+ * URL nor an explicit mock opt-in is configured, so a misconfigured deploy never serves ungated. */
+export class DenyPaymentVerifier implements PaymentVerifier {
+  async verify(): Promise<PaymentResult> {
+    return { ok: false, reason: 'no payment verifier configured (fail closed)' };
+  }
+}
+
+/** Pick a verifier based on config. Mock only when explicitly enabled (config decides);
+ * otherwise a facilitator if configured, else fail closed. */
 export function createPaymentVerifier(opts: {
   mock: boolean;
   facilitatorUrl: string;
 }): PaymentVerifier {
-  if (opts.mock || !opts.facilitatorUrl) {
+  if (opts.mock) {
     return new MockPaymentVerifier();
   }
-  return new FacilitatorPaymentVerifier(opts.facilitatorUrl);
+  if (opts.facilitatorUrl) {
+    return new FacilitatorPaymentVerifier(opts.facilitatorUrl);
+  }
+  return new DenyPaymentVerifier();
 }

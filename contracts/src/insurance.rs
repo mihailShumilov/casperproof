@@ -178,6 +178,15 @@ impl Insurance {
         // Cross-contract read of the backing attestation (reverts NotFound if absent).
         let registry = AttestationRegistryContractRef::new(self.env(), self.registry_addr());
         let attestation = registry.get_attestation(attestation_id);
+        // The backing attestation must be produced by the configured claim oracle model, so a
+        // holder cannot self-manufacture an unrelated attestation to drain coverage.
+        let claim_model = self
+            .claim_model_id
+            .get()
+            .unwrap_or_revert_with(self, Error::BadConfig);
+        if attestation.model_id != claim_model {
+            self.env().revert(Error::Unauthorized);
+        }
         // A slashed or still-challenged attestation cannot back a payout.
         if !matches!(
             attestation.status,
@@ -192,10 +201,12 @@ impl Insurance {
             self.env().revert(Error::VaultInsolvent);
         }
 
-        self.usdc().transfer(&policy.holder, &payout);
-        policy.status = PolicyStatus::Claimed;
+        // Checks-Effects-Interactions: mark the policy claimed and persist BEFORE the external
+        // token transfer, so a hook-bearing CEP-18 cannot re-enter and double-pay.
         let holder = policy.holder;
+        policy.status = PolicyStatus::Claimed;
         self.policies.set(&policy_id, policy);
+        self.usdc().transfer(&holder, &payout);
 
         self.env().emit_event(ClaimPaid {
             policy_id,
@@ -239,10 +250,11 @@ impl Insurance {
         if self.vault_balance() < amount {
             self.env().revert(Error::VaultInsolvent);
         }
-        self.usdc().transfer(&staker, &amount);
+        // Checks-Effects-Interactions: reduce the recorded position + total before paying out.
         self.positions.set(&staker, pos - amount);
         let total = self.total_staked.get_or_default() - amount;
         self.total_staked.set(total);
+        self.usdc().transfer(&staker, &amount);
         self.env().emit_event(Unstaked {
             staker,
             amount,

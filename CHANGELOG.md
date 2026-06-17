@@ -7,6 +7,7 @@ All notable changes to this project are documented here. The format is based on
 ## [Unreleased]
 
 ### Added
+
 - Monorepo scaffold (pnpm + Turborepo for TS, Cargo workspace for Odra contracts).
 - Claude Code build team: 9 specialist sub-agents + 4 repo skills (`.claude/`).
 - `packages/commitment`: blake2b-256 commitment scheme with canonical JSON + golden vectors.
@@ -17,7 +18,15 @@ All notable changes to this project are documented here. The format is based on
 - `packages/agent`: zero-cost runtime (risk-scorer, claim-oracle, attestor, verifier, store, Ollama loop).
 - `packages/sdk`: `@casperproof/casper-sdk` typed client.
 - `apps/x402-server`, `apps/mcp-server`, `apps/web` (dApp), `apps/marketing`.
+- `apps/x402-server`: x402-gated `GET /attestation/:id` + `POST /verify` (mock + facilitator).
 - Full dockerization (`docker compose up`), Makefile, GitHub Actions CI/e2e/release.
-- Documentation set, deploy + seed scripts.
+- Documentation set (`docs/` + ADRs), deploy/seed scripts, Playwright e2e, `SETUP_NEEDED.md`.
+
+### Security
+
+- `Insurance.claim` binds the backing attestation to the configured `claim_model_id`.
+- Checks-effects-interactions ordering in `claim`/`resolve`/`finalize`/`unstake`.
+- Verifier recomputes the full commitment (input + output + model + timestamp), not just output.
+- x402 server fails closed in production absent a facilitator or explicit mock opt-in.
 
 [Unreleased]: https://github.com/mihailShumilov/casperproof

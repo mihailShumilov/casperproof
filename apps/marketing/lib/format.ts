@@ -27,7 +27,11 @@ export function motesToCspr(motes: string | bigint, maxFractionDigits = 2): stri
   }
 
   // Build the fractional part, zero-padded to 9 digits, then trim.
-  const fraction = remainder.toString().padStart(9, '0').slice(0, maxFractionDigits).replace(/0+$/, '');
+  const fraction = remainder
+    .toString()
+    .padStart(9, '0')
+    .slice(0, maxFractionDigits)
+    .replace(/0+$/, '');
   const wholeStr = groupThousands(whole.toString());
   return fraction.length > 0 ? `${wholeStr}.${fraction}` : wholeStr;
 }

@@ -13,7 +13,7 @@
  * challenge/slash step.
  */
 import type { CasperProofSdk, Reputation } from '@casperproof/casper-sdk';
-import { hashPayload, verifyOutputHash } from '@casperproof/commitment';
+import { commitmentFromHashes, hashPayload, verifyOutputHash } from '@casperproof/commitment';
 import type { Hex, JsonValue } from '@casperproof/commitment';
 import type { PayloadStore } from './store.js';
 
@@ -35,13 +35,41 @@ export interface VerifyResult {
   uri: string;
 }
 
+/** The standard payload wrapper the attestor stores: `{ modelId, input, output, timestamp }`. */
+interface PayloadWrapper {
+  modelId: string;
+  input: JsonValue;
+  output: JsonValue;
+  timestamp: number;
+}
+
 /** Extract the attested `output` from a stored payload (the attestor stores a wrapper). */
 function extractOutput(payload: JsonValue): JsonValue {
-  if (payload !== null && typeof payload === 'object' && !Array.isArray(payload) && 'output' in payload) {
+  if (
+    payload !== null &&
+    typeof payload === 'object' &&
+    !Array.isArray(payload) &&
+    'output' in payload
+  ) {
     return (payload as { output: JsonValue }).output;
   }
   // Older / raw payloads stored the output directly.
   return payload;
+}
+
+/** Recognize the full `{ modelId, input, output, timestamp }` wrapper for commitment re-check. */
+function asWrapper(payload: JsonValue): PayloadWrapper | null {
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) return null;
+  const p = payload as Record<string, JsonValue>;
+  if (
+    typeof p.modelId === 'string' &&
+    typeof p.timestamp === 'number' &&
+    'input' in p &&
+    'output' in p
+  ) {
+    return { modelId: p.modelId, input: p.input, output: p.output, timestamp: p.timestamp };
+  }
+  return null;
 }
 
 /**
@@ -51,11 +79,32 @@ function extractOutput(payload: JsonValue): JsonValue {
  * @param store The off-chain payload store.
  * @param id The attestation id to verify.
  */
-export async function verify(sdk: CasperProofSdk, store: PayloadStore, id: number): Promise<VerifyResult> {
+export async function verify(
+  sdk: CasperProofSdk,
+  store: PayloadStore,
+  id: number,
+): Promise<VerifyResult> {
   const attestation = await sdk.getAttestation(id);
   const payload = await store.getJson(attestation.uri);
   const recomputedHash = hashPayload(extractOutput(payload));
-  const valid = verifyOutputHash(recomputedHash, attestation.outputHash);
+  let valid = verifyOutputHash(recomputedHash, attestation.outputHash);
+
+  // When the payload is the standard wrapper, re-verify the input hash AND the full commitment
+  // too — so tampering with the input, model id, or timestamp also yields FAIL, not just output.
+  const wrapper = asWrapper(payload);
+  if (wrapper) {
+    const recomputedInput = hashPayload(wrapper.input);
+    const recomputedCommitment = commitmentFromHashes(
+      recomputedInput,
+      recomputedHash,
+      wrapper.modelId,
+      wrapper.timestamp,
+    );
+    valid =
+      valid &&
+      verifyOutputHash(recomputedInput, attestation.inputHash) &&
+      verifyOutputHash(recomputedCommitment, attestation.commitment);
+  }
   const reputation = await sdk.attestorReputation(attestation.attestor);
 
   return {

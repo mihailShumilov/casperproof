@@ -4,7 +4,7 @@
 
 **The verifiable AI oracle and trust layer for the agent economy on Casper.**
 
-*Proof your agents can't fake.*
+_Proof your agents can't fake._
 
 [![CI](https://github.com/mihailShumilov/casperproof/actions/workflows/ci.yml/badge.svg)](https://github.com/mihailShumilov/casperproof/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-%3E90%25-brightgreen)](#testing)
@@ -14,7 +14,7 @@
 </div>
 
 > Built for the **Casper Agentic Buildathon 2026**. CasperProof lets an AI agent publish a
-> tamper-evident, **stake-backed** proof (an *attestation*) of its output. Anyone can pay a
+> tamper-evident, **stake-backed** proof (an _attestation_) of its output. Anyone can pay a
 > tiny x402 micropayment to fetch and **independently verify** it; bad attestations are
 > **challenged and slashed**. A parametric **agent-insurance** vault pays out against verified
 > attestations — the flagship demo of the oracle.
@@ -73,17 +73,17 @@ make seed             # seeds demo attestations + policies
 
 ## Monorepo layout
 
-| Path | What |
-|---|---|
-| `packages/commitment` | **Trust anchor** — blake2b-256 commitment + canonical JSON + golden vectors (§8). |
-| `packages/agent` | Zero-cost runtime: risk-scorer, claim-oracle, attestor, verifier, S3 store, Ollama loop. |
-| `packages/sdk` | `@casperproof/casper-sdk` — typed client over CSPR.cloud + deploys. |
-| `packages/ui` / `packages/config` | Shared React components / shared tooling presets. |
-| `apps/web` | dApp dashboard (Next.js + CSPR.click). |
-| `apps/marketing` | Marketing site (static export → casperproof.com). |
-| `apps/x402-server` | x402-gated resource server (Fastify). |
-| `apps/mcp-server` | Casper MCP server. |
-| `contracts/` | Odra contracts: `attestation_registry`, `insurance`, CEP-18 + RFC 7807 `problem` crate. |
+| Path                              | What                                                                                     |
+| --------------------------------- | ---------------------------------------------------------------------------------------- |
+| `packages/commitment`             | **Trust anchor** — blake2b-256 commitment + canonical JSON + golden vectors (§8).        |
+| `packages/agent`                  | Zero-cost runtime: risk-scorer, claim-oracle, attestor, verifier, S3 store, Ollama loop. |
+| `packages/sdk`                    | `@casperproof/casper-sdk` — typed client over CSPR.cloud + deploys.                      |
+| `packages/ui` / `packages/config` | Shared React components / shared tooling presets.                                        |
+| `apps/web`                        | dApp dashboard (Next.js + CSPR.click).                                                   |
+| `apps/marketing`                  | Marketing site (static export → casperproof.com).                                        |
+| `apps/x402-server`                | x402-gated resource server (Fastify).                                                    |
+| `apps/mcp-server`                 | Casper MCP server.                                                                       |
+| `contracts/`                      | Odra contracts: `attestation_registry`, `insurance`, CEP-18 + RFC 7807 `problem` crate.  |
 
 ## Testing
 

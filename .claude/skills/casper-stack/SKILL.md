@@ -15,14 +15,14 @@ network endpoint is unreachable, implement against the documented shapes and fal
 Every external dependency has a local/mock fallback so `make up` and the test suite run with
 no secrets:
 
-| Dependency | Local / mock | Real |
-|---|---|---|
-| Casper node + deploy | mock deploy returns deterministic hashes; `SETUP_NEEDED.md` lists keys | CSPR.cloud node + PEM key |
-| CSPR.cloud REST/stream | in-memory fixture store + a local SSE emitter | `CSPR_CLOUD_TOKEN` |
-| CSPR.click wallet | mock connector (fixed test account) | real app id |
-| x402 facilitator | local verifier that accepts a signed mock `X-PAYMENT` | facilitator URL |
-| S3 | MinIO (in compose) | Cloudflare R2 / AWS S3 |
-| LLM | Ollama (local) | — (no paid keys, ever) |
+| Dependency             | Local / mock                                                           | Real                      |
+| ---------------------- | ---------------------------------------------------------------------- | ------------------------- |
+| Casper node + deploy   | mock deploy returns deterministic hashes; `SETUP_NEEDED.md` lists keys | CSPR.cloud node + PEM key |
+| CSPR.cloud REST/stream | in-memory fixture store + a local SSE emitter                          | `CSPR_CLOUD_TOKEN`        |
+| CSPR.click wallet      | mock connector (fixed test account)                                    | real app id               |
+| x402 facilitator       | local verifier that accepts a signed mock `X-PAYMENT`                  | facilitator URL           |
+| S3                     | MinIO (in compose)                                                     | Cloudflare R2 / AWS S3    |
+| LLM                    | Ollama (local)                                                         | — (no paid keys, ever)    |
 
 The SDK selects mock vs live from env (`CSPR_CLOUD_TOKEN` present ⇒ live).
 

@@ -9,12 +9,7 @@
  * @packageDocumentation
  */
 
-export type {
-  AgentConfig,
-  LlmBackendKind,
-  RiskTier,
-  RiskThresholds,
-} from './agent.config.js';
+export type { AgentConfig, LlmBackendKind, RiskTier, RiskThresholds } from './agent.config.js';
 export { loadConfig, defaultConfig } from './agent.config.js';
 
 export type {

@@ -15,7 +15,13 @@ export interface Problem {
   [extension: string]: unknown;
 }
 
-function problem(slug: string, code: string, status: number, title: string, extra: Record<string, unknown> = {}): Problem {
+function problem(
+  slug: string,
+  code: string,
+  status: number,
+  title: string,
+  extra: Record<string, unknown> = {},
+): Problem {
   return { type: `${PROBLEM_BASE}${slug}`, title, status, code, ...extra };
 }
 

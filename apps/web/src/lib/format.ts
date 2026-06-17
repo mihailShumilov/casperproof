@@ -6,9 +6,7 @@
  */
 
 /** Result of attempting to parse a JSON text field. */
-export type JsonParseResult =
-  | { ok: true; value: unknown }
-  | { ok: false; error: string };
+export type JsonParseResult = { ok: true; value: unknown } | { ok: false; error: string };
 
 /**
  * Parse a user-entered JSON string, returning a tagged result rather than
@@ -94,9 +92,7 @@ function formatWithGrouping(value: bigint): string {
 }
 
 /** Map an attestation/policy status string to the UI Badge status variant. */
-export function statusToBadge(
-  status: string,
-): 'active' | 'challenged' | 'slashed' | 'finalized' {
+export function statusToBadge(status: string): 'active' | 'challenged' | 'slashed' | 'finalized' {
   switch (status) {
     case 'Challenged':
       return 'challenged';

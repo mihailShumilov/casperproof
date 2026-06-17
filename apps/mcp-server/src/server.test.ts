@@ -58,7 +58,10 @@ describe('server <-> client round-trip (in-memory transport)', () => {
     const client = new Client({ name: 'test-client', version: '0.0.0' });
     await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
 
-    const result = (await client.callTool({ name: 'get_attestation', arguments: { id: 4242 } })) as {
+    const result = (await client.callTool({
+      name: 'get_attestation',
+      arguments: { id: 4242 },
+    })) as {
       isError?: boolean;
       structuredContent?: { code?: string };
     };

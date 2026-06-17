@@ -7,7 +7,14 @@ import type { FetchLike, FetchResponseLike, ResolvedConfig } from './types.js';
 /** A queued response or a thrown error for the mock fetch. */
 type Step =
   | { ok: true; status?: number; json?: unknown; text?: string }
-  | { ok: false; status: number; json?: unknown; jsonThrows?: boolean; text?: string; textThrows?: boolean }
+  | {
+      ok: false;
+      status: number;
+      json?: unknown;
+      jsonThrows?: boolean;
+      text?: string;
+      textThrows?: boolean;
+    }
   | { throw: Error };
 
 function mockFetch(steps: Step[]): FetchLike & ReturnType<typeof vi.fn> {
@@ -63,7 +70,10 @@ describe('RestBackend reads', () => {
     await b.getAttestation(5);
     expect(f).toHaveBeenCalledWith(
       'https://api.testnet.cspr.cloud/attestations/5',
-      expect.objectContaining({ method: 'GET', headers: expect.objectContaining({ Authorization: 'test-token' }) }),
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({ Authorization: 'test-token' }),
+      }),
     );
   });
 
@@ -107,14 +117,26 @@ describe('RestBackend reads', () => {
   });
 
   it('reads the attestation count (numeric and string forms)', async () => {
-    expect(await new RestBackend(liveConfig(mockFetch([{ ok: true, json: { count: 12 } }]))).attestationCount()).toBe(12);
-    expect(await new RestBackend(liveConfig(mockFetch([{ ok: true, json: { count: '7' } }]))).attestationCount()).toBe(7);
-    expect(await new RestBackend(liveConfig(mockFetch([{ ok: true, json: {} }]))).attestationCount()).toBe(0);
+    expect(
+      await new RestBackend(
+        liveConfig(mockFetch([{ ok: true, json: { count: 12 } }])),
+      ).attestationCount(),
+    ).toBe(12);
+    expect(
+      await new RestBackend(
+        liveConfig(mockFetch([{ ok: true, json: { count: '7' } }])),
+      ).attestationCount(),
+    ).toBe(7);
+    expect(
+      await new RestBackend(liveConfig(mockFetch([{ ok: true, json: {} }]))).attestationCount(),
+    ).toBe(0);
   });
 
   it('reads reputation (camelCase and snake_case challenges field)', async () => {
     const camel = await new RestBackend(
-      liveConfig(mockFetch([{ ok: true, json: { successful: 3, slashed: 1, challengesDefended: 2 } }])),
+      liveConfig(
+        mockFetch([{ ok: true, json: { successful: 3, slashed: 1, challengesDefended: 2 } }]),
+      ),
     ).attestorReputation('account-hash-a');
     expect(camel).toMatchObject({ successful: 3, slashed: 1, challengesDefended: 2 });
     expect(camel.score).toBeCloseTo(0.75);
@@ -146,7 +168,9 @@ describe('RestBackend reads', () => {
   });
 
   it('defaults policy fields and non-array triggers', async () => {
-    const policy = await new RestBackend(liveConfig(mockFetch([{ ok: true, json: { status: 'weird' } }]))).getPolicy(1);
+    const policy = await new RestBackend(
+      liveConfig(mockFetch([{ ok: true, json: { status: 'weird' } }])),
+    ).getPolicy(1);
     expect(policy.holder).toBe('');
     expect(policy.coverage).toBe('0');
     expect(policy.triggerTypes).toEqual([]);
@@ -159,15 +183,35 @@ describe('RestBackend reads', () => {
   });
 
   it('derives the risk tier when none is provided (all three branches)', async () => {
-    expect((await new RestBackend(liveConfig(mockFetch([{ ok: true, json: { score: 10 } }]))).getRiskScore('a')).tier).toBe('LOW');
-    expect((await new RestBackend(liveConfig(mockFetch([{ ok: true, json: { score: 50 } }]))).getRiskScore('a')).tier).toBe('MEDIUM');
-    expect((await new RestBackend(liveConfig(mockFetch([{ ok: true, json: { score: 90 } }]))).getRiskScore('a')).tier).toBe('HIGH');
+    expect(
+      (
+        await new RestBackend(
+          liveConfig(mockFetch([{ ok: true, json: { score: 10 } }])),
+        ).getRiskScore('a')
+      ).tier,
+    ).toBe('LOW');
+    expect(
+      (
+        await new RestBackend(
+          liveConfig(mockFetch([{ ok: true, json: { score: 50 } }])),
+        ).getRiskScore('a')
+      ).tier,
+    ).toBe('MEDIUM');
+    expect(
+      (
+        await new RestBackend(
+          liveConfig(mockFetch([{ ok: true, json: { score: 90 } }])),
+        ).getRiskScore('a')
+      ).tier,
+    ).toBe('HIGH');
   });
 });
 
 describe('RestBackend error mapping + retries', () => {
   it('maps a non-retryable RFC 7807 problem to a typed error', async () => {
-    const f = mockFetch([{ ok: false, status: 404, json: { code: 'ATTESTATION_NOT_FOUND', detail: 'gone' } }]);
+    const f = mockFetch([
+      { ok: false, status: 404, json: { code: 'ATTESTATION_NOT_FOUND', detail: 'gone' } },
+    ]);
     await expect(new RestBackend(liveConfig(f)).getAttestation(1)).rejects.toMatchObject({
       code: 'ATTESTATION_NOT_FOUND',
       status: 404,
@@ -177,7 +221,9 @@ describe('RestBackend error mapping + retries', () => {
 
   it('falls back to text when the error body is not JSON', async () => {
     const f = mockFetch([{ ok: false, status: 422, jsonThrows: true, text: 'bad input' }]);
-    const err = await new RestBackend(liveConfig(f)).getAttestation(1).catch((e) => e as CasperProofSdkError);
+    const err = await new RestBackend(liveConfig(f))
+      .getAttestation(1)
+      .catch((e) => e as CasperProofSdkError);
     expect(err.status).toBe(422);
     // the text is wrapped as the RFC 7807 `detail` member, which becomes the message
     expect(err.message).toBe('bad input');
@@ -185,7 +231,9 @@ describe('RestBackend error mapping + retries', () => {
 
   it('falls back to an empty body when both json and text throw', async () => {
     const f = mockFetch([{ ok: false, status: 500, jsonThrows: true, textThrows: true }]);
-    const err = await new RestBackend(liveConfig(f)).getAttestation(1).catch((e) => e as CasperProofSdkError);
+    const err = await new RestBackend(liveConfig(f))
+      .getAttestation(1)
+      .catch((e) => e as CasperProofSdkError);
     expect(err.code).toBe('INTERNAL_ERROR');
   });
 
@@ -204,7 +252,9 @@ describe('RestBackend error mapping + retries', () => {
   it('throws after exhausting retries on a retryable status', async () => {
     vi.useFakeTimers();
     const f = mockFetch([{ ok: false, status: 429, json: { code: 'INTERNAL_ERROR' } }]);
-    const p = new RestBackend(liveConfig(f, { retries: 2, retryBaseDelayMs: 1 })).attestationCount();
+    const p = new RestBackend(
+      liveConfig(f, { retries: 2, retryBaseDelayMs: 1 }),
+    ).attestationCount();
     const assertion = expect(p).rejects.toBeInstanceOf(CasperProofSdkError);
     await vi.runAllTimersAsync();
     await assertion;
@@ -214,7 +264,9 @@ describe('RestBackend error mapping + retries', () => {
   it('retries network/abort errors then surfaces INTERNAL_ERROR', async () => {
     vi.useFakeTimers();
     const f = mockFetch([{ throw: new Error('socket hang up') }]);
-    const p = new RestBackend(liveConfig(f, { retries: 1, retryBaseDelayMs: 1 })).attestationCount();
+    const p = new RestBackend(
+      liveConfig(f, { retries: 1, retryBaseDelayMs: 1 }),
+    ).attestationCount();
     const assertion = expect(p).rejects.toMatchObject({ code: 'INTERNAL_ERROR' });
     await vi.runAllTimersAsync();
     await assertion;
@@ -234,16 +286,18 @@ describe('RestBackend error mapping + retries', () => {
   it('retries a network error then succeeds on the next attempt', async () => {
     vi.useFakeTimers();
     const f = mockFetch([{ throw: new Error('transient') }, { ok: true, json: { count: 9 } }]);
-    const p = new RestBackend(liveConfig(f, { retries: 2, retryBaseDelayMs: 1 })).attestationCount();
+    const p = new RestBackend(
+      liveConfig(f, { retries: 2, retryBaseDelayMs: 1 }),
+    ).attestationCount();
     await vi.runAllTimersAsync();
     expect(await p).toBe(9);
   });
 
   it('does not retry when retries is 0', async () => {
     const f = mockFetch([{ ok: false, status: 503, json: { code: 'INTERNAL_ERROR' } }]);
-    await expect(new RestBackend(liveConfig(f, { retries: 0 })).attestationCount()).rejects.toBeInstanceOf(
-      CasperProofSdkError,
-    );
+    await expect(
+      new RestBackend(liveConfig(f, { retries: 0 })).attestationCount(),
+    ).rejects.toBeInstanceOf(CasperProofSdkError);
     expect(f).toHaveBeenCalledTimes(1);
   });
 });
@@ -283,9 +337,20 @@ describe('RestBackend writes (deterministic placeholder deploy hashes)', () => {
     expect((await b.challenge(1)).status).toBe('Challenged');
     expect((await b.resolve(1, true)).status).toBe('Slashed');
     expect((await b.resolve(1, false)).status).toBe('Finalized');
-    const policy = await b.createPolicy({ coverage: '1', premium: '1', triggerTypes: ['exploit'], expiry: 1, holder: 'h' });
+    const policy = await b.createPolicy({
+      coverage: '1',
+      premium: '1',
+      triggerTypes: ['exploit'],
+      expiry: 1,
+      holder: 'h',
+    });
     expect(policy.holder).toBe('h');
-    const policy2 = await b.createPolicy({ coverage: '1', premium: '1', triggerTypes: [], expiry: 1 });
+    const policy2 = await b.createPolicy({
+      coverage: '1',
+      premium: '1',
+      triggerTypes: [],
+      expiry: 1,
+    });
     expect(policy2.holder).toBe('');
     const claim = await b.submitClaim(1, 2);
     expect(claim).toMatchObject({ policyId: 1, attestationId: 2, paid: true });

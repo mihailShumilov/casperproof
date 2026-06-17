@@ -2,13 +2,7 @@ import { clsx } from 'clsx';
 import type { HTMLAttributes, ReactNode } from 'react';
 
 /** Lifecycle + verdict status variants for an oracle claim. */
-export type BadgeStatus =
-  | 'active'
-  | 'challenged'
-  | 'slashed'
-  | 'finalized'
-  | 'pass'
-  | 'fail';
+export type BadgeStatus = 'active' | 'challenged' | 'slashed' | 'finalized' | 'pass' | 'fail';
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   /** Status variant. Drives color + default label. */

@@ -22,9 +22,7 @@ test('score an address (no wallet required)', async ({ page }) => {
 });
 
 test('buy a policy is gated on a connected wallet', async ({ page }) => {
-  await expect(
-    page.getByText('Connect your wallet to sign', { exact: false }),
-  ).toBeVisible();
+  await expect(page.getByText('Connect your wallet to sign', { exact: false })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Buy policy' })).toBeDisabled();
 
   await connectWallet(page);

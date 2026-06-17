@@ -17,13 +17,19 @@ import type { ToolContext } from './tools.js';
 function newCtx(): ToolContext {
   return {
     sdk: createClient({ mode: 'mock' }),
-    store: createStore({ region: 'us-east-1', bucket: 'casperproof-payloads', forcePathStyle: true }),
+    store: createStore({
+      region: 'us-east-1',
+      bucket: 'casperproof-payloads',
+      forcePathStyle: true,
+    }),
     config: defaultConfig,
   };
 }
 
 /** Parse the structuredContent from a tool result. */
-function structured(result: { structuredContent?: Record<string, unknown> }): Record<string, unknown> {
+function structured(result: {
+  structuredContent?: Record<string, unknown>;
+}): Record<string, unknown> {
   return result.structuredContent ?? {};
 }
 
@@ -180,10 +186,7 @@ describe('buy_policy + submit_claim', () => {
       stake: '2000000000',
     });
 
-    const claim = await submitClaimTool.handler(
-      { policyId, attestationId: submit.id },
-      ctx,
-    );
+    const claim = await submitClaimTool.handler({ policyId, attestationId: submit.id }, ctx);
     const body = structured(claim);
     expect(body.paid).toBe(true);
     expect(body.amount).toBe('1000000000');

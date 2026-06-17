@@ -58,9 +58,9 @@ describe('computeCommitment', () => {
       modelId: 'casperproof-riskscorer-v1',
       timestamp: 1718600000,
     });
-    expect(commitmentFromHashes(inputHash, outputHash, 'casperproof-riskscorer-v1', 1718600000)).toBe(
-      commitment,
-    );
+    expect(
+      commitmentFromHashes(inputHash, outputHash, 'casperproof-riskscorer-v1', 1718600000),
+    ).toBe(commitment);
   });
 });
 

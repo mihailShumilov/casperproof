@@ -3,14 +3,7 @@ import { Badge } from './Badge.js';
 import type { BadgeStatus } from './Badge.js';
 import { render } from '../test-utils.js';
 
-const STATUSES: BadgeStatus[] = [
-  'active',
-  'challenged',
-  'slashed',
-  'finalized',
-  'pass',
-  'fail',
-];
+const STATUSES: BadgeStatus[] = ['active', 'challenged', 'slashed', 'finalized', 'pass', 'fail'];
 
 describe('Badge', () => {
   it.each(STATUSES)('renders %s status with default label + dot', (status) => {

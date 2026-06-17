@@ -14,15 +14,7 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import {
-  Badge,
-  Button,
-  Card,
-  HashDisplay,
-  Spinner,
-  StatTile,
-  VerdictPill,
-} from '@casperproof/ui';
+import { Badge, Button, Card, HashDisplay, Spinner, StatTile, VerdictPill } from '@casperproof/ui';
 import type { Attestation, VerifyResult } from '@casperproof/casper-sdk';
 import { CasperProofSdkError } from '@casperproof/casper-sdk';
 import { getSdk } from '@/lib/sdk';
@@ -162,7 +154,9 @@ export function SlashView(): JSX.Element {
               <h2 className="section-title" style={{ margin: 0 }}>
                 1 · Submit attestation
               </h2>
-              {attestation && <Badge status={statusToBadge(attestation.status)}>{attestation.status}</Badge>}
+              {attestation && (
+                <Badge status={statusToBadge(attestation.status)}>{attestation.status}</Badge>
+              )}
             </div>
             <p className="muted">
               An honest-looking proof goes on-chain with <strong>3 CSPR</strong> staked behind it.
@@ -172,7 +166,11 @@ export function SlashView(): JSX.Element {
               onClick={() => void handleSubmit()}
               disabled={!isConnected || busy || step !== 'idle'}
             >
-              {busy && step === 'idle' ? <Spinner size="sm" label="Submitting" /> : 'Submit attestation'}
+              {busy && step === 'idle' ? (
+                <Spinner size="sm" label="Submitting" />
+              ) : (
+                'Submit attestation'
+              )}
             </Button>
             {attestation && (
               <dl className="kv" style={{ marginTop: 'var(--cp-space-md)' }}>
@@ -193,8 +191,8 @@ export function SlashView(): JSX.Element {
             <Card>
               <h2 className="section-title">2 · Tamper &amp; verify</h2>
               <p className="muted">
-                The honest output was <span className="mono">{prettyJson(HONEST_OUTPUT)}</span>.
-                The payload below is altered — verifying it recomputes a different hash.
+                The honest output was <span className="mono">{prettyJson(HONEST_OUTPUT)}</span>. The
+                payload below is altered — verifying it recomputes a different hash.
               </p>
               <JsonField label="Tampered payload" value={tamperedText} onChange={setTamperedText} />
               <Button
@@ -209,7 +207,9 @@ export function SlashView(): JSX.Element {
                   <div className="row" style={{ marginBottom: 'var(--cp-space-md)' }}>
                     <VerdictPill verdict={verifyResult.valid ? 'pass' : 'fail'} />
                     <span className="muted">
-                      {verifyResult.valid ? 'Unexpected PASS — edit the payload.' : 'Tamper detected.'}
+                      {verifyResult.valid
+                        ? 'Unexpected PASS — edit the payload.'
+                        : 'Tamper detected.'}
                     </span>
                   </div>
                   <dl className="kv">
@@ -287,7 +287,11 @@ export function SlashView(): JSX.Element {
                     delta={step === 'slashed' ? 'paid' : `${(10000 - Number(REWARD_BPS)) / 100}%`}
                   />
                 </div>
-                <p className="notice notice--warn" role="status" style={{ marginTop: 'var(--cp-space-md)' }}>
+                <p
+                  className="notice notice--warn"
+                  role="status"
+                  style={{ marginTop: 'var(--cp-space-md)' }}
+                >
                   {step === 'slashed'
                     ? `Slashed. ${formatMotes(challengerReward.toString())} moved to the challenger, ${formatMotes(treasuryCut.toString())} to the treasury. Attestor reputation: slashed +1.`
                     : 'On a fraudulent resolution the stake moves here.'}

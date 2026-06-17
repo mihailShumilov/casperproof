@@ -152,16 +152,18 @@ describe('createStore backend selection + S3Backend', () => {
   it('put/get round-trips through an injected S3 client', async () => {
     const sent: unknown[] = [];
     const fakeClient = {
-      send: vi.fn(async (command: { constructor: { name: string }; input: Record<string, unknown> }) => {
-        sent.push(command);
-        const name = command.constructor.name;
-        if (name === 'GetObjectCommand') {
-          return {
-            Body: { transformToByteArray: async () => new TextEncoder().encode('"stored"') },
-          };
-        }
-        return {};
-      }),
+      send: vi.fn(
+        async (command: { constructor: { name: string }; input: Record<string, unknown> }) => {
+          sent.push(command);
+          const name = command.constructor.name;
+          if (name === 'GetObjectCommand') {
+            return {
+              Body: { transformToByteArray: async () => new TextEncoder().encode('"stored"') },
+            };
+          }
+          return {};
+        },
+      ),
     };
     const backend = new S3Backend(
       loadStoreConfig({ S3_ENDPOINT: 'http://minio:9000', S3_BUCKET: 'b' }),
@@ -182,7 +184,10 @@ describe('createStore backend selection + S3Backend', () => {
         return {};
       }),
     };
-    const backend = new S3Backend(loadStoreConfig({ S3_ENDPOINT: 'http://m:9000' }), fakeClient as never);
+    const backend = new S3Backend(
+      loadStoreConfig({ S3_ENDPOINT: 'http://m:9000' }),
+      fakeClient as never,
+    );
     await backend.ensureBucket('b');
     expect(calls).toEqual(['HeadBucketCommand', 'CreateBucketCommand']);
   });
@@ -195,14 +200,20 @@ describe('createStore backend selection + S3Backend', () => {
         return {};
       }),
     };
-    const backend = new S3Backend(loadStoreConfig({ S3_ENDPOINT: 'http://m:9000' }), fakeClient as never);
+    const backend = new S3Backend(
+      loadStoreConfig({ S3_ENDPOINT: 'http://m:9000' }),
+      fakeClient as never,
+    );
     await backend.ensureBucket('b');
     expect(calls).toEqual(['HeadBucketCommand']);
   });
 
   it('throws when GetObject returns an empty body', async () => {
     const fakeClient = { send: vi.fn(async () => ({ Body: undefined })) };
-    const backend = new S3Backend(loadStoreConfig({ S3_ENDPOINT: 'http://m:9000' }), fakeClient as never);
+    const backend = new S3Backend(
+      loadStoreConfig({ S3_ENDPOINT: 'http://m:9000' }),
+      fakeClient as never,
+    );
     await expect(backend.getBytes('b', 'k')).rejects.toThrow(/Empty payload body/);
   });
 });

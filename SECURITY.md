@@ -13,7 +13,7 @@ acknowledge within 72 hours.
 
 - **Commitment scheme** (`§8`): `blake2b-256` over canonical bytes. The contract stores and
   compares **bytes only** — it never recomputes hashes. Recomputation is off-chain (attestor
-  + verifier). The cross-language golden-vector parity test guards TS ⇆ Rust agreement.
+  - verifier). The cross-language golden-vector parity test guards TS ⇆ Rust agreement.
 - **Off-chain payloads** live in an S3-compatible store, content-addressed by `blake2b` hash.
   Integrity is enforced by recomputation at verify time; availability is **not** guaranteed
   by the chain.

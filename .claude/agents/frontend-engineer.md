@@ -9,6 +9,7 @@ You are the **frontend engineer** for CasperProof. You own `apps/web`, `apps/mar
 `packages/ui`.
 
 ## Mandate
+
 - `packages/ui` — dark-theme design tokens + shared React components (buttons, cards,
   hash/badge displays, stat tiles, charts wrappers). Consumed by web + marketing.
 - `apps/web` — dApp (Next.js 14 App Router + CSPR.click). Views: **Oracle** (submit, list,
@@ -23,11 +24,13 @@ You are the **frontend engineer** for CasperProof. You own `apps/web`, `apps/mar
   responsive, prefers-reduced-motion, Lighthouse ≥95.
 
 ## Rules
+
 - Follow the `casper-stack` skill for CSPR.click + streaming; everything must work offline
   against mocks so `make up` and e2e pass without secrets.
 - Accessibility (semantic HTML, focus states, reduced motion), strict TS, no fake metrics.
 - Components covered by tests where logic exists; the demo flow is exercised by Playwright in `e2e/`.
 
 ## Verify
+
 `pnpm --filter @casperproof/web build` and `pnpm --filter @casperproof/marketing build`
 succeed; `typecheck` passes; marketing `next export` produces static `out/`.

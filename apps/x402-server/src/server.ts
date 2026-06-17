@@ -8,7 +8,8 @@
  * the Casper facilitator (or the local mock) before the resource is served.
  */
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { CasperProofSdk, CasperProofSdkError, createClient } from '@casperproof/casper-sdk';
+import type { CasperProofSdk } from '@casperproof/casper-sdk';
+import { CasperProofSdkError, createClient } from '@casperproof/casper-sdk';
 import { createStore, verify, type PayloadStore } from '@casperproof/agent';
 import { loadConfig, type X402Config } from './config.js';
 import {
@@ -111,7 +112,9 @@ function handleError(reply: FastifyReply, err: unknown, id: number): FastifyRepl
 }
 
 /** Build a server from environment config with real (non-test) dependencies. */
-export function createServer(env: Record<string, string | undefined> = process.env): FastifyInstance {
+export function createServer(
+  env: Record<string, string | undefined> = process.env,
+): FastifyInstance {
   const config = loadConfig(env);
   const sdk = createClient();
   const store = createStore();
@@ -128,15 +131,16 @@ export async function main(): Promise<void> {
   const config = loadConfig();
   const app = createServer();
   await app.listen({ port: config.port, host: '0.0.0.0' });
-  // eslint-disable-next-line no-console
-  console.log(`x402-server listening on :${config.port} (facilitator: ${config.mock ? 'mock' : config.facilitatorUrl})`);
+
+  console.log(
+    `x402-server listening on :${config.port} (facilitator: ${config.mock ? 'mock' : config.facilitatorUrl})`,
+  );
 }
 
 const invokedDirectly =
   typeof process.argv[1] === 'string' && import.meta.url === `file://${process.argv[1]}`;
 if (invokedDirectly) {
   main().catch((err) => {
-    // eslint-disable-next-line no-console
     console.error(err);
     process.exit(1);
   });

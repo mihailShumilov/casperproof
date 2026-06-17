@@ -52,7 +52,9 @@ function clean(value: string | undefined): string | undefined {
  *
  * @param env Environment source. Defaults to `process.env`. Injectable for tests.
  */
-export function loadStoreConfig(env: Record<string, string | undefined> = process.env): StoreConfig {
+export function loadStoreConfig(
+  env: Record<string, string | undefined> = process.env,
+): StoreConfig {
   return {
     endpoint: clean(env['S3_ENDPOINT']),
     region: clean(env['S3_REGION']) ?? 'us-east-1',
@@ -231,7 +233,10 @@ export class PayloadStore {
  * @param config Resolved store config. Defaults to {@link loadStoreConfig}.
  * @param backend Explicit backend override (mostly for tests).
  */
-export function createStore(config: StoreConfig = loadStoreConfig(), backend?: StoreBackend): PayloadStore {
+export function createStore(
+  config: StoreConfig = loadStoreConfig(),
+  backend?: StoreBackend,
+): PayloadStore {
   const chosen = backend ?? (config.endpoint ? new S3Backend(config) : new MemoryBackend());
   return new PayloadStore(chosen, config.bucket);
 }

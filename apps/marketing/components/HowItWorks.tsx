@@ -11,8 +11,8 @@ export function HowItWorks(): JSX.Element {
           Stake, prove, and let anyone check the work.
         </h2>
         <p className="mk-section__lead">
-          Three on-chain steps turn an unverifiable model output into a stake-backed,
-          challengeable proof.
+          Three on-chain steps turn an unverifiable model output into a stake-backed, challengeable
+          proof.
         </p>
         <ol className="mk-grid mk-grid--3" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
           {HOW_IT_WORKS.map((step) => (

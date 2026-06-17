@@ -111,7 +111,12 @@ export class RestBackend implements Backend {
   }
 
   private isTyped(err: unknown): err is { code: string; status: number } {
-    return Boolean(err) && typeof err === 'object' && err instanceof Error && err.name === 'CasperProofSdkError';
+    return (
+      Boolean(err) &&
+      typeof err === 'object' &&
+      err instanceof Error &&
+      err.name === 'CasperProofSdkError'
+    );
   }
 
   private describe(err: unknown): string {
@@ -289,7 +294,10 @@ export class RestBackend implements Backend {
   }
 
   private toAttestationStatus(value: unknown): AttestationStatus {
-    return value === 'Active' || value === 'Challenged' || value === 'Slashed' || value === 'Finalized'
+    return value === 'Active' ||
+      value === 'Challenged' ||
+      value === 'Slashed' ||
+      value === 'Finalized'
       ? value
       : 'Active';
   }

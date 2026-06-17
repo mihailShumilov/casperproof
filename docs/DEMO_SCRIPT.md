@@ -113,10 +113,10 @@ Still on **`/slash`**:
 
 ## The three on-chain transactions (for the recording)
 
-| # | Action | Where | Contract call |
-|---|---|---|---|
-| 1 | Attest | `/oracle` → Submit attestation | `submit_attestation` |
-| 2 | Claim payout | `/insurance` → Simulate trigger | `claim` |
-| 3 | Slash | `/slash` → Resolve fraudulent | `resolve(id, true)` |
+| #   | Action       | Where                           | Contract call        |
+| --- | ------------ | ------------------------------- | -------------------- |
+| 1   | Attest       | `/oracle` → Submit attestation  | `submit_attestation` |
+| 2   | Claim payout | `/insurance` → Simulate trigger | `claim`              |
+| 3   | Slash        | `/slash` → Resolve fraudulent   | `resolve(id, true)`  |
 
 CSPR.live deploy links for these (live runs only): see [`../SETUP_NEEDED.md`](../SETUP_NEEDED.md).

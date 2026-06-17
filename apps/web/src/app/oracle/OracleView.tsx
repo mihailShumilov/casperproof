@@ -9,16 +9,7 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import {
-  Badge,
-  Button,
-  Card,
-  CodeBlock,
-  HashDisplay,
-  Spinner,
-  Tag,
-  VerdictPill,
-} from '@casperproof/ui';
+import { Badge, Button, Card, HashDisplay, Spinner, Tag, VerdictPill } from '@casperproof/ui';
 import type { Attestation, VerifyResult } from '@casperproof/casper-sdk';
 import { CasperProofSdkError } from '@casperproof/casper-sdk';
 import { getSdk } from '@/lib/sdk';
@@ -48,7 +39,8 @@ export function OracleView(): JSX.Element {
 
   const inputValid = parseJson(inputText).ok;
   const outputValid = parseJson(outputText).ok;
-  const canSubmit = isConnected && inputValid && outputValid && modelId.trim().length > 0 && !submitting;
+  const canSubmit =
+    isConnected && inputValid && outputValid && modelId.trim().length > 0 && !submitting;
 
   const handleSubmit = useCallback(async () => {
     setSubmitError(null);
@@ -82,8 +74,8 @@ export function OracleView(): JSX.Element {
         <h1>Oracle</h1>
         <p>
           Publish a stake-backed proof of an AI decision, then verify any attestation against its
-          on-chain commitment. The contract stores hashes only — verification recomputes them
-          from the payload.
+          on-chain commitment. The contract stores hashes only — verification recomputes them from
+          the payload.
         </p>
       </header>
 

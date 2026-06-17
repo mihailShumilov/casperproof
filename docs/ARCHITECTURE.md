@@ -1,7 +1,7 @@
 # Architecture
 
 CasperProof is a **verifiable AI oracle** with a DeFi insurance layer on top. An AI agent
-publishes a stake-backed, tamper-evident proof (an *attestation*) of its output; anyone can pay
+publishes a stake-backed, tamper-evident proof (an _attestation_) of its output; anyone can pay
 a small x402 micropayment to fetch and independently verify it; bad proofs are challenged and
 slashed. A parametric insurance vault pays out against verified attestations — the flagship demo
 that proves the oracle in DeFi.
@@ -40,33 +40,33 @@ CasperProof is built as two layers that share one trust anchor:
 
 ## Components
 
-| Component | Path | Role |
-|---|---|---|
-| **Commitment** | `packages/commitment` | The trust anchor (§8): blake2b-256 commitment + canonical JSON. Imported everywhere; never reimplemented. Rust mirror in `contracts/src/commitment.rs`. |
-| **Contracts** | `contracts/src` | Odra contracts: `attestation_registry`, `insurance`, CEP-18 `tokens` (STAKE + mock USDC). RFC 7807 mapping in `contracts/problem`. |
-| **SDK** | `packages/sdk` (`@casperproof/casper-sdk`) | The single typed client. Mock backend (in-memory, deterministic) by default; REST backend over CSPR.cloud when `CSPR_CLOUD_TOKEN` is set. All hashing flows through the commitment package. |
-| **Agent** | `packages/agent` (`@casperproof/agent`) | Zero-cost runtime: deterministic risk-scorer + claim-oracle, the content-addressed payload **store**, the **attestor** (commit → store → submit), the **verifier** (refetch → recompute → PASS/FAIL), and a pluggable runtime loop. |
-| **x402 server** | `apps/x402-server` | Fastify resource server. `GET /attestation/:id` and `POST /verify`, both x402-gated; unpaid/invalid requests get a `402` with an RFC 7807 body. |
-| **MCP server** | `apps/mcp-server` | Exposes the oracle/insurance tools over the Model Context Protocol (stdio by default, HTTP in compose), backed by the SDK + agent. |
-| **Web dApp** | `apps/web` | Next.js dashboard: oracle, insurance, and slash demo views; CSPR.click wallet; live event feed. |
-| **Marketing** | `apps/marketing` | Static site exported and served by nginx → `casperproof.com`. |
-| **UI / Config** | `packages/ui`, `packages/config` | Shared React components / shared tooling presets. |
-| **Payload store** | MinIO (local) / R2 / S3 (prod) | Off-chain, content-addressed payloads keyed by their blake2b-256 hash. |
-| **LLM runtime** | Ollama (local) | Optional. The demo path runs in `LLM_BACKEND=none` (pure deterministic); model quality never gates a demo. |
+| Component         | Path                                       | Role                                                                                                                                                                                                                                |
+| ----------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Commitment**    | `packages/commitment`                      | The trust anchor (§8): blake2b-256 commitment + canonical JSON. Imported everywhere; never reimplemented. Rust mirror in `contracts/src/commitment.rs`.                                                                             |
+| **Contracts**     | `contracts/src`                            | Odra contracts: `attestation_registry`, `insurance`, CEP-18 `tokens` (STAKE + mock USDC). RFC 7807 mapping in `contracts/problem`.                                                                                                  |
+| **SDK**           | `packages/sdk` (`@casperproof/casper-sdk`) | The single typed client. Mock backend (in-memory, deterministic) by default; REST backend over CSPR.cloud when `CSPR_CLOUD_TOKEN` is set. All hashing flows through the commitment package.                                         |
+| **Agent**         | `packages/agent` (`@casperproof/agent`)    | Zero-cost runtime: deterministic risk-scorer + claim-oracle, the content-addressed payload **store**, the **attestor** (commit → store → submit), the **verifier** (refetch → recompute → PASS/FAIL), and a pluggable runtime loop. |
+| **x402 server**   | `apps/x402-server`                         | Fastify resource server. `GET /attestation/:id` and `POST /verify`, both x402-gated; unpaid/invalid requests get a `402` with an RFC 7807 body.                                                                                     |
+| **MCP server**    | `apps/mcp-server`                          | Exposes the oracle/insurance tools over the Model Context Protocol (stdio by default, HTTP in compose), backed by the SDK + agent.                                                                                                  |
+| **Web dApp**      | `apps/web`                                 | Next.js dashboard: oracle, insurance, and slash demo views; CSPR.click wallet; live event feed.                                                                                                                                     |
+| **Marketing**     | `apps/marketing`                           | Static site exported and served by nginx → `casperproof.com`.                                                                                                                                                                       |
+| **UI / Config**   | `packages/ui`, `packages/config`           | Shared React components / shared tooling presets.                                                                                                                                                                                   |
+| **Payload store** | MinIO (local) / R2 / S3 (prod)             | Off-chain, content-addressed payloads keyed by their blake2b-256 hash.                                                                                                                                                              |
+| **LLM runtime**   | Ollama (local)                             | Optional. The demo path runs in `LLM_BACKEND=none` (pure deterministic); model quality never gates a demo.                                                                                                                          |
 
 ### Mock-first design
 
 Every external dependency has a zero-secret local/mock fallback, so `make up` and the test suite
 run with no secrets and no network:
 
-| Dependency | Local / mock | Real |
-|---|---|---|
-| Casper node + deploy | deterministic mock deploy hashes (`scripts/deploy-testnet.ts`) | CSPR.cloud node + PEM key |
-| CSPR.cloud REST/stream | in-memory fixture store + local event emitter | `CSPR_CLOUD_TOKEN` |
-| CSPR.click wallet | mock connector (fixed test account) | real app id |
-| x402 facilitator | local verifier accepting a signed mock `X-PAYMENT` | facilitator URL |
-| Object storage | MinIO (compose) | Cloudflare R2 / AWS S3 |
-| LLM | Ollama (local) | — (no paid keys, ever) |
+| Dependency             | Local / mock                                                   | Real                      |
+| ---------------------- | -------------------------------------------------------------- | ------------------------- |
+| Casper node + deploy   | deterministic mock deploy hashes (`scripts/deploy-testnet.ts`) | CSPR.cloud node + PEM key |
+| CSPR.cloud REST/stream | in-memory fixture store + local event emitter                  | `CSPR_CLOUD_TOKEN`        |
+| CSPR.click wallet      | mock connector (fixed test account)                            | real app id               |
+| x402 facilitator       | local verifier accepting a signed mock `X-PAYMENT`             | facilitator URL           |
+| Object storage         | MinIO (compose)                                                | Cloudflare R2 / AWS S3    |
+| LLM                    | Ollama (local)                                                 | — (no paid keys, ever)    |
 
 The SDK selects mock vs live from env: `CSPR_CLOUD_TOKEN` present ⇒ live.
 

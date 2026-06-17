@@ -57,8 +57,20 @@ describe('MockBackend.submitAttestation', () => {
 
   it('assigns monotonic ids and counts them', async () => {
     const b = backend();
-    const a = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
-    const c = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://y', stake: '2000000000' });
+    const a = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
+    const c = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://y',
+      stake: '2000000000',
+    });
     expect(a.id).toBe(1);
     expect(c.id).toBe(2);
     expect(await b.attestationCount()).toBe(2);
@@ -66,28 +78,58 @@ describe('MockBackend.submitAttestation', () => {
 
   it('defaults the timestamp to the injected clock', async () => {
     const b = backend();
-    const res = await b.submitAttestation({ modelId: 'm', input: { a: 1 }, output: { b: 2 }, uri: 's3://x', stake: '2000000000' });
+    const res = await b.submitAttestation({
+      modelId: 'm',
+      input: { a: 1 },
+      output: { b: 2 },
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     const stored = await b.getAttestation(res.id);
     expect(stored.createdAt).toBe(FIXED_NOW);
-    const expected = computeCommitment({ input: { a: 1 }, output: { b: 2 }, modelId: 'm', timestamp: FIXED_NOW });
+    const expected = computeCommitment({
+      input: { a: 1 },
+      output: { b: 2 },
+      modelId: 'm',
+      timestamp: FIXED_NOW,
+    });
     expect(stored.commitment).toBe(expected.commitment);
   });
 
   it('defaults attestor to the mock account', async () => {
     const b = backend();
-    const res = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const res = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     expect((await b.getAttestation(res.id)).attestor).toBe(MOCK_ACCOUNT);
   });
 
   it('honors an explicit attestor', async () => {
     const b = backend();
-    const res = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000', attestor: 'account-hash-zzz' });
+    const res = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+      attestor: 'account-hash-zzz',
+    });
     expect((await b.getAttestation(res.id)).attestor).toBe('account-hash-zzz');
   });
 
   it('rejects stake below the minimum', async () => {
     await expect(
-      backend().submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '1' }),
+      backend().submitAttestation({
+        modelId: 'm',
+        input: {},
+        output: {},
+        uri: 's3://x',
+        stake: '1',
+      }),
     ).rejects.toMatchObject({ code: 'INSUFFICIENT_STAKE' });
   });
 });
@@ -95,12 +137,20 @@ describe('MockBackend.submitAttestation', () => {
 describe('MockBackend.getAttestation', () => {
   it('throws ATTESTATION_NOT_FOUND for missing ids', async () => {
     await expect(backend().getAttestation(999)).rejects.toBeInstanceOf(CasperProofSdkError);
-    await expect(backend().getAttestation(999)).rejects.toMatchObject({ code: 'ATTESTATION_NOT_FOUND' });
+    await expect(backend().getAttestation(999)).rejects.toMatchObject({
+      code: 'ATTESTATION_NOT_FOUND',
+    });
   });
 
   it('returns a copy, not the internal record', async () => {
     const b = backend();
-    const { id } = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const { id } = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     const a = await b.getAttestation(id);
     a.status = 'Slashed';
     expect((await b.getAttestation(id)).status).toBe('Active');
@@ -115,8 +165,20 @@ describe('MockBackend reputation', () => {
 
   it('tracks slashing and honest resolution', async () => {
     const b = backend();
-    const honest = await b.submitAttestation({ modelId: 'm', input: { a: 1 }, output: {}, uri: 's3://h', stake: '2000000000' });
-    const fraud = await b.submitAttestation({ modelId: 'm', input: { a: 2 }, output: {}, uri: 's3://f', stake: '2000000000' });
+    const honest = await b.submitAttestation({
+      modelId: 'm',
+      input: { a: 1 },
+      output: {},
+      uri: 's3://h',
+      stake: '2000000000',
+    });
+    const fraud = await b.submitAttestation({
+      modelId: 'm',
+      input: { a: 2 },
+      output: {},
+      uri: 's3://f',
+      stake: '2000000000',
+    });
     await b.challenge(honest.id);
     await b.resolve(honest.id, false);
     await b.challenge(fraud.id);
@@ -132,7 +194,13 @@ describe('MockBackend reputation', () => {
 describe('MockBackend challenge/resolve', () => {
   it('challenge sets Challenged and records the challenger', async () => {
     const b = backend();
-    const { id } = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const { id } = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     const res = await b.challenge(id);
     expect(res.status).toBe('Challenged');
     expect((await b.getAttestation(id)).challenger).toBe(MOCK_ACCOUNT);
@@ -144,14 +212,26 @@ describe('MockBackend challenge/resolve', () => {
 
   it('challenge throws ALREADY_CHALLENGED on a second challenge', async () => {
     const b = backend();
-    const { id } = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const { id } = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     await b.challenge(id);
     await expect(b.challenge(id)).rejects.toMatchObject({ code: 'ALREADY_CHALLENGED' });
   });
 
   it('challenge throws ATTESTATION_NOT_ACTIVE when already resolved', async () => {
     const b = backend();
-    const { id } = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const { id } = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     await b.challenge(id);
     await b.resolve(id, true);
     await expect(b.challenge(id)).rejects.toMatchObject({ code: 'ATTESTATION_NOT_ACTIVE' });
@@ -159,7 +239,13 @@ describe('MockBackend challenge/resolve', () => {
 
   it('resolve(false) finalizes', async () => {
     const b = backend();
-    const { id } = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const { id } = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     await b.challenge(id);
     const res = await b.resolve(id, false);
     expect(res.status).toBe('Finalized');
@@ -167,19 +253,33 @@ describe('MockBackend challenge/resolve', () => {
 
   it('resolve(true) slashes', async () => {
     const b = backend();
-    const { id } = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const { id } = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     await b.challenge(id);
     const res = await b.resolve(id, true);
     expect(res.status).toBe('Slashed');
   });
 
   it('resolve throws ATTESTATION_NOT_FOUND', async () => {
-    await expect(backend().resolve(7, true)).rejects.toMatchObject({ code: 'ATTESTATION_NOT_FOUND' });
+    await expect(backend().resolve(7, true)).rejects.toMatchObject({
+      code: 'ATTESTATION_NOT_FOUND',
+    });
   });
 
   it('resolve throws ATTESTATION_NOT_ACTIVE when not challenged', async () => {
     const b = backend();
-    const { id } = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const { id } = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     await expect(b.resolve(id, true)).rejects.toMatchObject({ code: 'ATTESTATION_NOT_ACTIVE' });
   });
 });
@@ -206,7 +306,13 @@ describe('MockBackend policies + claims', () => {
 
   it('honors an explicit holder', async () => {
     const b = backend();
-    const policy = await b.createPolicy({ coverage: '1', premium: '1', triggerTypes: [], expiry: future, holder: 'account-hash-holder' });
+    const policy = await b.createPolicy({
+      coverage: '1',
+      premium: '1',
+      triggerTypes: [],
+      expiry: future,
+      holder: 'account-hash-holder',
+    });
     expect(policy.holder).toBe('account-hash-holder');
   });
 
@@ -216,7 +322,12 @@ describe('MockBackend policies + claims', () => {
 
   it('pays a claim when the attested trigger is covered', async () => {
     const b = backend();
-    const policy = await b.createPolicy({ coverage: '5000000000', premium: '1', triggerTypes: ['oracle_failure'], expiry: future });
+    const policy = await b.createPolicy({
+      coverage: '5000000000',
+      premium: '1',
+      triggerTypes: ['oracle_failure'],
+      expiry: future,
+    });
     const att = await b.submitAttestation({
       modelId: 'm',
       input: {},
@@ -236,7 +347,12 @@ describe('MockBackend policies + claims', () => {
 
   it('claim throws POLICY_EXPIRED for an expired policy', async () => {
     const b = backend();
-    const policy = await b.createPolicy({ coverage: '1', premium: '1', triggerTypes: ['exploit'], expiry: FIXED_NOW - 1 });
+    const policy = await b.createPolicy({
+      coverage: '1',
+      premium: '1',
+      triggerTypes: ['exploit'],
+      expiry: FIXED_NOW - 1,
+    });
     await expect(b.submitClaim(policy.id, 1)).rejects.toMatchObject({ code: 'POLICY_EXPIRED' });
     // and the status is flipped to Expired
     expect((await b.getPolicy(policy.id)).status).toBe('Expired');
@@ -244,28 +360,64 @@ describe('MockBackend policies + claims', () => {
 
   it('claim re-throws POLICY_EXPIRED when status already Expired', async () => {
     const b = backend();
-    const policy = await b.createPolicy({ coverage: '1', premium: '1', triggerTypes: ['exploit'], expiry: FIXED_NOW - 1 });
+    const policy = await b.createPolicy({
+      coverage: '1',
+      premium: '1',
+      triggerTypes: ['exploit'],
+      expiry: FIXED_NOW - 1,
+    });
     await b.submitClaim(policy.id, 1).catch(() => undefined); // first call flips to Expired
     await expect(b.submitClaim(policy.id, 1)).rejects.toMatchObject({ code: 'POLICY_EXPIRED' });
   });
 
   it('claim throws ATTESTATION_NOT_FOUND for a missing attestation', async () => {
     const b = backend();
-    const policy = await b.createPolicy({ coverage: '1', premium: '1', triggerTypes: ['exploit'], expiry: future });
-    await expect(b.submitClaim(policy.id, 999)).rejects.toMatchObject({ code: 'ATTESTATION_NOT_FOUND' });
+    const policy = await b.createPolicy({
+      coverage: '1',
+      premium: '1',
+      triggerTypes: ['exploit'],
+      expiry: future,
+    });
+    await expect(b.submitClaim(policy.id, 999)).rejects.toMatchObject({
+      code: 'ATTESTATION_NOT_FOUND',
+    });
   });
 
   it('claim throws TRIGGER_NOT_COVERED when the trigger is not in the policy', async () => {
     const b = backend();
-    const policy = await b.createPolicy({ coverage: '1', premium: '1', triggerTypes: ['exploit'], expiry: future });
-    const att = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x#trigger=oracle_failure', stake: '2000000000' });
-    await expect(b.submitClaim(policy.id, att.id)).rejects.toMatchObject({ code: 'TRIGGER_NOT_COVERED' });
+    const policy = await b.createPolicy({
+      coverage: '1',
+      premium: '1',
+      triggerTypes: ['exploit'],
+      expiry: future,
+    });
+    const att = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x#trigger=oracle_failure',
+      stake: '2000000000',
+    });
+    await expect(b.submitClaim(policy.id, att.id)).rejects.toMatchObject({
+      code: 'TRIGGER_NOT_COVERED',
+    });
   });
 
   it('claim throws TRIGGER_NOT_COVERED (unknown) when the uri has no trigger tag', async () => {
     const b = backend();
-    const policy = await b.createPolicy({ coverage: '1', premium: '1', triggerTypes: ['exploit'], expiry: future });
-    const att = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const policy = await b.createPolicy({
+      coverage: '1',
+      premium: '1',
+      triggerTypes: ['exploit'],
+      expiry: future,
+    });
+    const att = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     await expect(b.submitClaim(policy.id, att.id)).rejects.toMatchObject({
       code: 'TRIGGER_NOT_COVERED',
       detail: { trigger: 'unknown' },
@@ -313,7 +465,13 @@ describe('MockBackend events', () => {
     const b = backend();
     const live: CasperProofEvent[] = [];
     const unsub = b.subscribeEvents((e) => live.push(e));
-    const att = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const att = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     await b.challenge(att.id);
     expect(live.map((e) => e.name)).toEqual(['AttestationSubmitted', 'Challenged']);
 
@@ -335,7 +493,13 @@ describe('MockBackend events', () => {
       await b.stake('1'); // stake emits no events, use submit to push events
     }
     for (let i = 0; i < 120; i++) {
-      await b.submitAttestation({ modelId: 'm', input: { i }, output: {}, uri: 's3://x', stake: '2000000000' });
+      await b.submitAttestation({
+        modelId: 'm',
+        input: { i },
+        output: {},
+        uri: 's3://x',
+        stake: '2000000000',
+      });
     }
     const replayed: CasperProofEvent[] = [];
     b.subscribeEvents((e) => replayed.push(e));
@@ -345,7 +509,13 @@ describe('MockBackend events', () => {
   it('uses the real clock by default', async () => {
     const b = new MockBackend();
     const before = Math.floor(Date.now() / 1000);
-    const res = await b.submitAttestation({ modelId: 'm', input: {}, output: {}, uri: 's3://x', stake: '2000000000' });
+    const res = await b.submitAttestation({
+      modelId: 'm',
+      input: {},
+      output: {},
+      uri: 's3://x',
+      stake: '2000000000',
+    });
     const stored = await b.getAttestation(res.id);
     expect(stored.createdAt).toBeGreaterThanOrEqual(before);
   });

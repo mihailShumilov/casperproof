@@ -7,15 +7,15 @@ and `@casperproof/agent`. It starts cleanly with no secrets (the SDK selects moc
 
 ## Tools
 
-| Tool | Input | What it does |
-|---|---|---|
-| `get_attestation` | `{ id }` | Fetch a stored attestation. |
-| `verify` | `{ id }` | Refetch the payload, recompute the hash, return PASS/FAIL. |
-| `submit_attestation` | `{ modelId, input, output, stake?, timestamp? }` | Commit → store → submit on-chain. |
-| `get_risk_score` | `{ address }` | Deterministic 15-signal score, tier, decision. |
-| `buy_policy` | `{ coverage, premium, triggerTypes[], expiry, holder? }` | Create an insurance policy. |
-| `submit_claim` | `{ policyId, attestationId }` | File a claim against a policy. |
-| `challenge` | `{ id }` | Challenge a tampered / fraudulent attestation. |
+| Tool                 | Input                                                    | What it does                                               |
+| -------------------- | -------------------------------------------------------- | ---------------------------------------------------------- |
+| `get_attestation`    | `{ id }`                                                 | Fetch a stored attestation.                                |
+| `verify`             | `{ id }`                                                 | Refetch the payload, recompute the hash, return PASS/FAIL. |
+| `submit_attestation` | `{ modelId, input, output, stake?, timestamp? }`         | Commit → store → submit on-chain.                          |
+| `get_risk_score`     | `{ address }`                                            | Deterministic 15-signal score, tier, decision.             |
+| `buy_policy`         | `{ coverage, premium, triggerTypes[], expiry, holder? }` | Create an insurance policy.                                |
+| `submit_claim`       | `{ policyId, attestationId }`                            | File a claim against a policy.                             |
+| `challenge`          | `{ id }`                                                 | Challenge a tampered / fraudulent attestation.             |
 
 Each tool input is zod-typed. Results carry both human-readable `content` and machine-readable
 `structuredContent`. Typed `CasperProofSdkError`s are returned as MCP error results

@@ -18,14 +18,10 @@ export function stripTrailingSlash(url: string): string {
 }
 
 /** Production marketing-site origin (used for canonical + OG absolute URLs). */
-export const SITE_URL = stripTrailingSlash(
-  env('NEXT_PUBLIC_SITE_URL', 'https://casperproof.com'),
-);
+export const SITE_URL = stripTrailingSlash(env('NEXT_PUBLIC_SITE_URL', 'https://casperproof.com'));
 
 /** The dApp the "Launch app" CTA points to. */
-export const APP_URL = stripTrailingSlash(
-  env('NEXT_PUBLIC_APP_URL', 'http://localhost:3000'),
-);
+export const APP_URL = stripTrailingSlash(env('NEXT_PUBLIC_APP_URL', 'http://localhost:3000'));
 
 /**
  * The CSPR.fans community-vote listing.

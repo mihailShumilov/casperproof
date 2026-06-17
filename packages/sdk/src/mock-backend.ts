@@ -47,7 +47,8 @@ import type {
 } from './types.js';
 
 /** Default mock test account used when no attestor / holder is supplied. */
-export const MOCK_ACCOUNT = 'account-hash-0000000000000000000000000000000000000000000000000000000000000001';
+export const MOCK_ACCOUNT =
+  'account-hash-0000000000000000000000000000000000000000000000000000000000000001';
 
 /** Minimum stake the mock registry enforces (motes), mirroring a deployed `min_stake`. */
 export const MOCK_MIN_STAKE = 1_000_000_000n;
@@ -138,7 +139,12 @@ export class MockBackend implements Backend {
     };
     this.attestations.set(id, attestation);
     const deployHash = this.deployHash('submit_attestation', { id, commitment });
-    this.emit({ name: 'AttestationSubmitted', id, timestamp, data: { attestor, modelId: args.modelId } });
+    this.emit({
+      name: 'AttestationSubmitted',
+      id,
+      timestamp,
+      data: { attestor, modelId: args.modelId },
+    });
     return { id, deployHash, commitment, inputHash, outputHash, status: 'Active' };
   }
 
@@ -177,7 +183,12 @@ export class MockBackend implements Backend {
     attestation.status = 'Challenged';
     attestation.challenger = MOCK_ACCOUNT;
     const deployHash = this.deployHash('challenge', { id });
-    this.emit({ name: 'Challenged', id, timestamp: this.now(), data: { challenger: MOCK_ACCOUNT } });
+    this.emit({
+      name: 'Challenged',
+      id,
+      timestamp: this.now(),
+      data: { challenger: MOCK_ACCOUNT },
+    });
     return { deployHash, id, status: 'Challenged' };
   }
 

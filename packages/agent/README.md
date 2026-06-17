@@ -2,7 +2,7 @@
 
 The CasperProof **zero-cost product runtime**: a deterministic risk scorer and claim oracle, a
 content-addressed payload store, the attestor/verifier that anchor and prove outputs on-chain,
-and a pluggable runtime loop that decides *when* to act. It runs fully offline with no secrets
+and a pluggable runtime loop that decides _when_ to act. It runs fully offline with no secrets
 and no paid API keys — `LLM_BACKEND=none` makes every cycle reproducible (the demo never depends
 on LLM quality).
 
@@ -11,16 +11,16 @@ through `@casperproof/casper-sdk` (mock mode by default).
 
 ## Modules
 
-| Module | Purpose |
-|---|---|
-| `agent.config.ts` | Typed config from env (`LLM_BACKEND`, `OLLAMA_*`, poll interval, thresholds, model ids). |
-| `risk-scorer.ts` | Deterministic **15-signal** model → `{ score 0..100, tier, decision, signals }`. Pure. |
-| `claim-oracle.ts` | Deterministic trigger taxonomy → `{ decision, triggerType, confidence, amount }`. Pure. |
-| `store.ts` | Content-addressed S3 store (MinIO/R2/S3) with an **in-memory fallback** + dev-only `corrupt`. |
-| `attestor.ts` | `commit → store.put → sdk.submitAttestation`. |
-| `verifier.ts` | `getAttestation → store.get → recompute hash → PASS/FAIL`. |
-| `runtime.ts` | Ollama / `none` / (disabled) openai+anthropic backends + the decision loop. |
-| `cli.ts` | Headless entry (`casperproof-agent`): runs one attest+verify cycle in mock mode. |
+| Module            | Purpose                                                                                       |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| `agent.config.ts` | Typed config from env (`LLM_BACKEND`, `OLLAMA_*`, poll interval, thresholds, model ids).      |
+| `risk-scorer.ts`  | Deterministic **15-signal** model → `{ score 0..100, tier, decision, signals }`. Pure.        |
+| `claim-oracle.ts` | Deterministic trigger taxonomy → `{ decision, triggerType, confidence, amount }`. Pure.       |
+| `store.ts`        | Content-addressed S3 store (MinIO/R2/S3) with an **in-memory fallback** + dev-only `corrupt`. |
+| `attestor.ts`     | `commit → store.put → sdk.submitAttestation`.                                                 |
+| `verifier.ts`     | `getAttestation → store.get → recompute hash → PASS/FAIL`.                                    |
+| `runtime.ts`      | Ollama / `none` / (disabled) openai+anthropic backends + the decision loop.                   |
+| `cli.ts`          | Headless entry (`casperproof-agent`): runs one attest+verify cycle in mock mode.              |
 
 ## The 15 risk signals
 
@@ -47,9 +47,14 @@ const runtime = createRuntime({ LLM_BACKEND: 'none' });
 const { result } = await runtime.runOnce({ address: 'account-hash-…' }); // attests + returns id/uri
 const verified = await runtime.runOnce({ attestationId: (result as { id: number }).id }); // PASS
 
-scoreRisk('account-hash-…');                 // → { score, tier, decision, signals }
-evaluateClaim({ policyId: 1, coveredTriggers: ['exploit'], coverage: '1000000000',
-  exploitDetected: true, fundsDrained: true }); // → { decision: 'payout', … }
+scoreRisk('account-hash-…'); // → { score, tier, decision, signals }
+evaluateClaim({
+  policyId: 1,
+  coveredTriggers: ['exploit'],
+  coverage: '1000000000',
+  exploitDetected: true,
+  fundsDrained: true,
+}); // → { decision: 'payout', … }
 ```
 
 CLI (headless, mock mode):

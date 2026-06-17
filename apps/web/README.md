@@ -11,12 +11,12 @@ works offline, and `next build` produces a fully static set of pages.
 
 ## Routes
 
-| Route        | View                | What it does |
-|--------------|---------------------|--------------|
-| `/`          | Home                | Hero, the three-step explainer, and the live event feed. |
-| `/oracle`    | Oracle              | Submit a stake-backed attestation (model id + input/output JSON), list attestations, and **Verify** any one → PASS/FAIL with both the on-chain and recomputed hashes. |
-| `/insurance` | Insurance           | Score an address → buy a parametric policy → simulate a covered trigger → automatic payout. Risk gauge + vault-solvency charts (Recharts) + StatTiles. |
-| `/slash`     | Slash demo          | Submit → tamper the payload → Verify **FAIL** → challenge → resolve(fraudulent) → slash, with the stake split between challenger and treasury. |
+| Route        | View       | What it does                                                                                                                                                          |
+| ------------ | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`          | Home       | Hero, the three-step explainer, and the live event feed.                                                                                                              |
+| `/oracle`    | Oracle     | Submit a stake-backed attestation (model id + input/output JSON), list attestations, and **Verify** any one → PASS/FAIL with both the on-chain and recomputed hashes. |
+| `/insurance` | Insurance  | Score an address → buy a parametric policy → simulate a covered trigger → automatic payout. Risk gauge + vault-solvency charts (Recharts) + StatTiles.                |
+| `/slash`     | Slash demo | Submit → tamper the payload → Verify **FAIL** → challenge → resolve(fraudulent) → slash, with the stake split between challenger and treasury.                        |
 
 Every page embeds the **live feed** (`AttestationSubmitted`, `Challenged`,
 `Resolved`, `ClaimPaid`) via `sdk.subscribeEvents`. Because the SDK client is a

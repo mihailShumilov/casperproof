@@ -45,7 +45,9 @@ describe('leU64', () => {
   });
 
   it('handles bigint and the max u64', () => {
-    expect(Array.from(leU64(0xffffffffffffffffn))).toEqual([255, 255, 255, 255, 255, 255, 255, 255]);
+    expect(Array.from(leU64(0xffffffffffffffffn))).toEqual([
+      255, 255, 255, 255, 255, 255, 255, 255,
+    ]);
   });
 
   it('rejects negative and overflowing values', () => {

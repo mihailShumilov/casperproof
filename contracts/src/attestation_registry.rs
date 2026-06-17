@@ -225,33 +225,46 @@ impl AttestationRegistry {
             _ => self.env().revert(Error::NotActive),
         }
         let challenger = att.challenger.unwrap_or_revert_with(self, Error::NotActive);
+        let attestor = att.attestor;
+        let stake = att.stake;
+        let bond = att.challenge_bond;
 
-        let mut token = self.token();
+        // Compute payouts, then write terminal state + reputation BEFORE any external token
+        // transfer (Checks-Effects-Interactions), so a hook-bearing token can't re-enter.
+        let reward = stake * U256::from(cfg.reward_bps) / U256::from(BPS_DENOM);
+        let treasury_cut = stake - reward;
         let (slashed_amount, challenger_reward) = if fraudulent {
-            // Slash: reward to challenger, remainder to treasury; bond returned to challenger.
-            let reward = att.stake * U256::from(cfg.reward_bps) / U256::from(BPS_DENOM);
-            let treasury_cut = att.stake - reward;
-            token.transfer(&challenger, &(reward + att.challenge_bond));
-            if treasury_cut > U256::zero() {
-                token.transfer(&cfg.treasury, &treasury_cut);
-            }
             att.status = AttestationStatus::Slashed;
-            self.bump_reputation(att.attestor, |r| r.slashed += 1);
-            (att.stake, reward)
+            (stake, reward)
         } else {
-            // Honest: refund stake to attestor; bond forfeited to treasury.
-            token.transfer(&att.attestor, &att.stake);
-            if att.challenge_bond > U256::zero() {
-                token.transfer(&cfg.treasury, &att.challenge_bond);
-            }
             att.status = AttestationStatus::Finalized;
-            self.bump_reputation(att.attestor, |r| {
-                r.successful += 1;
-                r.challenges_defended += 1;
-            });
             (U256::zero(), U256::zero())
         };
         self.attestations.set(&id, att);
+        if fraudulent {
+            self.bump_reputation(attestor, |r| r.slashed += 1);
+        } else {
+            self.bump_reputation(attestor, |r| {
+                r.successful += 1;
+                r.challenges_defended += 1;
+            });
+        }
+
+        // Interactions last.
+        let mut token = self.token();
+        if fraudulent {
+            // Slash: reward + bond to challenger, remainder to treasury.
+            token.transfer(&challenger, &(reward + bond));
+            if treasury_cut > U256::zero() {
+                token.transfer(&cfg.treasury, &treasury_cut);
+            }
+        } else {
+            // Honest: refund stake to attestor; bond forfeited to treasury.
+            token.transfer(&attestor, &stake);
+            if bond > U256::zero() {
+                token.transfer(&cfg.treasury, &bond);
+            }
+        }
 
         self.env().emit_event(Resolved {
             id,
@@ -272,12 +285,13 @@ impl AttestationRegistry {
         if !self.window_closed(&att) {
             self.env().revert(Error::WindowClosed);
         }
-        self.token().transfer(&att.attestor, &att.stake);
-        att.status = AttestationStatus::Finalized;
+        // Checks-Effects-Interactions: write terminal state + reputation before the transfer.
         let attestor = att.attestor;
         let stake = att.stake;
+        att.status = AttestationStatus::Finalized;
         self.attestations.set(&id, att);
         self.bump_reputation(attestor, |r| r.successful += 1);
+        self.token().transfer(&attestor, &stake);
 
         self.env().emit_event(Finalized {
             id,

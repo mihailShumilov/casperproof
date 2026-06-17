@@ -4,6 +4,7 @@ export {
   createPaymentVerifier,
   MockPaymentVerifier,
   FacilitatorPaymentVerifier,
+  DenyPaymentVerifier,
   type PaymentVerifier,
   type PaymentResult,
   type PaymentContext,

@@ -51,7 +51,9 @@ async function main(): Promise<void> {
   // 2. Verify the first attestation → PASS.
   const firstId = attestationIds[0]!;
   const pass = await verify(sdk, store, firstId);
-  console.log(`\n  verify #${firstId} → ${pass.valid ? 'PASS ✅' : 'FAIL ❌'} (onchain=${pass.onchainHash.slice(0, 12)}…)`);
+  console.log(
+    `\n  verify #${firstId} → ${pass.valid ? 'PASS ✅' : 'FAIL ❌'} (onchain=${pass.onchainHash.slice(0, 12)}…)`,
+  );
 
   // 3. Claim-oracle decision → attest it.
   const claim = evaluateClaim({
@@ -77,7 +79,9 @@ async function main(): Promise<void> {
     uri: `${claimUri}#trigger=${claim.triggerType}`,
     stake: STAKE,
   });
-  console.log(`  claim-oracle → ${claim.decision} (${claim.triggerType}) attested as #${claimAttest.id}`);
+  console.log(
+    `  claim-oracle → ${claim.decision} (${claim.triggerType}) attested as #${claimAttest.id}`,
+  );
 
   // 4. Buy a policy + submit a claim against the claim attestation.
   const policy = await sdk.createPolicy({
@@ -95,7 +99,9 @@ async function main(): Promise<void> {
   try {
     store.corrupt(tampered.uri);
     const fail = await verify(sdk, store, tamperId);
-    console.log(`\n  tampered #${tamperId} → verify ${fail.valid ? 'PASS ❌(unexpected)' : 'FAIL ✅'}`);
+    console.log(
+      `\n  tampered #${tamperId} → verify ${fail.valid ? 'PASS ❌(unexpected)' : 'FAIL ✅'}`,
+    );
   } catch (err) {
     console.log(`  (tamper only supported on the in-memory store: ${(err as Error).message})`);
   }
@@ -107,7 +113,9 @@ async function main(): Promise<void> {
   const count = await sdk.attestationCount();
   console.log(`\n✓ Demo seeded. attestation_count=${count}, policies=1, slashed=1.\n`);
   if (sdk.mode === 'mock') {
-    console.log('  (mock mode: state lives in-process. Set CSPR_CLOUD_TOKEN for on-chain seeding.)\n');
+    console.log(
+      '  (mock mode: state lives in-process. Set CSPR_CLOUD_TOKEN for on-chain seeding.)\n',
+    );
   }
 }
 

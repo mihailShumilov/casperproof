@@ -81,7 +81,14 @@ describe('CasperProofSdk delegation', () => {
       mode: 'mock',
       submitAttestation: vi.fn(async () => {
         calls.push('submitAttestation');
-        return { id: 1, deployHash: 'd', commitment: 'c', inputHash: 'i', outputHash: 'o', status: 'Active' as const };
+        return {
+          id: 1,
+          deployHash: 'd',
+          commitment: 'c',
+          inputHash: 'i',
+          outputHash: 'o',
+          status: 'Active' as const,
+        };
       }),
       getAttestation: vi.fn(async () => {
         calls.push('getAttestation');
@@ -116,11 +123,27 @@ describe('CasperProofSdk delegation', () => {
       }),
       createPolicy: vi.fn(async () => {
         calls.push('createPolicy');
-        return { id: 1, holder: 'h', coverage: '1', premium: '1', triggerTypes: [], expiry: 0, status: 'Active' as const };
+        return {
+          id: 1,
+          holder: 'h',
+          coverage: '1',
+          premium: '1',
+          triggerTypes: [],
+          expiry: 0,
+          status: 'Active' as const,
+        };
       }),
       getPolicy: vi.fn(async () => {
         calls.push('getPolicy');
-        return { id: 1, holder: 'h', coverage: '1', premium: '1', triggerTypes: [], expiry: 0, status: 'Active' as const };
+        return {
+          id: 1,
+          holder: 'h',
+          coverage: '1',
+          premium: '1',
+          triggerTypes: [],
+          expiry: 0,
+          status: 'Active' as const,
+        };
       }),
       submitClaim: vi.fn(async () => {
         calls.push('submitClaim');

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   createPaymentVerifier,
+  DenyPaymentVerifier,
   FacilitatorPaymentVerifier,
   MockPaymentVerifier,
 } from './payment.js';
@@ -28,8 +29,9 @@ describe('FacilitatorPaymentVerifier', () => {
   });
 
   it('accepts when the facilitator validates the payment', async () => {
-    const fetchImpl = vi.fn(async () =>
-      new Response(JSON.stringify({ valid: true, settlement: 'stl-1' }), { status: 200 }),
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ valid: true, settlement: 'stl-1' }), { status: 200 }),
     );
     const v = new FacilitatorPaymentVerifier(url, fetchImpl as unknown as typeof fetch);
     const r = await v.verify('proof', ctx);
@@ -39,7 +41,9 @@ describe('FacilitatorPaymentVerifier', () => {
   });
 
   it('rejects when the facilitator says the payment is invalid', async () => {
-    const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ valid: false }), { status: 200 }));
+    const fetchImpl = vi.fn(
+      async () => new Response(JSON.stringify({ valid: false }), { status: 200 }),
+    );
     const v = new FacilitatorPaymentVerifier(url, fetchImpl as unknown as typeof fetch);
     expect((await v.verify('proof', ctx)).ok).toBe(false);
   });
@@ -63,16 +67,28 @@ describe('FacilitatorPaymentVerifier', () => {
   });
 });
 
+describe('DenyPaymentVerifier', () => {
+  it('rejects every payment (fail closed)', async () => {
+    const r = await new DenyPaymentVerifier().verify();
+    expect(r.ok).toBe(false);
+    expect(r.reason).toContain('fail closed');
+  });
+});
+
 describe('createPaymentVerifier', () => {
   it('returns the mock verifier when mock=true', () => {
-    expect(createPaymentVerifier({ mock: true, facilitatorUrl: 'x' })).toBeInstanceOf(MockPaymentVerifier);
+    expect(createPaymentVerifier({ mock: true, facilitatorUrl: 'x' })).toBeInstanceOf(
+      MockPaymentVerifier,
+    );
   });
-  it('returns the mock verifier when no facilitator url', () => {
-    expect(createPaymentVerifier({ mock: false, facilitatorUrl: '' })).toBeInstanceOf(MockPaymentVerifier);
+  it('returns the facilitator verifier when configured (not mock)', () => {
+    expect(createPaymentVerifier({ mock: false, facilitatorUrl: 'https://f' })).toBeInstanceOf(
+      FacilitatorPaymentVerifier,
+    );
   });
-  it('returns the facilitator verifier when configured', () => {
-    expect(
-      createPaymentVerifier({ mock: false, facilitatorUrl: 'https://f' }),
-    ).toBeInstanceOf(FacilitatorPaymentVerifier);
+  it('fails closed when not mock and no facilitator url', () => {
+    expect(createPaymentVerifier({ mock: false, facilitatorUrl: '' })).toBeInstanceOf(
+      DenyPaymentVerifier,
+    );
   });
 });

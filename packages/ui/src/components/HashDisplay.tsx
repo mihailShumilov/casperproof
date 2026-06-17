@@ -2,8 +2,7 @@ import { clsx } from 'clsx';
 import { useCallback, useState } from 'react';
 import type { HTMLAttributes } from 'react';
 
-export interface HashDisplayProps
-  extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
+export interface HashDisplayProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   /** The full hash value (e.g. a 64-char hex digest). */
   hash: string;
   /** Number of leading chars to keep. Defaults to 6. */

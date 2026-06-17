@@ -21,8 +21,8 @@ The package is part of the CasperProof monorepo and is consumed as a workspace d
 // package.json
 {
   "dependencies": {
-    "@casperproof/casper-sdk": "workspace:*"
-  }
+    "@casperproof/casper-sdk": "workspace:*",
+  },
 }
 ```
 
@@ -62,22 +62,22 @@ console.log(tampered.valid); // false (FAIL)
 `createClient(config?)` resolves each field from, in order: the explicit `config`, the
 environment, then a documented local default.
 
-| Field | Env var | Default |
-|---|---|---|
-| `mode` | — | `live` if a token is present, else `mock` |
-| `csprCloudRestUrl` | `CSPR_CLOUD_REST_URL` | `https://api.testnet.cspr.cloud` |
-| `csprCloudStreamingUrl` | `CSPR_CLOUD_STREAMING_URL` | `wss://streaming.testnet.cspr.cloud` |
-| `csprCloudToken` | `CSPR_CLOUD_TOKEN` | _(unset → mock mode)_ |
-| `casperNodeUrl` | `CASPER_NODE_URL` | `https://node.testnet.casper.network/rpc` |
-| `casperNetworkName` | `CASPER_NETWORK_NAME` | `casper-test` |
-| `attestationRegistryHash` | `ATTESTATION_REGISTRY_HASH` | _(unset)_ |
-| `insuranceHash` | `INSURANCE_HASH` | _(unset)_ |
-| `stakeTokenHash` | `STAKE_TOKEN_HASH` | _(unset)_ |
-| `timeoutMs` | — | `10000` |
-| `retries` | — | `2` |
-| `retryBaseDelayMs` | — | `50` |
-| `fetch` | — | global `fetch` |
-| `env` | — | `process.env` |
+| Field                     | Env var                     | Default                                   |
+| ------------------------- | --------------------------- | ----------------------------------------- |
+| `mode`                    | —                           | `live` if a token is present, else `mock` |
+| `csprCloudRestUrl`        | `CSPR_CLOUD_REST_URL`       | `https://api.testnet.cspr.cloud`          |
+| `csprCloudStreamingUrl`   | `CSPR_CLOUD_STREAMING_URL`  | `wss://streaming.testnet.cspr.cloud`      |
+| `csprCloudToken`          | `CSPR_CLOUD_TOKEN`          | _(unset → mock mode)_                     |
+| `casperNodeUrl`           | `CASPER_NODE_URL`           | `https://node.testnet.casper.network/rpc` |
+| `casperNetworkName`       | `CASPER_NETWORK_NAME`       | `casper-test`                             |
+| `attestationRegistryHash` | `ATTESTATION_REGISTRY_HASH` | _(unset)_                                 |
+| `insuranceHash`           | `INSURANCE_HASH`            | _(unset)_                                 |
+| `stakeTokenHash`          | `STAKE_TOKEN_HASH`          | _(unset)_                                 |
+| `timeoutMs`               | —                           | `10000`                                   |
+| `retries`                 | —                           | `2`                                       |
+| `retryBaseDelayMs`        | —                           | `50`                                      |
+| `fetch`                   | —                           | global `fetch`                            |
+| `env`                     | —                           | `process.env`                             |
 
 ```ts
 // Force live mode with an injected fetch (e.g. in tests):
@@ -88,22 +88,22 @@ const client = createClient({ csprCloudToken: 'token', fetch: myFetch });
 
 `createClient(config?): CasperProofSdk`. The `CasperProofSdk` instance exposes `mode` plus:
 
-| Method | Returns | Notes |
-|---|---|---|
-| `submitAttestation({ modelId, input, output, timestamp?, uri, stake })` | `{ id, deployHash, commitment, inputHash, outputHash, status }` | Computes hashes via `@casperproof/commitment`. |
-| `getAttestation(id)` | `Attestation` | Throws `ATTESTATION_NOT_FOUND`. |
-| `verify(id, payload)` | `{ valid, recomputedHash, onchainHash, attestor, stake, reputation }` | Recomputes the output hash and compares to on-chain. `valid:false` is a normal tamper result (not thrown). |
-| `attestationCount()` | `number` | Registry size. |
-| `attestorReputation(addr)` | `Reputation` | `{ successful, slashed, challengesDefended, score }`. |
-| `challenge(id)` | `DeployResult` | Posts a dispute bond. Throws `ALREADY_CHALLENGED`, `ATTESTATION_NOT_ACTIVE`. |
-| `resolve(id, fraudulent)` | `DeployResult` | `true` slashes, `false` finalizes honestly (resolver-only). |
-| `createPolicy({ coverage, premium, triggerTypes, expiry })` | `Policy` | Insurance policy. |
-| `getPolicy(id)` | `Policy` | Throws `POLICY_NOT_FOUND`. |
-| `submitClaim(policyId, attestationId)` | `ClaimResult` | Throws `POLICY_EXPIRED`, `TRIGGER_NOT_COVERED`, … |
-| `getRiskScore(address)` | `RiskScore` | `{ score, tier }`. |
-| `stake(amount)` | `DeployResult` | Lock stake. |
-| `unstake(amount)` | `DeployResult` | Throws `INSUFFICIENT_STAKE` if over-withdrawing. |
-| `subscribeEvents(handler)` | `Unsubscribe` | Live contract events; mock mode replays recent local events. |
+| Method                                                                  | Returns                                                               | Notes                                                                                                      |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `submitAttestation({ modelId, input, output, timestamp?, uri, stake })` | `{ id, deployHash, commitment, inputHash, outputHash, status }`       | Computes hashes via `@casperproof/commitment`.                                                             |
+| `getAttestation(id)`                                                    | `Attestation`                                                         | Throws `ATTESTATION_NOT_FOUND`.                                                                            |
+| `verify(id, payload)`                                                   | `{ valid, recomputedHash, onchainHash, attestor, stake, reputation }` | Recomputes the output hash and compares to on-chain. `valid:false` is a normal tamper result (not thrown). |
+| `attestationCount()`                                                    | `number`                                                              | Registry size.                                                                                             |
+| `attestorReputation(addr)`                                              | `Reputation`                                                          | `{ successful, slashed, challengesDefended, score }`.                                                      |
+| `challenge(id)`                                                         | `DeployResult`                                                        | Posts a dispute bond. Throws `ALREADY_CHALLENGED`, `ATTESTATION_NOT_ACTIVE`.                               |
+| `resolve(id, fraudulent)`                                               | `DeployResult`                                                        | `true` slashes, `false` finalizes honestly (resolver-only).                                                |
+| `createPolicy({ coverage, premium, triggerTypes, expiry })`             | `Policy`                                                              | Insurance policy.                                                                                          |
+| `getPolicy(id)`                                                         | `Policy`                                                              | Throws `POLICY_NOT_FOUND`.                                                                                 |
+| `submitClaim(policyId, attestationId)`                                  | `ClaimResult`                                                         | Throws `POLICY_EXPIRED`, `TRIGGER_NOT_COVERED`, …                                                          |
+| `getRiskScore(address)`                                                 | `RiskScore`                                                           | `{ score, tier }`.                                                                                         |
+| `stake(amount)`                                                         | `DeployResult`                                                        | Lock stake.                                                                                                |
+| `unstake(amount)`                                                       | `DeployResult`                                                        | Throws `INSUFFICIENT_STAKE` if over-withdrawing.                                                           |
+| `subscribeEvents(handler)`                                              | `Unsubscribe`                                                         | Live contract events; mock mode replays recent local events.                                               |
 
 ### Errors
 
@@ -116,7 +116,7 @@ try {
   await client.getAttestation(999);
 } catch (err) {
   if (CasperProofSdkError.is(err)) {
-    console.log(err.code);   // 'ATTESTATION_NOT_FOUND'
+    console.log(err.code); // 'ATTESTATION_NOT_FOUND'
     console.log(err.status); // 404
     console.log(err.detail); // { attestation_id: 999 }
   }
@@ -132,11 +132,11 @@ the services back to a `CasperProofSdkError`.
 
 ## Mock vs live
 
-| Path | Mock (default) | Live (`CSPR_CLOUD_TOKEN` set) |
-|---|---|---|
-| Reads | in-memory store, seeded empty | CSPR.cloud REST + bounded retries + timeouts |
-| Writes (deploys) | deterministic mock deploy hashes | deterministic placeholder hashes — see below |
-| Events | replays recent local events + emits new ones | no-op stub (streaming not yet wired) |
+| Path             | Mock (default)                               | Live (`CSPR_CLOUD_TOKEN` set)                |
+| ---------------- | -------------------------------------------- | -------------------------------------------- |
+| Reads            | in-memory store, seeded empty                | CSPR.cloud REST + bounded retries + timeouts |
+| Writes (deploys) | deterministic mock deploy hashes             | deterministic placeholder hashes — see below |
+| Events           | replays recent local events + emits new ones | no-op stub (streaming not yet wired)         |
 
 Mock deploy hashes are `blake2b256(label ‖ le_u64(counter) ‖ utf8(canonical(payload)))` via
 `@casperproof/commitment`, so the same write produces the same hash — keeping the demo and the

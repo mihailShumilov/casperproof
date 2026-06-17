@@ -51,9 +51,4 @@ export {
   tokensToCssVars,
   tokensToCssVarsString,
 } from './tokens.js';
-export type {
-  Tokens,
-  ColorToken,
-  SpacingToken,
-  RadiusToken,
-} from './tokens.js';
+export type { Tokens, ColorToken, SpacingToken, RadiusToken } from './tokens.js';

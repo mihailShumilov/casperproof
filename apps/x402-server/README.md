@@ -5,11 +5,11 @@ micropayment per request to fetch an attestation's payload or to verify it.
 
 ## Routes
 
-| Method & path | Gated | Purpose |
-|---|---|---|
-| `GET /healthz`, `GET /health` | no | liveness + SDK mode |
-| `GET /attestation/:id` | **x402** | on-chain metadata + the off-chain payload (from S3) |
-| `POST /verify` `{ id }` | **x402** | recompute + compare hashes → `{ valid, recomputedHash, onchainHash, … }` |
+| Method & path                 | Gated    | Purpose                                                                  |
+| ----------------------------- | -------- | ------------------------------------------------------------------------ |
+| `GET /healthz`, `GET /health` | no       | liveness + SDK mode                                                      |
+| `GET /attestation/:id`        | **x402** | on-chain metadata + the off-chain payload (from S3)                      |
+| `POST /verify` `{ id }`       | **x402** | recompute + compare hashes → `{ valid, recomputedHash, onchainHash, … }` |
 
 ## x402 flow
 
@@ -24,13 +24,13 @@ All error bodies are RFC 7807, mirroring the `contracts/problem` (`CasperProofEr
 
 ## Configuration (env)
 
-| Var | Default | Meaning |
-|---|---|---|
-| `X402_SERVER_PORT` | `8402` | listen port |
-| `X402_PRICE_USD` | `0.01` | price per gated request |
-| `X402_PAY_TO` | `casperproof-treasury` | payee |
-| `X402_FACILITATOR_URL` | _(empty)_ | facilitator base URL; empty ⇒ mock verifier |
-| `X402_MOCK` | — | `true` forces the mock verifier |
+| Var                    | Default                | Meaning                                     |
+| ---------------------- | ---------------------- | ------------------------------------------- |
+| `X402_SERVER_PORT`     | `8402`                 | listen port                                 |
+| `X402_PRICE_USD`       | `0.01`                 | price per gated request                     |
+| `X402_PAY_TO`          | `casperproof-treasury` | payee                                       |
+| `X402_FACILITATOR_URL` | _(empty)_              | facilitator base URL; empty ⇒ mock verifier |
+| `X402_MOCK`            | —                      | `true` forces the mock verifier             |
 
 With no facilitator URL the server runs fully offline against the mock verifier, the SDK mock
 backend, and the in-memory payload store — so `make up` and the test suite need no secrets.

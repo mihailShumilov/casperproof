@@ -65,9 +65,7 @@ export async function fillJsonField(page: Page, label: string, value: string): P
  */
 export async function readHashByLabel(scope: Locator, dtLabel: string): Promise<string> {
   // dt → its following-sibling dd → the cp-hash value span carrying the full hash.
-  const value = scope
-    .locator(`dt:has-text("${dtLabel}") + dd .cp-hash__value`)
-    .first();
+  const value = scope.locator(`dt:has-text("${dtLabel}") + dd .cp-hash__value`).first();
   await expect(value).toBeVisible();
   const title = await value.getAttribute('title');
   expect(title, `${dtLabel} should expose a full hash via title`).toBeTruthy();

@@ -42,8 +42,7 @@ export default defineConfig({
   webServer: {
     // Build then serve the production build. `reuseExistingServer` lets a dev
     // run reuse an already-running `next start` on :3000.
-    command:
-      'pnpm --filter @casperproof/web build && pnpm --filter @casperproof/web start',
+    command: 'pnpm --filter @casperproof/web build && pnpm --filter @casperproof/web start',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     // A cold production build can take a while in CI.

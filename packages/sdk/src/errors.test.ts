@@ -168,7 +168,13 @@ describe('errorFromProblem', () => {
   });
 
   it('omits detail when only standard members are present', () => {
-    const e = errorFromProblem(404, { code: 'POLICY_NOT_FOUND', detail: 'x', title: 't', status: 404, type: 'u' });
+    const e = errorFromProblem(404, {
+      code: 'POLICY_NOT_FOUND',
+      detail: 'x',
+      title: 't',
+      status: 404,
+      type: 'u',
+    });
     expect(e.detail).toBeUndefined();
   });
 });

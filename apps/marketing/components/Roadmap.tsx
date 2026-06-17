@@ -2,7 +2,10 @@ import { Card, Badge } from './ui';
 import { ROADMAP } from '../lib/content';
 import type { RoadmapItem } from '../lib/content';
 
-const STATUS_BADGE: Record<RoadmapItem['status'], { status: 'pass' | 'challenged' | 'finalized'; label: string }> = {
+const STATUS_BADGE: Record<
+  RoadmapItem['status'],
+  { status: 'pass' | 'challenged' | 'finalized'; label: string }
+> = {
   shipped: { status: 'pass', label: 'Shipped' },
   'in-progress': { status: 'challenged', label: 'In progress' },
   planned: { status: 'finalized', label: 'Planned' },

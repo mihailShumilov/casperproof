@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: '%s · CasperProof',
   },
   description:
-    'CasperProof is the verifiable AI oracle and parametric insurance layer on Casper. Proof your agents can\'t fake.',
+    "CasperProof is the verifiable AI oracle and parametric insurance layer on Casper. Proof your agents can't fake.",
   applicationName: 'CasperProof',
   keywords: [
     'Casper',
@@ -36,13 +36,14 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'CasperProof',
     title: 'CasperProof — Verifiable AI Oracle',
-    description: 'Proof your agents can\'t fake. Verifiable AI oracle + parametric insurance on Casper.',
+    description:
+      "Proof your agents can't fake. Verifiable AI oracle + parametric insurance on Casper.",
     url: 'https://app.casperproof.com',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CasperProof — Verifiable AI Oracle',
-    description: 'Proof your agents can\'t fake.',
+    description: "Proof your agents can't fake.",
   },
   robots: { index: true, follow: true },
 };
@@ -63,9 +64,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
               <main className="app-main">{children}</main>
               <footer className="app-footer">
                 <p>
-                  CasperProof · built for the Casper buildathon · verifiable AI oracle on the
-                  Casper Network. Running in <strong>mock mode</strong> — fully offline, no
-                  secrets.
+                  CasperProof · built for the Casper buildathon · verifiable AI oracle on the Casper
+                  Network. Running in <strong>mock mode</strong> — fully offline, no secrets.
                 </p>
               </footer>
             </div>

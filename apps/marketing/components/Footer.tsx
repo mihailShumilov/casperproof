@@ -36,7 +36,10 @@ export function Footer(): JSX.Element {
           </div>
           <nav aria-label="Team and socials">
             <p className="mk-eyebrow">Team &amp; socials</p>
-            <ul className="mk-footer__links" style={{ flexDirection: 'column', gap: 'var(--cp-space-sm)' }}>
+            <ul
+              className="mk-footer__links"
+              style={{ flexDirection: 'column', gap: 'var(--cp-space-sm)' }}
+            >
               {TEAM_LINKS.map((link) => (
                 <li key={link.href}>
                   <a

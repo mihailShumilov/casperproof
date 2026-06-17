@@ -14,15 +14,7 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import {
-  Badge,
-  Button,
-  Card,
-  HashDisplay,
-  Spinner,
-  StatTile,
-  Tag,
-} from '@casperproof/ui';
+import { Badge, Button, Card, HashDisplay, Spinner, StatTile, Tag } from '@casperproof/ui';
 import type { ClaimResult, Policy, RiskScore, TriggerType } from '@casperproof/casper-sdk';
 import { CasperProofSdkError } from '@casperproof/casper-sdk';
 import { getSdk } from '@/lib/sdk';
@@ -39,7 +31,8 @@ const TRIGGER_LABELS: Record<TriggerType, string> = {
 };
 const TRIGGERS = Object.keys(TRIGGER_LABELS) as TriggerType[];
 
-const DEFAULT_ADDRESS = 'account-hash-1f4c0a9e2b7d6f8a3c5e1b0d9a7f6e4c2b1a0d9e8f7c6b5a4d3e2f1a0b9c8d7e';
+const DEFAULT_ADDRESS =
+  'account-hash-1f4c0a9e2b7d6f8a3c5e1b0d9a7f6e4c2b1a0d9e8f7c6b5a4d3e2f1a0b9c8d7e';
 const DEFAULT_COVERAGE = '5000000000'; // 5 CSPR
 const DEFAULT_PREMIUM = '250000000'; // 0.25 CSPR
 
@@ -132,10 +125,7 @@ export function InsuranceView(): JSX.Element {
     const coverageOutstanding = policies
       .filter((p) => p.status === 'Active')
       .reduce((sum, p) => sum + bigIntFromMotes(p.coverage), 0n);
-    const premiumsCollected = policies.reduce(
-      (sum, p) => sum + bigIntFromMotes(p.premium),
-      0n,
-    );
+    const premiumsCollected = policies.reduce((sum, p) => sum + bigIntFromMotes(p.premium), 0n);
     // A nominal vault reserve so the solvency guard is visible in the demo.
     const reserve = 50_000_000_000n; // 50 CSPR seed reserve
     const free = reserve + premiumsCollected - coverageOutstanding;
@@ -157,8 +147,8 @@ export function InsuranceView(): JSX.Element {
         <h1>Insurance</h1>
         <p>
           Parametric cover backed by the oracle. Score an address, buy a policy, then simulate a
-          covered trigger — the vault pays out automatically the moment an attested decision
-          matches the policy.
+          covered trigger — the vault pays out automatically the moment an attested decision matches
+          the policy.
         </p>
       </header>
 
@@ -184,7 +174,10 @@ export function InsuranceView(): JSX.Element {
                 <div className="grid grid--3" style={{ marginTop: 'var(--cp-space-md)' }}>
                   <StatTile label="Score" value={`${score.score}/100`} />
                   <StatTile label="Tier" value={score.tier} />
-                  <StatTile label="Address" value={<HashDisplay hash={score.address} prefix="" copyable={false} />} />
+                  <StatTile
+                    label="Address"
+                    value={<HashDisplay hash={score.address} prefix="" copyable={false} />}
+                  />
                 </div>
                 <RiskGauge score={score.score} tier={score.tier} />
               </>
@@ -233,7 +226,11 @@ export function InsuranceView(): JSX.Element {
                 ))}
               </select>
             </label>
-            <Button variant="primary" onClick={() => void handleBuy()} disabled={!isConnected || buying}>
+            <Button
+              variant="primary"
+              onClick={() => void handleBuy()}
+              disabled={!isConnected || buying}
+            >
               {buying ? 'Buying…' : 'Buy policy'}
             </Button>
           </div>
@@ -287,7 +284,11 @@ export function InsuranceView(): JSX.Element {
         )}
 
         {claim && claim.paid && (
-          <p className="notice notice--success" role="status" style={{ marginTop: 'var(--cp-space-lg)' }}>
+          <p
+            className="notice notice--success"
+            role="status"
+            style={{ marginTop: 'var(--cp-space-lg)' }}
+          >
             ✓ Auto-payout: policy <span className="mono">#{claim.policyId}</span> paid{' '}
             <strong>{formatMotes(claim.amount)}</strong> against attestation{' '}
             <span className="mono">#{claim.attestationId}</span>. Deploy{' '}
@@ -301,7 +302,10 @@ export function InsuranceView(): JSX.Element {
         <Card>
           <h2 className="section-title">Vault solvency</h2>
           <div className="grid grid--3" style={{ marginBottom: 'var(--cp-space-md)' }}>
-            <StatTile label="Coverage out" value={`${motesToCspr(solvency.coverageOutstanding)} CSPR`} />
+            <StatTile
+              label="Coverage out"
+              value={`${motesToCspr(solvency.coverageOutstanding)} CSPR`}
+            />
             <StatTile label="Premiums" value={`${motesToCspr(solvency.premiumsCollected)} CSPR`} />
             <StatTile
               label="Free reserve"

@@ -61,7 +61,8 @@ describe('attest', () => {
   it('honors an explicit attestor address', async () => {
     const sdk = newSdk();
     const store = createStore(loadStoreConfig({}));
-    const attestor = 'account-hash-1111111111111111111111111111111111111111111111111111111111111111';
+    const attestor =
+      'account-hash-1111111111111111111111111111111111111111111111111111111111111111';
     const result = await attest(sdk, store, {
       modelId: 'm',
       input: { a: 1 },

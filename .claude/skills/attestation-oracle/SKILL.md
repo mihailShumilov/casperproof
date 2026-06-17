@@ -12,19 +12,19 @@ Pairs with [`commitment-scheme`](../commitment-scheme/SKILL.md).
 
 ## Data model — `Attestation`
 
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `u64` | monotonic counter |
-| `attestor` | `Address` | who submitted |
-| `model_id` | `String` | e.g. `casperproof-riskscorer-v1` |
-| `input_hash` | `[u8;32]` | blake2b-256(canonical(input)) |
-| `output_hash` | `[u8;32]` | blake2b-256(canonical(output)) |
-| `commitment` | `[u8;32]` | full commitment (§8) |
-| `uri` | `String` | S3 URL of the off-chain payload (content-addressed) |
-| `stake` | `U512` | locked behind the attestation |
-| `created_at` | `u64` | submit timestamp |
-| `status` | `Active \| Challenged \| Slashed \| Finalized` | lifecycle |
-| `challenger`, `challenge_bond`, `challenged_at` | dispute state |
+| Field                                           | Type                                           | Notes                                               |
+| ----------------------------------------------- | ---------------------------------------------- | --------------------------------------------------- |
+| `id`                                            | `u64`                                          | monotonic counter                                   |
+| `attestor`                                      | `Address`                                      | who submitted                                       |
+| `model_id`                                      | `String`                                       | e.g. `casperproof-riskscorer-v1`                    |
+| `input_hash`                                    | `[u8;32]`                                      | blake2b-256(canonical(input))                       |
+| `output_hash`                                   | `[u8;32]`                                      | blake2b-256(canonical(output))                      |
+| `commitment`                                    | `[u8;32]`                                      | full commitment (§8)                                |
+| `uri`                                           | `String`                                       | S3 URL of the off-chain payload (content-addressed) |
+| `stake`                                         | `U512`                                         | locked behind the attestation                       |
+| `created_at`                                    | `u64`                                          | submit timestamp                                    |
+| `status`                                        | `Active \| Challenged \| Slashed \| Finalized` | lifecycle                                           |
+| `challenger`, `challenge_bond`, `challenged_at` | dispute state                                  |
 
 On-chain stores **hashes + metadata + stake only**. Full payload lives off-chain (S3) by `uri`.
 **The contract compares bytes; it never recomputes hashes.**

@@ -20,12 +20,7 @@ export function definePackageConfig(overrides = {}) {
         provider: 'v8',
         reporter: ['text', 'json-summary', 'json', 'lcov'],
         include: ['src/**/*.ts'],
-        exclude: [
-          'src/**/*.{test,spec}.ts',
-          'src/**/index.ts',
-          'src/**/types.ts',
-          'src/**/*.d.ts',
-        ],
+        exclude: ['src/**/*.{test,spec}.ts', 'src/**/index.ts', 'src/**/types.ts', 'src/**/*.d.ts'],
         thresholds: coverageThresholds,
         ...coverageOverride,
       },

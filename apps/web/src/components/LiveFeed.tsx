@@ -58,8 +58,8 @@ export function LiveFeed({ limit = 12 }: { limit?: number }): JSX.Element {
       </div>
       {entries.length === 0 ? (
         <p className="empty">
-          No events yet. Submit an attestation, run the slash demo, or file a claim to see the
-          chain stream live.
+          No events yet. Submit an attestation, run the slash demo, or file a claim to see the chain
+          stream live.
         </p>
       ) : (
         <ul className="feed" aria-live="polite">

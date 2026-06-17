@@ -17,8 +17,8 @@ export default function HomePage(): JSX.Element {
         </h1>
         <p>
           CasperProof anchors every AI decision as a stake-backed, tamper-evident attestation on
-          Casper. Anyone can verify a proof; bad proofs get slashed. Parametric insurance pays
-          out automatically when an attested trigger fires.
+          Casper. Anyone can verify a proof; bad proofs get slashed. Parametric insurance pays out
+          automatically when an attested trigger fires.
         </p>
         <div className="row">
           <Link href="/oracle">
@@ -43,8 +43,8 @@ export default function HomePage(): JSX.Element {
         <Card>
           <h2 className="section-title">1 · Attest</h2>
           <p className="muted">
-            An agent publishes a blake2b-256 commitment of its input/output, stake locked behind
-            it. The chain stores hashes only.
+            An agent publishes a blake2b-256 commitment of its input/output, stake locked behind it.
+            The chain stores hashes only.
           </p>
         </Card>
         <Card>

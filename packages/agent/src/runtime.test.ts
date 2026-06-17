@@ -56,7 +56,12 @@ describe('createBackend', () => {
   });
 
   it('builds the ollama backend with an injected fetch', () => {
-    const f: FetchLike = async () => ({ ok: true, status: 200, json: async () => ({}), text: async () => '' });
+    const f: FetchLike = async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({}),
+      text: async () => '',
+    });
     expect(createBackend(loadConfig({ LLM_BACKEND: 'ollama' }), f).kind).toBe('ollama');
   });
 
@@ -65,14 +70,18 @@ describe('createBackend', () => {
     // @ts-expect-error force-remove for the test
     delete globalThis.fetch;
     try {
-      expect(() => createBackend(loadConfig({ LLM_BACKEND: 'ollama' }))).toThrow(/requires a global/);
+      expect(() => createBackend(loadConfig({ LLM_BACKEND: 'ollama' }))).toThrow(
+        /requires a global/,
+      );
     } finally {
       globalThis.fetch = original;
     }
   });
 
   it('throws building the openai backend (paid disabled)', () => {
-    expect(() => createBackend(loadConfig({ LLM_BACKEND: 'openai' }))).toThrow(/paid backends disabled/);
+    expect(() => createBackend(loadConfig({ LLM_BACKEND: 'openai' }))).toThrow(
+      /paid backends disabled/,
+    );
   });
 
   it('throws building the anthropic backend (paid disabled)', () => {
@@ -102,7 +111,9 @@ describe('OllamaBackend.decide', () => {
       status: 200,
       text: async () => '',
       json: async () => ({
-        message: { tool_calls: [{ function: { name: 'score_and_attest', arguments: { address: 'a1' } } }] },
+        message: {
+          tool_calls: [{ function: { name: 'score_and_attest', arguments: { address: 'a1' } } }],
+        },
       }),
     });
     const d = await backendWith(f).decide({ address: 'a1' });
@@ -117,7 +128,9 @@ describe('OllamaBackend.decide', () => {
       text: async () => '',
       json: async () => ({
         message: {
-          tool_calls: [{ function: { name: 'verify_attestation', arguments: '{"attestationId":3}' } }],
+          tool_calls: [
+            { function: { name: 'verify_attestation', arguments: '{"attestationId":3}' } },
+          ],
         },
       }),
     });
@@ -132,7 +145,11 @@ describe('OllamaBackend.decide', () => {
       status: 200,
       text: async () => '',
       json: async () => ({
-        message: { tool_calls: [{ function: { name: 'challenge_attestation', arguments: { attestationId: 9 } } }] },
+        message: {
+          tool_calls: [
+            { function: { name: 'challenge_attestation', arguments: { attestationId: 9 } } },
+          ],
+        },
       }),
     });
     const d = await backendWith(f).decide({ attestationId: 9 });
@@ -145,7 +162,9 @@ describe('OllamaBackend.decide', () => {
       ok: true,
       status: 200,
       text: async () => '',
-      json: async () => ({ message: { tool_calls: [{ function: { name: 'mystery', arguments: {} } }] } }),
+      json: async () => ({
+        message: { tool_calls: [{ function: { name: 'mystery', arguments: {} } }] },
+      }),
     });
     const d = await backendWith(f).decide({ address: 'a' });
     expect(d.action).toBe('noop');
@@ -182,7 +201,12 @@ describe('OllamaBackend.decide', () => {
   });
 
   it('falls back on a non-ok HTTP response', async () => {
-    const f: FetchLike = async () => ({ ok: false, status: 500, text: async () => 'err', json: async () => ({}) });
+    const f: FetchLike = async () => ({
+      ok: false,
+      status: 500,
+      text: async () => 'err',
+      json: async () => ({}),
+    });
     const d = await backendWith(f).decide({ attestationId: 2 });
     expect(d.action).toBe('verify');
   });
@@ -215,9 +239,14 @@ describe('AgentRuntime.runOnce', () => {
 
   it('scores when the backend chooses score', async () => {
     const runtime = new AgentRuntime(
-      deps({ backend: { kind: 'none', async decide() {
-        return { action: 'score', address: 'account-hash-s', reason: 'test' };
-      } } }),
+      deps({
+        backend: {
+          kind: 'none',
+          async decide() {
+            return { action: 'score', address: 'account-hash-s', reason: 'test' };
+          },
+        },
+      }),
     );
     const cycle = await runtime.runOnce({ address: 'account-hash-s' });
     expect(cycle.decision.action).toBe('score');
@@ -247,9 +276,14 @@ describe('AgentRuntime.runOnce', () => {
     [{ action: 'challenge' as const, reason: 'r' }],
   ])('returns null when a %s decision lacks its required argument', async (decision) => {
     const runtime = new AgentRuntime(
-      deps({ backend: { kind: 'none', async decide() {
-        return decision;
-      } } }),
+      deps({
+        backend: {
+          kind: 'none',
+          async decide() {
+            return decision;
+          },
+        },
+      }),
     );
     const cycle = await runtime.runOnce({});
     expect(cycle.result).toBeNull();

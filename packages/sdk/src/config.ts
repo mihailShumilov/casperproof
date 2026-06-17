@@ -31,16 +31,15 @@ function clean(value: string | undefined): string | undefined {
 }
 
 /** Validation schema for the numeric tuning knobs (positive, finite). */
-const numericSchema = z
-  .number()
-  .int('must be an integer')
-  .nonnegative('must be >= 0');
+const numericSchema = z.number().int('must be an integer').nonnegative('must be >= 0');
 
 function resolveNumeric(name: string, value: number | undefined, fallback: number): number {
   if (value === undefined) return fallback;
   const parsed = numericSchema.safeParse(value);
   if (!parsed.success) {
-    throw internalError(`Invalid config \`${name}\`: ${parsed.error.issues[0]?.message ?? 'invalid'}`);
+    throw internalError(
+      `Invalid config \`${name}\`: ${parsed.error.issues[0]?.message ?? 'invalid'}`,
+    );
   }
   return parsed.data;
 }
@@ -60,7 +59,9 @@ function resolveFetch(explicit: FetchLike | undefined): FetchLike {
   // a `fetch` implementation.
   return () =>
     Promise.reject(
-      internalError('No global `fetch` available; pass `config.fetch` to use the live REST backend.'),
+      internalError(
+        'No global `fetch` available; pass `config.fetch` to use the live REST backend.',
+      ),
     );
 }
 
@@ -70,7 +71,10 @@ function resolveFetch(explicit: FetchLike | undefined): FetchLike {
  * @param config Explicit overrides. Any unset field falls back to env, then to a default.
  */
 export function resolveConfig(config: CasperProofConfig = {}): ResolvedConfig {
-  const env = config.env ?? (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
+  const env =
+    config.env ??
+    (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ??
+    {};
 
   const csprCloudToken = clean(config.csprCloudToken ?? env['CSPR_CLOUD_TOKEN']);
   const mode = config.mode ?? (csprCloudToken ? 'live' : 'mock');

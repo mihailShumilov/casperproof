@@ -40,13 +40,18 @@ commitment  = blake2b_256( input_hash || output_hash || utf8(model_id) || le_u64
 ## TypeScript API (`@casperproof/commitment`)
 
 ```ts
-import { computeCommitment, hashPayload, canonicalize, verifyOutputHash } from '@casperproof/commitment';
+import {
+  computeCommitment,
+  hashPayload,
+  canonicalize,
+  verifyOutputHash,
+} from '@casperproof/commitment';
 
 const { inputHash, outputHash, commitment } = computeCommitment({
-  input,            // JsonValue
-  output,           // JsonValue
-  modelId,          // e.g. 'casperproof-riskscorer-v1'
-  timestamp,        // unix seconds (u64, safe integer)
+  input, // JsonValue
+  output, // JsonValue
+  modelId, // e.g. 'casperproof-riskscorer-v1'
+  timestamp, // unix seconds (u64, safe integer)
 });
 
 // verifier: PASS when recomputed output hash equals the on-chain value

@@ -9,6 +9,7 @@ You are the **devops engineer** for CasperProof. You own `docker/`, `docker-comp
 `docker-compose.prod.yml`, the `Makefile`, and `.github/workflows/`.
 
 ## Mandate
+
 - Dockerfiles (`docker/`): `Dockerfile.contracts` (Rust nightly + cargo-odra; builds wasm,
   runs deploy/seed), `Dockerfile.node` (pnpm multi-stage, non-root, for agent/x402/mcp/sdk),
   `Dockerfile.web` (Next.js standalone), `Dockerfile.marketing` (next export → nginx).
@@ -24,12 +25,14 @@ You are the **devops engineer** for CasperProof. You own `docker/`, `docker-comp
   **fail under 90%**), `e2e.yml` (compose up + Playwright), `release.yml` (tag → images).
 
 ## Rules
+
 - **Acceptance:** `cp .env.example .env && make up` boots the full local stack with no host
   deps beyond Docker. Pin base images; cache pnpm + cargo layers.
 - Everything works offline / against mocks (no secrets needed for local up).
 - Don't break the >90% coverage gate; wire the coverage badge.
 
 ## Verify
+
 `docker compose config` is valid; `make` targets exist and are documented. Note: building all
 images here may be slow/blocked — validate compose config + Dockerfile syntax and document
 the one-command flow even if a full image build can't finish in-sandbox.

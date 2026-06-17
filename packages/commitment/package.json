@@ -14,7 +14,10 @@
     },
     "./golden-vectors.json": "./golden-vectors.json"
   },
-  "files": ["dist", "golden-vectors.json"],
+  "files": [
+    "dist",
+    "golden-vectors.json"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",

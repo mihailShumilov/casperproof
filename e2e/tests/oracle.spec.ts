@@ -23,9 +23,7 @@ test.beforeEach(async ({ page }) => {
 
 test('submit is gated on a connected wallet', async ({ page }) => {
   // Before connecting, the submit form shows the connect prompt and the button is disabled.
-  await expect(
-    page.getByText('Connect your wallet to sign the', { exact: false }),
-  ).toBeVisible();
+  await expect(page.getByText('Connect your wallet to sign the', { exact: false })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Submit attestation' })).toBeDisabled();
 
   await connectWallet(page);
@@ -37,9 +35,7 @@ test('submit an attestation and see it in the list and live feed', async ({ page
   const id = await submitOracleAttestation(page);
 
   // The attestation appears in the list with its model id.
-  await expect(
-    page.getByText(`#${id} · ${ORACLE_DEFAULTS.modelId}`),
-  ).toBeVisible();
+  await expect(page.getByText(`#${id} · ${ORACLE_DEFAULTS.modelId}`)).toBeVisible();
 
   // The live feed streams an AttestationSubmitted event for the submit.
   const feed = page.locator('.cp-card', { hasText: 'Live feed' }).first();
@@ -54,14 +50,10 @@ test('verify the unedited payload PASSes with equal hashes', async ({ page }) =>
   // The panel pre-fills the canonical output, so an unchanged verify PASSes.
   await row.getByRole('button', { name: 'Verify proof' }).click();
   await expectVerifyPass(row);
-  await expect(
-    row.getByText('Recomputed hash matches the on-chain commitment.'),
-  ).toBeVisible();
+  await expect(row.getByText('Recomputed hash matches the on-chain commitment.')).toBeVisible();
 });
 
-test('tampering the payload flips the verdict to FAIL with diverging hashes', async ({
-  page,
-}) => {
+test('tampering the payload flips the verdict to FAIL with diverging hashes', async ({ page }) => {
   await connectWallet(page);
   const id = await submitOracleAttestation(page);
 

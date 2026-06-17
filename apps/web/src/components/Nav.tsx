@@ -16,8 +16,7 @@ const LINKS: { href: string; label: string }[] = [
 
 export function Nav(): JSX.Element {
   const pathname = usePathname();
-  const isActive = (href: string) =>
-    pathname === href || (href === '/oracle' && pathname === '/');
+  const isActive = (href: string) => pathname === href || (href === '/oracle' && pathname === '/');
 
   return (
     <nav className="app-nav" aria-label="Primary">

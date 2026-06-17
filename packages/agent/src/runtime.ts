@@ -163,13 +163,17 @@ function decisionFromToolCall(name: string, args: Record<string, unknown>): Agen
     case 'verify_attestation':
       return {
         action: 'verify',
-        ...(typeof args['attestationId'] === 'number' ? { attestationId: args['attestationId'] } : {}),
+        ...(typeof args['attestationId'] === 'number'
+          ? { attestationId: args['attestationId'] }
+          : {}),
         reason: 'Ollama chose verify_attestation.',
       };
     case 'challenge_attestation':
       return {
         action: 'challenge',
-        ...(typeof args['attestationId'] === 'number' ? { attestationId: args['attestationId'] } : {}),
+        ...(typeof args['attestationId'] === 'number'
+          ? { attestationId: args['attestationId'] }
+          : {}),
         reason: 'Ollama chose challenge_attestation.',
       };
     default:

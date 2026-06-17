@@ -30,21 +30,26 @@ commitment  = blake2b_256( input_hash || output_hash || utf8(model_id) || le_u64
 
 ## Modules
 
-| Module | Purpose |
-|---|---|
-| `hash.ts` | `blake2b256`, hex helpers (`toHex`/`fromHex`), `leU64`, `concatBytes`, `HASH_LENGTH`. |
-| `canonical.ts` | `canonicalize` / `canonicalBytes` + `CanonicalizationError`. |
-| `commitment.ts` | `hashPayload`, `commitmentFromHashes`, `computeCommitment`, `verifyOutputHash`. |
-| `types.ts` | `JsonValue`, `Hex`, `CommitmentInput`, `CommitmentResult`, golden-vector types. |
-| `gen-golden.ts` | Generator for `golden-vectors.json` (the TS⇆Rust parity fixtures). |
+| Module          | Purpose                                                                               |
+| --------------- | ------------------------------------------------------------------------------------- |
+| `hash.ts`       | `blake2b256`, hex helpers (`toHex`/`fromHex`), `leU64`, `concatBytes`, `HASH_LENGTH`. |
+| `canonical.ts`  | `canonicalize` / `canonicalBytes` + `CanonicalizationError`.                          |
+| `commitment.ts` | `hashPayload`, `commitmentFromHashes`, `computeCommitment`, `verifyOutputHash`.       |
+| `types.ts`      | `JsonValue`, `Hex`, `CommitmentInput`, `CommitmentResult`, golden-vector types.       |
+| `gen-golden.ts` | Generator for `golden-vectors.json` (the TS⇆Rust parity fixtures).                    |
 
 ## Quick start
 
 ```ts
-import { computeCommitment, hashPayload, canonicalize, verifyOutputHash } from '@casperproof/commitment';
+import {
+  computeCommitment,
+  hashPayload,
+  canonicalize,
+  verifyOutputHash,
+} from '@casperproof/commitment';
 
 const { inputHash, outputHash, commitment } = computeCommitment({
-  input:  { address: 'account-hash-aabbcc', signals: 15 },
+  input: { address: 'account-hash-aabbcc', signals: 15 },
   output: { score: 73, tier: 'HIGH' },
   modelId: 'casperproof-riskscorer-v1',
   timestamp: 1718600123, // unix seconds (u64, safe integer)

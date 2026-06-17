@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  tokens,
-  colors,
-  spacing,
-  tokensToCssVars,
-  tokensToCssVarsString,
-} from './tokens.js';
+import { tokens, colors, spacing, tokensToCssVars, tokensToCssVarsString } from './tokens.js';
 
 describe('tokens', () => {
   it('exposes the brand accent and semantic proof/fail pair', () => {

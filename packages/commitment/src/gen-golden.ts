@@ -69,7 +69,13 @@ const SPECS: VectorSpec[] = [
   },
   {
     name: 'nested-arrays-objects',
-    input: { matrix: [[1, 2], [3, 4]], meta: { tags: ['a', 'b'], n: 0 } },
+    input: {
+      matrix: [
+        [1, 2],
+        [3, 4],
+      ],
+      meta: { tags: ['a', 'b'], n: 0 },
+    },
     output: { flat: [1, 2, 3, 4] },
     modelId: 'casperproof-test-v1',
     timestamp: 9999999999,

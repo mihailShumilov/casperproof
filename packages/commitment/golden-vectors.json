@@ -90,11 +90,7 @@
         "glyph": "漢字",
         "ok": true,
         "missing": null,
-        "items": [
-          3,
-          2,
-          1
-        ]
+        "items": [3, 2, 1]
       },
       "output": {
         "note": "verified ✓",
@@ -112,30 +108,16 @@
       "name": "nested-arrays-objects",
       "input": {
         "matrix": [
-          [
-            1,
-            2
-          ],
-          [
-            3,
-            4
-          ]
+          [1, 2],
+          [3, 4]
         ],
         "meta": {
-          "tags": [
-            "a",
-            "b"
-          ],
+          "tags": ["a", "b"],
           "n": 0
         }
       },
       "output": {
-        "flat": [
-          1,
-          2,
-          3,
-          4
-        ]
+        "flat": [1, 2, 3, 4]
       },
       "modelId": "casperproof-test-v1",
       "timestamp": 9999999999,

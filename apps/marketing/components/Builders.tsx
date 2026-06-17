@@ -11,8 +11,8 @@ export function Builders(): JSX.Element {
           Wire verifiable trust into your agents in minutes.
         </h2>
         <p className="mk-section__lead">
-          One typed SDK, MCP tools for agent-to-agent verification, and native x402 metering.
-          Works offline against a mock; flips to live with a single env var.
+          One typed SDK, MCP tools for agent-to-agent verification, and native x402 metering. Works
+          offline against a mock; flips to live with a single env var.
         </p>
         <div className="mk-stack-sm" style={{ display: 'grid', gap: 'var(--cp-space-2xl)' }}>
           {BUILDER_FEATURES.map((feature) => (

@@ -135,11 +135,9 @@ export class CasperProofSdkError extends Error {
 
 /** Convenience constructor for {@link CasperProofSdkError.code} `ATTESTATION_NOT_FOUND`. */
 export function attestationNotFound(id: number): CasperProofSdkError {
-  return new CasperProofSdkError(
-    'ATTESTATION_NOT_FOUND',
-    `No attestation exists with id ${id}.`,
-    { attestation_id: id },
-  );
+  return new CasperProofSdkError('ATTESTATION_NOT_FOUND', `No attestation exists with id ${id}.`, {
+    attestation_id: id,
+  });
 }
 
 /** Convenience constructor for `POLICY_NOT_FOUND`. */
@@ -178,9 +176,13 @@ export function tamperedPayload(
 
 /** Convenience constructor for `ALREADY_CHALLENGED`. */
 export function alreadyChallenged(id: number): CasperProofSdkError {
-  return new CasperProofSdkError('ALREADY_CHALLENGED', `Attestation ${id} is already under challenge.`, {
-    attestation_id: id,
-  });
+  return new CasperProofSdkError(
+    'ALREADY_CHALLENGED',
+    `Attestation ${id} is already under challenge.`,
+    {
+      attestation_id: id,
+    },
+  );
 }
 
 /** Convenience constructor for `ATTESTATION_NOT_ACTIVE`. */
@@ -194,9 +196,13 @@ export function attestationNotActive(id: number, status: string): CasperProofSdk
 
 /** Convenience constructor for `POLICY_EXPIRED`. */
 export function policyExpired(id: number): CasperProofSdkError {
-  return new CasperProofSdkError('POLICY_EXPIRED', `Policy ${id} has expired and cannot be claimed against.`, {
-    policy_id: id,
-  });
+  return new CasperProofSdkError(
+    'POLICY_EXPIRED',
+    `Policy ${id} has expired and cannot be claimed against.`,
+    {
+      policy_id: id,
+    },
+  );
 }
 
 /** Convenience constructor for `TRIGGER_NOT_COVERED`. */
@@ -230,23 +236,29 @@ export function internalError(message: string): CasperProofSdkError {
  * code (see {@link CODE_BY_STATUS}), defaulting to `INTERNAL_ERROR`.
  */
 export function errorFromProblem(status: number, body: unknown): CasperProofSdkError {
-  const problem = (body && typeof body === 'object' ? (body as Record<string, unknown>) : {}) as Record<
-    string,
-    unknown
-  >;
+  const problem = (
+    body && typeof body === 'object' ? (body as Record<string, unknown>) : {}
+  ) as Record<string, unknown>;
   const rawCode = problem['code'];
   const code: CasperProofErrorCode = isErrorCode(rawCode)
     ? rawCode
     : (CODE_BY_STATUS[status] ?? 'INTERNAL_ERROR');
 
   const title = typeof problem['title'] === 'string' ? (problem['title'] as string) : undefined;
-  const detailText = typeof problem['detail'] === 'string' ? (problem['detail'] as string) : undefined;
+  const detailText =
+    typeof problem['detail'] === 'string' ? (problem['detail'] as string) : undefined;
   const message = detailText ?? title ?? `Request failed with status ${status}.`;
 
   // Preserve every RFC 7807 extension member except the standard ones as structured detail.
   const detail: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(problem)) {
-    if (key === 'type' || key === 'title' || key === 'status' || key === 'detail' || key === 'code') {
+    if (
+      key === 'type' ||
+      key === 'title' ||
+      key === 'status' ||
+      key === 'detail' ||
+      key === 'code'
+    ) {
       continue;
     }
     detail[key] = value;

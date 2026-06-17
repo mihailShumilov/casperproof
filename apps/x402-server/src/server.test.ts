@@ -96,7 +96,12 @@ describe('x402-server', () => {
   });
 
   it('400s a verify request without a numeric id', async () => {
-    const res = await app.inject({ method: 'POST', url: '/verify', headers: PAY, payload: { id: 'nope' } });
+    const res = await app.inject({
+      method: 'POST',
+      url: '/verify',
+      headers: PAY,
+      payload: { id: 'nope' },
+    });
     expect(res.statusCode).toBe(400);
     expect(res.json().code).toBe('BAD_REQUEST');
   });
@@ -116,7 +121,11 @@ describe('x402-server', () => {
       uri: 'memory://casperproof-payloads/deadbeef',
       stake: '1000000000000',
     });
-    const res = await app.inject({ method: 'GET', url: `/attestation/${submitted.id}`, headers: PAY });
+    const res = await app.inject({
+      method: 'GET',
+      url: `/attestation/${submitted.id}`,
+      headers: PAY,
+    });
     expect(res.statusCode).toBe(502);
     expect(res.json().code).toBe('PAYLOAD_UNAVAILABLE');
   });
@@ -130,7 +139,12 @@ describe('x402-server', () => {
       uri: 'memory://casperproof-payloads/deadbeef',
       stake: '1000000000000',
     });
-    const res = await app.inject({ method: 'POST', url: '/verify', headers: PAY, payload: { id: submitted.id } });
+    const res = await app.inject({
+      method: 'POST',
+      url: '/verify',
+      headers: PAY,
+      payload: { id: submitted.id },
+    });
     expect(res.statusCode).toBe(500);
     expect(res.json().code).toBe('INTERNAL_ERROR');
   });

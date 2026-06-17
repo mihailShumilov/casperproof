@@ -61,7 +61,12 @@ function fail(error: unknown): ToolResult {
   if (CasperProofSdkError.is(error)) {
     return {
       content: [{ type: 'text', text: `${error.code}: ${error.message}` }],
-      structuredContent: { code: error.code, status: error.status, message: error.message, detail: error.detail },
+      structuredContent: {
+        code: error.code,
+        status: error.status,
+        message: error.message,
+        detail: error.detail,
+      },
       isError: true,
     };
   }

@@ -6,22 +6,22 @@ agent-insurance** demo. Built for the Casper Agentic Buildathon 2026.
 
 ## What's implemented (end to end)
 
-| Area | Status | Notes |
-|---|---|---|
-| **Commitment scheme** (trust anchor, §8) | ✅ done + verified | `packages/commitment` (TS) + `contracts/src/commitment.rs` (Rust); blake2b-256 + canonical JSON; **cross-language golden-vector parity test passes** (TS generates, Rust asserts). |
-| **Odra contracts** | ✅ done + tested | `attestation_registry` (submit/get/challenge/resolve/finalize/reputation), `insurance` (buy_policy/claim/stake/unstake, reads registry cross-contract), CEP-18 `StakeToken` + `MockUsdc`. 30 MockVM tests + parity; clippy `-D warnings` clean. |
-| **RFC 7807 errors** | ✅ done | `contracts/problem` (Rust, `rust-rfc7807`) maps the full error taxonomy; the SDK + x402 server mirror the same `application/problem+json` shape. |
-| **Agent runtime** (zero-cost) | ✅ done + tested | `packages/agent`: 15-signal risk-scorer, claim-oracle, attestor, verifier, S3/MinIO store (+ in-memory + tamper), Ollama loop with `LLM_BACKEND=none\|ollama` (no paid keys). 97 tests. |
-| **SDK** | ✅ done + tested | `@casperproof/casper-sdk`: typed client over CSPR.cloud + deploys; mock + REST backends; 103 tests. |
-| **x402 server** | ✅ done + tested | Fastify, `GET /attestation/:id` + `POST /verify`, x402-gated (402 → pay → serve); mock + facilitator verifiers. 27 tests. |
-| **MCP server** | ✅ done + tested | 7 tools (get/verify/submit/score/policy/claim/challenge) over stdio. 20 tests. |
-| **dApp** (`apps/web`) | ✅ done | Next.js + CSPR.click (mock connector); Oracle / Insurance / Slash views + live feed + Recharts; static build passes offline. |
-| **Marketing** (`apps/marketing`) | ✅ done | Next.js static export; full SEO/OG/sitemap; live numbers via SDK; 29 tests. |
-| **Dockerization** | ✅ done | `docker/` images + `docker-compose.yml` (+ prod overlay), `Makefile`; `cp .env.example .env && make up` boots ollama/minio/agent/x402/mcp/web/marketing + one-shot deployer. |
-| **CI** | ✅ done | `.github/workflows/`: ci (lint+typecheck+cargo test+TS coverage gate), e2e (compose+Playwright), release. |
-| **E2E** | ✅ specs written | Playwright `e2e/` covers the full demo arc; runs in CI (`playwright install chromium`). |
-| **Docs** | ✅ done | README + per-package READMEs + `docs/` (ARCHITECTURE/COMMITMENT/CONTRACTS/DEPLOYMENT/DEMO_SCRIPT/API + 6 ADRs) + typedoc config. |
-| **Testnet deploy** | ⏳ mock (no keys) | `scripts/deploy-testnet.ts` runs a deterministic mock deploy; real deploy needs the secrets in `SETUP_NEEDED.md`. |
+| Area                                     | Status             | Notes                                                                                                                                                                                                                                           |
+| ---------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Commitment scheme** (trust anchor, §8) | ✅ done + verified | `packages/commitment` (TS) + `contracts/src/commitment.rs` (Rust); blake2b-256 + canonical JSON; **cross-language golden-vector parity test passes** (TS generates, Rust asserts).                                                              |
+| **Odra contracts**                       | ✅ done + tested   | `attestation_registry` (submit/get/challenge/resolve/finalize/reputation), `insurance` (buy_policy/claim/stake/unstake, reads registry cross-contract), CEP-18 `StakeToken` + `MockUsdc`. 30 MockVM tests + parity; clippy `-D warnings` clean. |
+| **RFC 7807 errors**                      | ✅ done            | `contracts/problem` (Rust, `rust-rfc7807`) maps the full error taxonomy; the SDK + x402 server mirror the same `application/problem+json` shape.                                                                                                |
+| **Agent runtime** (zero-cost)            | ✅ done + tested   | `packages/agent`: 15-signal risk-scorer, claim-oracle, attestor, verifier, S3/MinIO store (+ in-memory + tamper), Ollama loop with `LLM_BACKEND=none\|ollama` (no paid keys). 97 tests.                                                         |
+| **SDK**                                  | ✅ done + tested   | `@casperproof/casper-sdk`: typed client over CSPR.cloud + deploys; mock + REST backends; 103 tests.                                                                                                                                             |
+| **x402 server**                          | ✅ done + tested   | Fastify, `GET /attestation/:id` + `POST /verify`, x402-gated (402 → pay → serve); mock + facilitator verifiers. 27 tests.                                                                                                                       |
+| **MCP server**                           | ✅ done + tested   | 7 tools (get/verify/submit/score/policy/claim/challenge) over stdio. 20 tests.                                                                                                                                                                  |
+| **dApp** (`apps/web`)                    | ✅ done            | Next.js + CSPR.click (mock connector); Oracle / Insurance / Slash views + live feed + Recharts; static build passes offline.                                                                                                                    |
+| **Marketing** (`apps/marketing`)         | ✅ done            | Next.js static export; full SEO/OG/sitemap; live numbers via SDK; 29 tests.                                                                                                                                                                     |
+| **Dockerization**                        | ✅ done            | `docker/` images + `docker-compose.yml` (+ prod overlay), `Makefile`; `cp .env.example .env && make up` boots ollama/minio/agent/x402/mcp/web/marketing + one-shot deployer.                                                                    |
+| **CI**                                   | ✅ done            | `.github/workflows/`: ci (lint+typecheck+cargo test+TS coverage gate), e2e (compose+Playwright), release.                                                                                                                                       |
+| **E2E**                                  | ✅ specs written   | Playwright `e2e/` covers the full demo arc; runs in CI (`playwright install chromium`).                                                                                                                                                         |
+| **Docs**                                 | ✅ done            | README + per-package READMEs + `docs/` (ARCHITECTURE/COMMITMENT/CONTRACTS/DEPLOYMENT/DEMO_SCRIPT/API + 6 ADRs) + typedoc config.                                                                                                                |
+| **Testnet deploy**                       | ⏳ mock (no keys)  | `scripts/deploy-testnet.ts` runs a deterministic mock deploy; real deploy needs the secrets in `SETUP_NEEDED.md`.                                                                                                                               |
 
 ## How to run
 
@@ -67,5 +67,21 @@ make test               # contracts (cargo test) + TS (turbo) suites
 
 ## Final gates
 
-- **security-reviewer** and **qa-test-engineer** sub-agents run as the submission gate; see the
-  build log. (Testnet-only, unaudited — not for mainnet value.)
+Both submission gates (§9) ran as fresh specialist sub-agents and returned **GO**:
+
+- **Security review — GO.** Money-math conserves value, `resolve` is resolver-only, the
+  dispute-window logic and TS⇆Rust hash parity hold, and the error surface doesn't leak. Its
+  findings were applied as hardening: the insurance `claim` now binds the backing attestation to
+  the configured `claim_model_id`; `claim`/`resolve`/`finalize`/`unstake` follow
+  checks-effects-interactions (state written before external token transfers); the verifier now
+  recomputes the **full commitment** (input + output + model + timestamp), so input/model/
+  timestamp tampering also FAILs; and the x402 server **fails closed** in production when no
+  facilitator and no explicit mock are configured. (Vault capital-reservation across LPs is
+  documented as a mainnet item; content-addressing-on-read is intentionally not enforced so the
+  in-memory tamper demo can flip bytes at a fixed key.)
+- **QA gate — GO.** 40 Rust tests + ~400 TS tests pass; every threshold-gated package clears
+  **>90% line + branch**; repo-wide typecheck + Prettier are clean; the `make seed` arc
+  completes with a paid claim and one slash. E2E specs are validated; browser execution runs in
+  CI (`playwright install chromium`).
+
+Testnet-only, unaudited — not for mainnet value (see `SECURITY.md` / `SETUP_NEEDED.md`).

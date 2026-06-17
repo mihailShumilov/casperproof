@@ -10,12 +10,6 @@ import { CodeBlock } from './ui';
  * inside a client boundary. This thin wrapper provides exactly that, keeping
  * the rest of the page as Server Components.
  */
-export function ClientCode({
-  code,
-  language,
-}: {
-  code: string;
-  language?: string;
-}): JSX.Element {
+export function ClientCode({ code, language }: { code: string; language?: string }): JSX.Element {
   return <CodeBlock code={code} language={language} />;
 }

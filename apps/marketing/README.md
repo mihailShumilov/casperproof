@@ -78,7 +78,7 @@ state through the **public API** — it never hard-codes a metric.
 
 - **Mock mode** (default — no `CSPR_CLOUD_TOKEN`): the SDK's in-memory store
   starts empty, so the module drives a small, deterministic demo flow through
-  the *same* methods an agent would call (submit 9 attestations across 3
+  the _same_ methods an agent would call (submit 9 attestations across 3
   attestors, challenge 2, resolve one honestly and one as fraud, open a
   policy). It then reports `attestationCount()` and aggregated
   `attestorReputation(...)` — i.e. genuine SDK output (currently 9 / 2 / 1 /
@@ -93,12 +93,12 @@ time, so the figures are baked into the static HTML — zero client fetch.
 
 ## Environment variables (all optional, build-time)
 
-| Var | Default | Used for |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | `https://casperproof.com` | canonical, OG, sitemap, robots |
-| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | "Launch app" CTA |
-| `NEXT_PUBLIC_CSPR_FANS_URL` | `https://cspr.fans` | "Vote on CSPR.fans" CTA |
-| `CSPR_CLOUD_TOKEN` | _(unset)_ | flips the SDK to live mode for stats |
+| Var                         | Default                   | Used for                             |
+| --------------------------- | ------------------------- | ------------------------------------ |
+| `NEXT_PUBLIC_SITE_URL`      | `https://casperproof.com` | canonical, OG, sitemap, robots       |
+| `NEXT_PUBLIC_APP_URL`       | `http://localhost:3000`   | "Launch app" CTA                     |
+| `NEXT_PUBLIC_CSPR_FANS_URL` | `https://cspr.fans`       | "Vote on CSPR.fans" CTA              |
+| `CSPR_CLOUD_TOKEN`          | _(unset)_                 | flips the SDK to live mode for stats |
 
 ## Accessibility & performance
 
@@ -125,4 +125,7 @@ time, so the figures are baked into the static HTML — zero client fetch.
   tiles from real Casper testnet data instead of the labelled mock flow.
 - **Social handles** — `@casperproof` (X/Twitter) and `github.com/casperproof`
   are placeholders in `lib/site.ts`; confirm the real handles/org.
+
+```
+
 ```

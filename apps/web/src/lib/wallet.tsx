@@ -23,14 +23,7 @@
  */
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useReducer,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useMemo, useReducer, type ReactNode } from 'react';
 import { MOCK_ACCOUNT } from '@casperproof/casper-sdk';
 
 /** A connected wallet account (mirrors the fields the dApp reads from CSPR.click). */

@@ -6,12 +6,12 @@ against the SDK mock backend — no secrets, no network, deterministic.
 
 ## What it covers
 
-| Spec | Asserts |
-|------|---------|
+| Spec                      | Asserts                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `tests/demo-flow.spec.ts` | The full §20 climax in one continuous session: connect wallet (mock) → score an address → submit/attest → **verify PASS** (on-chain hash == recomputed hash, both shown and equal) → buy a covered policy → simulate a covered trigger → claim payout → tamper a payload → **verify FAIL** (hashes diverge) → challenge → resolve fraudulent → slash. Asserts the live feed accumulates `AttestationSubmitted`, `ClaimPaid`, `Challenged`, and `Resolved` (fraudulent → slashed) events across in-app navigation. |
-| `tests/oracle.spec.ts` | Oracle happy path: submit gated on a connected wallet; submit appears in the list + live feed; unedited verify → **PASS** with equal hashes; tampered payload → **FAIL** with diverging hashes. |
-| `tests/insurance.spec.ts` | Insurance happy path: score an address (no wallet needed); buy gated on a connected wallet; score → buy → simulate covered trigger → **auto-payout** (`ClaimPaid` in feed, policy flips to `Claimed`); vault solvency tiles reflect the policy. |
-| `tests/slash.spec.ts` | Slash happy path: flow gated on a connected wallet; submit → tamper & **verify FAIL** → challenge → resolve fraudulent → **slash**, stake split between challenger and treasury; `Challenged` + `Resolved` stream into the feed. |
+| `tests/oracle.spec.ts`    | Oracle happy path: submit gated on a connected wallet; submit appears in the list + live feed; unedited verify → **PASS** with equal hashes; tampered payload → **FAIL** with diverging hashes.                                                                                                                                                                                                                                                                                                                   |
+| `tests/insurance.spec.ts` | Insurance happy path: score an address (no wallet needed); buy gated on a connected wallet; score → buy → simulate covered trigger → **auto-payout** (`ClaimPaid` in feed, policy flips to `Claimed`); vault solvency tiles reflect the policy.                                                                                                                                                                                                                                                                   |
+| `tests/slash.spec.ts`     | Slash happy path: flow gated on a connected wallet; submit → tamper & **verify FAIL** → challenge → resolve fraudulent → **slash**, stake split between challenger and treasury; `Challenged` + `Resolved` stream into the feed.                                                                                                                                                                                                                                                                                  |
 
 Shared steps live in `tests/helpers.ts` (connect wallet, submit attestation,
 open the verify panel, read the full hash behind a `HashDisplay`, assert
@@ -67,7 +67,7 @@ pnpm --filter @casperproof/e2e exec tsc --noEmit -p tsconfig.json
 
 - **Chromium browser binary.** `playwright install chromium` downloads the
   browser from the Playwright CDN. In a network-restricted sandbox that download
-  is blocked, so the suite cannot *execute* there — but the specs are written and
+  is blocked, so the suite cannot _execute_ there — but the specs are written and
   typechecked to run green in CI / locally where the binary is available. Run the
   two commands under [Running](#running) on a machine with network access (CI
   installs the binary as a normal step).

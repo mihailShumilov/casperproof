@@ -13,17 +13,17 @@ make up        # build + start every service in the foreground
 
 What boots (all on one bridge network, `.env`-driven):
 
-| Service       | Image / Dockerfile                  | Host port      | Role |
-|---------------|-------------------------------------|----------------|------|
-| `ollama`      | `ollama/ollama`                     | 11434          | Local LLM backend; pulls `${OLLAMA_MODEL}` on first run. |
-| `minio`       | `minio/minio`                       | 9000 / 9001    | S3-compatible payload store (+ web console). |
-| `minio-init`  | `minio/mc`                          | —              | One-shot: creates `${S3_BUCKET}`, then exits. |
-| `deployer`    | `docker/Dockerfile.contracts`       | —              | One-shot: builds wasm + deploys contracts (mock unless keys), then exits. |
-| `agent`       | `docker/Dockerfile.node`            | —              | Zero-cost runtime (risk-scorer, attestor, verifier, Ollama loop). |
-| `x402-server` | `docker/Dockerfile.node`            | 8402           | Pay-per-request resource server. |
-| `mcp-server`  | `docker/Dockerfile.node`            | 8405           | Agent ↔ chain MCP tools (HTTP transport in compose). |
-| `web`         | `docker/Dockerfile.web`             | 3000           | Next.js dApp dashboard (standalone). |
-| `marketing`   | `docker/Dockerfile.marketing`       | 3001           | Static marketing site served by nginx. |
+| Service       | Image / Dockerfile            | Host port   | Role                                                                      |
+| ------------- | ----------------------------- | ----------- | ------------------------------------------------------------------------- |
+| `ollama`      | `ollama/ollama`               | 11434       | Local LLM backend; pulls `${OLLAMA_MODEL}` on first run.                  |
+| `minio`       | `minio/minio`                 | 9000 / 9001 | S3-compatible payload store (+ web console).                              |
+| `minio-init`  | `minio/mc`                    | —           | One-shot: creates `${S3_BUCKET}`, then exits.                             |
+| `deployer`    | `docker/Dockerfile.contracts` | —           | One-shot: builds wasm + deploys contracts (mock unless keys), then exits. |
+| `agent`       | `docker/Dockerfile.node`      | —           | Zero-cost runtime (risk-scorer, attestor, verifier, Ollama loop).         |
+| `x402-server` | `docker/Dockerfile.node`      | 8402        | Pay-per-request resource server.                                          |
+| `mcp-server`  | `docker/Dockerfile.node`      | 8405        | Agent ↔ chain MCP tools (HTTP transport in compose).                      |
+| `web`         | `docker/Dockerfile.web`       | 3000        | Next.js dApp dashboard (standalone).                                      |
+| `marketing`   | `docker/Dockerfile.marketing` | 3001        | Static marketing site served by nginx.                                    |
 
 Open:
 
@@ -42,7 +42,7 @@ and the cargo registry/git are mounted as BuildKit caches so re-builds are fast.
 
 - **`Dockerfile.node`** — pnpm + Turborepo base (`corepack pnpm@9.15.4`,
   `node:20.18.1-slim`). `deps` (frozen install) → `builder` (`turbo run build
-  --filter=$APP...` + a `--prod` prune) → non-root `runner`. The `APP` build
+--filter=$APP...` + a `--prod` prune) → non-root `runner`. The `APP` build
   arg (a pnpm filter scope) selects which workspace runs; one image powers
   `agent`, `x402-server`, and `mcp-server`.
 - **`Dockerfile.web`** — builds the Next.js **standalone** output and runs it
@@ -94,21 +94,21 @@ for automated Let's Encrypt issuance is sketched (commented) in the overlay.
 
 Run `make help` for the self-documenting list:
 
-| Target           | Does |
-|------------------|------|
-| `install`        | `pnpm install` + `cargo fetch`. |
-| `up`             | Build + start the full local stack (foreground). |
-| `up-prod`        | Start the prod overlay, detached. |
-| `down`           | Stop + remove containers/networks (keeps volumes). |
-| `logs`           | Tail all service logs. |
-| `deploy-testnet` | Build wasm + deploy contracts. |
-| `seed`           | Seed demo data. |
-| `test`           | `cargo test` + `pnpm turbo run test` (e2e noted). |
-| `coverage`       | `pnpm turbo run test:coverage` (>90% gate). |
+| Target           | Does                                                             |
+| ---------------- | ---------------------------------------------------------------- |
+| `install`        | `pnpm install` + `cargo fetch`.                                  |
+| `up`             | Build + start the full local stack (foreground).                 |
+| `up-prod`        | Start the prod overlay, detached.                                |
+| `down`           | Stop + remove containers/networks (keeps volumes).               |
+| `logs`           | Tail all service logs.                                           |
+| `deploy-testnet` | Build wasm + deploy contracts.                                   |
+| `seed`           | Seed demo data.                                                  |
+| `test`           | `cargo test` + `pnpm turbo run test` (e2e noted).                |
+| `coverage`       | `pnpm turbo run test:coverage` (>90% gate).                      |
 | `lint`           | turbo lint+typecheck + `prettier --check` + `cargo fmt --check`. |
-| `build`          | `pnpm turbo run build` + `cargo odra build`. |
-| `config`         | Validate the merged compose config (base + prod). |
-| `clean`          | Tear down + clean build artifacts. |
+| `build`          | `pnpm turbo run build` + `cargo odra build`.                     |
+| `config`         | Validate the merged compose config (base + prod).                |
+| `clean`          | Tear down + clean build artifacts.                               |
 
 ## CI (`.github/workflows/`)
 
@@ -128,7 +128,7 @@ DevOps surface (they live in app/contract source, which DevOps does not edit):
 1. **`apps/web/next.config.mjs` needs `output: 'standalone'`.** `Dockerfile.web`
    copies `.next/standalone` + `.next/static`. Without standalone output, add:
    ```js
-   const nextConfig = { output: 'standalone', /* ...existing... */ };
+   const nextConfig = { output: 'standalone' /* ...existing... */ };
    ```
 2. **`apps/marketing` needs a `next.config.mjs` with `output: 'export'`** (and,
    if deployed under a subpath, `images: { unoptimized: true }`).

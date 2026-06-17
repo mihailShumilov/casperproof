@@ -15,10 +15,7 @@ export function Card({
   ...rest
 }: CardProps): JSX.Element {
   return (
-    <div
-      className={clsx('cp-card', interactive && 'cp-card--interactive', className)}
-      {...rest}
-    >
+    <div className={clsx('cp-card', interactive && 'cp-card--interactive', className)} {...rest}>
       {children}
     </div>
   );
