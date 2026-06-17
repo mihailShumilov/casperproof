@@ -1,0 +1,284 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml — CasperProof local stack (one command: `make up`).
+#
+#   cp .env.example .env && make up
+#
+# Boots the full stack with NO host dependency beyond Docker, fully offline /
+# mock (no secrets required). Every value is sourced from `.env` (see
+# `.env.example`). Services: ollama, minio (+ minio-init), deployer (one-shot),
+# agent, x402-server, mcp-server, web, marketing.
+#
+# Postgres/Redis are intentionally omitted — the stack is leaner without them
+# (the SDK uses in-memory fixtures + MinIO for payloads).
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: casperproof
+
+networks:
+  casperproof:
+    driver: bridge
+
+volumes:
+  ollama-models:
+  minio-data:
+  contracts-out: # deployer writes deployed addresses + wasm here, shared read-only
+
+services:
+  # ── Ollama: local LLM backend (zero-cost agent runtime) ────────────────────
+  ollama:
+    image: ollama/ollama:0.5.4
+    networks: [casperproof]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    # On first run, pull the configured model in the background, then keep the
+    # server in the foreground. Subsequent runs find the model already present.
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        ollama serve &
+        pid=$$!
+        echo "waiting for ollama daemon..."
+        until ollama list >/dev/null 2>&1; do sleep 1; done
+        echo "pulling ${OLLAMA_MODEL}..."
+        ollama pull "${OLLAMA_MODEL}" || echo "model pull failed (offline?) — continuing"
+        wait $$pid
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  # ── MinIO: S3-compatible payload store ─────────────────────────────────────
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    networks: [casperproof]
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # web console
+    volumes:
+      - minio-data:/data
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    command: server /data --console-address ":9001"
+    healthcheck:
+      # `mc ready local` is MinIO's documented in-image readiness probe (the
+      # server image auto-registers the `local` alias for itself).
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    restart: unless-stopped
+
+  # ── minio-init: create the payload bucket once MinIO is healthy ────────────
+  minio-init:
+    image: minio/mc:RELEASE.2024-11-21T17-21-54Z
+    networks: [casperproof]
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        mc alias set local http://minio:9000 "$${S3_ACCESS_KEY}" "$${S3_SECRET_KEY}"
+        mc mb --ignore-existing "local/$${S3_BUCKET}"
+        # Public-read so the verifier can re-fetch payloads by blake2b key.
+        mc anonymous set download "local/$${S3_BUCKET}"
+        echo "bucket $${S3_BUCKET} ready"
+    restart: "no"
+
+  # ── deployer: one-shot wasm build + testnet deploy, then exit ──────────────
+  # Mock mode unless CASPER_SECRET_KEY_PATH + CSPR_CLOUD_TOKEN are set. Writes
+  # the deployed contract hashes to the shared `contracts-out` volume so the
+  # Node services can read them. (`make deploy-testnet` runs the same image.)
+  deployer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.contracts
+    image: casperproof/contracts:local
+    networks: [casperproof]
+    env_file: [.env]
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      CASPER_NODE_URL: ${CASPER_NODE_URL}
+      CASPER_NETWORK_NAME: ${CASPER_NETWORK_NAME}
+      CASPER_SECRET_KEY_PATH: ${CASPER_SECRET_KEY_PATH}
+      CSPR_CLOUD_REST_URL: ${CSPR_CLOUD_REST_URL}
+      CSPR_CLOUD_TOKEN: ${CSPR_CLOUD_TOKEN}
+    volumes:
+      - contracts-out:/app/contracts/wasm-out
+    # Deploy to testnet (mock if no keys), write addresses into the shared
+    # volume's .env.local, then exit 0.
+    command:
+      - sh
+      - -c
+      - |
+        pnpm exec tsx scripts/deploy-testnet.ts \
+          && cp -f .env.local /app/contracts/wasm-out/.env.local 2>/dev/null || true
+    restart: "no"
+
+  # ── agent: zero-cost runtime (risk-scorer, attestor, verifier, Ollama loop) ─
+  agent:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.node
+      args:
+        APP: "@casperproof/agent"
+    image: casperproof/agent:local
+    networks: [casperproof]
+    env_file: [.env]
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      LOG_LEVEL: ${LOG_LEVEL}
+      LLM_BACKEND: ${LLM_BACKEND}
+      OLLAMA_HOST: ${OLLAMA_HOST}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+      AGENT_POLL_INTERVAL_MS: ${AGENT_POLL_INTERVAL_MS}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_REGION: ${S3_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_FORCE_PATH_STYLE: ${S3_FORCE_PATH_STYLE}
+      CASPER_NODE_URL: ${CASPER_NODE_URL}
+      CSPR_CLOUD_REST_URL: ${CSPR_CLOUD_REST_URL}
+      CSPR_CLOUD_TOKEN: ${CSPR_CLOUD_TOKEN}
+    depends_on:
+      ollama:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # ── x402-server: pay-per-request resource server ───────────────────────────
+  x402-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.node
+      args:
+        APP: "@casperproof/x402-server"
+    image: casperproof/x402-server:local
+    networks: [casperproof]
+    env_file: [.env]
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      LOG_LEVEL: ${LOG_LEVEL}
+      X402_SERVER_PORT: ${X402_SERVER_PORT}
+      X402_FACILITATOR_URL: ${X402_FACILITATOR_URL}
+      X402_PRICE_USD: ${X402_PRICE_USD}
+      X402_PAY_TO: ${X402_PAY_TO}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_REGION: ${S3_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_FORCE_PATH_STYLE: ${S3_FORCE_PATH_STYLE}
+      CSPR_CLOUD_REST_URL: ${CSPR_CLOUD_REST_URL}
+      CSPR_CLOUD_TOKEN: ${CSPR_CLOUD_TOKEN}
+    ports:
+      - "${X402_SERVER_PORT}:${X402_SERVER_PORT}"
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        ["CMD", "node", "-e", "fetch('http://localhost:'+(process.env.X402_SERVER_PORT||8402)+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  # ── mcp-server: agent ↔ chain tools (HTTP transport in compose) ────────────
+  mcp-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.node
+      args:
+        APP: "@casperproof/mcp-server"
+    image: casperproof/mcp-server:local
+    networks: [casperproof]
+    env_file: [.env]
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      LOG_LEVEL: ${LOG_LEVEL}
+      MCP_SERVER_PORT: ${MCP_SERVER_PORT}
+      # Containerized MCP runs over HTTP so the dApp can reach it.
+      MCP_TRANSPORT: http
+      CSPR_CLOUD_REST_URL: ${CSPR_CLOUD_REST_URL}
+      CSPR_CLOUD_TOKEN: ${CSPR_CLOUD_TOKEN}
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+    ports:
+      - "${MCP_SERVER_PORT}:${MCP_SERVER_PORT}"
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # ── web: Next.js dApp dashboard ────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+        NEXT_PUBLIC_MARKETING_URL: ${NEXT_PUBLIC_MARKETING_URL}
+        NEXT_PUBLIC_X402_SERVER_URL: ${NEXT_PUBLIC_X402_SERVER_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_CSPR_CLICK_APP_ID: ${NEXT_PUBLIC_CSPR_CLICK_APP_ID}
+        NEXT_PUBLIC_CSPR_CLICK_APP_NAME: ${NEXT_PUBLIC_CSPR_CLICK_APP_NAME}
+    image: casperproof/web:local
+    networks: [casperproof]
+    env_file: [.env]
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - x402-server
+      - mcp-server
+    healthcheck:
+      test:
+        ["CMD", "node", "-e", "fetch('http://localhost:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+
+  # ── marketing: static site served by nginx ─────────────────────────────────
+  marketing:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.marketing
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+    image: casperproof/marketing:local
+    networks: [casperproof]
+    ports:
+      - "3001:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped

@@ -1,0 +1,149 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.prod.yml — production overlay.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   (or: `make up-prod`)
+#
+# Layers production posture onto the base stack: NODE_ENV=production,
+# restart policies, resource limits, JSON log rotation, and an `nginx` reverse
+# proxy terminating casperproof.com → marketing and app.casperproof.com → web.
+# TLS is ready to enable (drop certs + uncomment the 443 blocks in
+# docker/nginx/nginx.prod.conf; an optional certbot sidecar is sketched below).
+# ─────────────────────────────────────────────────────────────────────────────
+
+volumes:
+  certbot-certs:
+  certbot-webroot:
+
+services:
+  ollama:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 8g
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  minio:
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  agent:
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1g
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  x402-server:
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    # Internal only in prod — exposed via the nginx proxy, not a host port.
+    ports: !reset []
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512m
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  mcp-server:
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    ports: !reset []
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512m
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  web:
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    # Fronted by nginx; do not publish the host port directly.
+    ports: !reset []
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1g
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  marketing:
+    restart: unless-stopped
+    ports: !reset []
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128m
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  # ── nginx: TLS-ready reverse proxy / router ────────────────────────────────
+  nginx:
+    image: nginx:1.27.3-alpine
+    networks: [casperproof]
+    depends_on:
+      - web
+      - marketing
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - certbot-certs:/etc/nginx/certs:ro
+      - certbot-webroot:/var/www/certbot:ro
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256m
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  # ── certbot (optional): automated Let's Encrypt certs ──────────────────────
+  # Uncomment to issue/renew certs into the shared `certbot-certs` volume, then
+  # enable the 443 server blocks in docker/nginx/nginx.prod.conf and reload nginx.
+  #
+  # certbot:
+  #   image: certbot/certbot:latest
+  #   volumes:
+  #     - certbot-certs:/etc/letsencrypt
+  #     - certbot-webroot:/var/www/certbot
+  #   entrypoint: ["/bin/sh", "-c"]
+  #   command:
+  #     - |
+  #       certbot certonly --webroot -w /var/www/certbot \
+  #         -d casperproof.com -d www.casperproof.com -d app.casperproof.com \
+  #         --email ${CERTBOT_EMAIL:-admin@casperproof.com} \
+  #         --agree-tos --no-eff-email
+  #   # Re-run periodically (or via host cron) to renew:
+  #   #   certbot renew && docker compose exec nginx nginx -s reload

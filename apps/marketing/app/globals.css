@@ -1,0 +1,328 @@
+/*
+ * Marketing-site layout styles, layered on top of @casperproof/ui/styles.css.
+ *
+ * The UI stylesheet provides the design tokens, base reset, reduced-motion
+ * handling, and component classes. Everything here is page-level layout
+ * (sections, grids, hero) scoped with a `mk-` prefix so it never collides with
+ * the shared `cp-` component classes.
+ */
+
+/* --- Layout primitives ----------------------------------------------- */
+
+.mk-container {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding-inline: var(--cp-space-xl);
+}
+
+.mk-section {
+  padding-block: 4rem;
+  border-top: 1px solid var(--cp-color-border);
+}
+
+.mk-section--flush {
+  border-top: none;
+}
+
+.mk-eyebrow {
+  display: inline-block;
+  font-size: var(--cp-fontsize-sm);
+  font-weight: var(--cp-fontweight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cp-color-accent);
+  margin: 0 0 var(--cp-space-sm);
+}
+
+.mk-section__title {
+  font-size: var(--cp-fontsize-2xl);
+  font-weight: var(--cp-fontweight-bold);
+  line-height: 1.15;
+  margin: 0 0 var(--cp-space-md);
+  letter-spacing: -0.01em;
+}
+
+.mk-section__lead {
+  max-width: 46rem;
+  color: var(--cp-color-textMuted);
+  font-size: var(--cp-fontsize-lg);
+  margin: 0 0 var(--cp-space-2xl);
+}
+
+.mk-grid {
+  display: grid;
+  gap: var(--cp-space-xl);
+}
+
+.mk-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mk-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.mk-grid--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+  .mk-grid--3,
+  .mk-grid--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .mk-grid--2,
+  .mk-grid--3,
+  .mk-grid--4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mk-card-title {
+  font-size: var(--cp-fontsize-lg);
+  font-weight: var(--cp-fontweight-semibold);
+  margin: 0 0 var(--cp-space-sm);
+}
+
+.mk-card-body {
+  color: var(--cp-color-textMuted);
+  margin: 0;
+}
+
+/* --- Skip link ------------------------------------------------------- */
+
+.mk-skip-link {
+  position: absolute;
+  left: var(--cp-space-md);
+  top: -3rem;
+  z-index: var(--cp-z-toast);
+  padding: var(--cp-space-sm) var(--cp-space-lg);
+  background: var(--cp-color-accent);
+  color: #fff;
+  border-radius: var(--cp-radius-md);
+  transition: top 0.15s ease;
+}
+.mk-skip-link:focus {
+  top: var(--cp-space-md);
+  text-decoration: none;
+}
+
+/* --- Header ---------------------------------------------------------- */
+
+.mk-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--cp-z-sticky);
+  background: rgba(10, 11, 14, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--cp-color-border);
+}
+
+.mk-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-space-lg);
+  height: 4rem;
+}
+
+.mk-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cp-space-sm);
+  font-weight: var(--cp-fontweight-bold);
+  font-size: var(--cp-fontsize-lg);
+  color: var(--cp-color-text);
+  text-decoration: none;
+}
+.mk-brand:hover {
+  text-decoration: none;
+}
+
+.mk-brand__mark {
+  color: var(--cp-color-accent);
+}
+
+.mk-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--cp-space-xl);
+}
+
+.mk-nav__links {
+  display: flex;
+  gap: var(--cp-space-xl);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mk-nav__link {
+  color: var(--cp-color-textMuted);
+  font-size: var(--cp-fontsize-sm);
+  font-weight: var(--cp-fontweight-medium);
+  text-decoration: none;
+}
+.mk-nav__link:hover {
+  color: var(--cp-color-text);
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .mk-nav__links {
+    display: none;
+  }
+}
+
+/* --- Hero ------------------------------------------------------------ */
+
+.mk-hero {
+  position: relative;
+  padding-block: 6rem 4rem;
+  overflow: hidden;
+}
+
+.mk-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60rem 30rem at 70% -10%, rgba(255, 45, 45, 0.14), transparent 60%),
+    radial-gradient(40rem 24rem at 10% 0%, rgba(74, 163, 255, 0.08), transparent 55%);
+  pointer-events: none;
+}
+
+.mk-hero__inner {
+  position: relative;
+  max-width: 52rem;
+}
+
+.mk-hero__title {
+  font-size: clamp(2.25rem, 6vw, 3.75rem);
+  font-weight: var(--cp-fontweight-bold);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: var(--cp-space-lg) 0 var(--cp-space-md);
+}
+
+.mk-hero__accent {
+  color: var(--cp-color-accent);
+}
+
+.mk-hero__sub {
+  font-size: var(--cp-fontsize-xl);
+  color: var(--cp-color-textMuted);
+  margin: 0 0 var(--cp-space-2xl);
+}
+
+.mk-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cp-space-lg);
+}
+
+.mk-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cp-space-md);
+  margin-top: var(--cp-space-2xl);
+}
+
+/* --- How it works ---------------------------------------------------- */
+
+.mk-step__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--cp-radius-full);
+  border: 1px solid var(--cp-color-accent);
+  color: var(--cp-color-accent);
+  font-family: var(--cp-font-mono);
+  font-weight: var(--cp-fontweight-bold);
+  margin-bottom: var(--cp-space-md);
+}
+
+/* --- Live numbers ---------------------------------------------------- */
+
+.mk-source-note {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cp-space-sm);
+  margin-top: var(--cp-space-xl);
+  font-size: var(--cp-fontsize-sm);
+  color: var(--cp-color-textMuted);
+}
+
+/* --- Builders -------------------------------------------------------- */
+
+.mk-builder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  gap: var(--cp-space-xl);
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .mk-builder {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- Roadmap --------------------------------------------------------- */
+
+.mk-roadmap-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-space-md);
+  margin-bottom: var(--cp-space-sm);
+}
+
+/* --- Footer ---------------------------------------------------------- */
+
+.mk-footer {
+  border-top: 1px solid var(--cp-color-border);
+  padding-block: var(--cp-space-3xl);
+  color: var(--cp-color-textMuted);
+  font-size: var(--cp-fontsize-sm);
+}
+
+.mk-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cp-space-xl);
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.mk-footer__links {
+  display: flex;
+  gap: var(--cp-space-xl);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+}
+
+.mk-footer__link {
+  color: var(--cp-color-textMuted);
+  text-decoration: none;
+}
+.mk-footer__link:hover {
+  color: var(--cp-color-text);
+}
+
+.mk-footer__legal {
+  margin-top: var(--cp-space-xl);
+  color: var(--cp-color-textFaint);
+}
+
+.mk-stack-sm > * + * {
+  margin-top: var(--cp-space-sm);
+}

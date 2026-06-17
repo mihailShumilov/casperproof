@@ -9,7 +9,7 @@
 //! Rust side recomputes the scheme — purely to prove it agrees with the TypeScript
 //! generator byte-for-byte.
 
-use odra::casper_types::U512;
+use odra::casper_types::U256;
 use odra::prelude::*;
 
 /// A 32-byte blake2b-256 digest. Stored and compared as raw bytes on-chain.
@@ -57,18 +57,19 @@ pub struct Attestation {
     /// S3 object URL for the off-chain payload (content-addressed by hash).
     pub uri: String,
     /// Stake locked behind this attestation (CEP-18 STAKE motes).
-    pub stake: U512,
+    pub stake: U256,
     pub created_at: u64,
     pub status: AttestationStatus,
     /// The account that opened a challenge, if any.
     pub challenger: Option<Address>,
     /// Bond posted by the challenger.
-    pub challenge_bond: U512,
+    pub challenge_bond: U256,
     pub challenged_at: u64,
 }
 
 /// Per-attestor reputation, updated on every resolution.
 #[odra::odra_type]
+#[derive(Default)]
 pub struct Reputation {
     /// Total attestations submitted.
     pub total: u64,
@@ -80,24 +81,13 @@ pub struct Reputation {
     pub challenges_defended: u64,
 }
 
-impl Default for Reputation {
-    fn default() -> Self {
-        Reputation {
-            total: 0,
-            successful: 0,
-            slashed: 0,
-            challenges_defended: 0,
-        }
-    }
-}
-
 /// Registry configuration, set at deploy time.
 #[odra::odra_type]
 pub struct RegistryConfig {
     /// Minimum stake required to submit an attestation.
-    pub min_stake: U512,
+    pub min_stake: U256,
     /// Bond a challenger must post.
-    pub challenge_bond: U512,
+    pub challenge_bond: U256,
     /// Dispute window in seconds; challenges are only accepted within it.
     pub dispute_window: u64,
     /// Treasury that receives the protocol's cut of a slash.
@@ -210,14 +200,32 @@ mod golden_parity {
             // 1. Canonicalization parity (key sorting, compaction, unicode).
             let ci = canonical(&v.input);
             let co = canonical(&v.output);
-            assert_eq!(ci, v.canonical_input, "canonicalInput mismatch [{}]", v.name);
-            assert_eq!(co, v.canonical_output, "canonicalOutput mismatch [{}]", v.name);
+            assert_eq!(
+                ci, v.canonical_input,
+                "canonicalInput mismatch [{}]",
+                v.name
+            );
+            assert_eq!(
+                co, v.canonical_output,
+                "canonicalOutput mismatch [{}]",
+                v.name
+            );
 
             // 2. input_hash / output_hash parity.
             let ih = blake2b256(ci.as_bytes());
             let oh = blake2b256(co.as_bytes());
-            assert_eq!(hex::encode(ih), v.input_hash, "inputHash mismatch [{}]", v.name);
-            assert_eq!(hex::encode(oh), v.output_hash, "outputHash mismatch [{}]", v.name);
+            assert_eq!(
+                hex::encode(ih),
+                v.input_hash,
+                "inputHash mismatch [{}]",
+                v.name
+            );
+            assert_eq!(
+                hex::encode(oh),
+                v.output_hash,
+                "outputHash mismatch [{}]",
+                v.name
+            );
 
             // 3. commitment parity: blake2b_256(ih || oh || utf8(model_id) || le_u64(ts)).
             let mut preimage = Vec::with_capacity(32 + 32 + v.model_id.len() + 8);

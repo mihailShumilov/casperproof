@@ -11,6 +11,10 @@ repository = "https://github.com/mihailShumilov/casperproof"
 odra = { version = "2", default-features = false }
 odra-modules = { version = "2", default-features = false }
 
+[build-dependencies]
+# Used by `build.rs` to emit the `odra_module` cfg + flags for `cargo odra build`.
+odra-build = { version = "2", default-features = false }
+
 [dev-dependencies]
 odra-test = { version = "2", default-features = false }
 # Host-only deps used solely by the cross-language golden-vector parity test in
@@ -19,9 +23,6 @@ blake2 = "0.10"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 hex = "0.4"
-
-[build-dependencies]
-odra-build = { version = "2", default-features = false }
 
 [lib]
 crate-type = ["rlib"]
@@ -32,16 +33,6 @@ doctest = false
 # so it is built/tested with the rest of the Rust code but never compiled to wasm.
 [workspace]
 members = ["problem"]
-
-[[bin]]
-name = "casperproof_build_contract"
-path = "bin/build_contract.rs"
-test = false
-
-[[bin]]
-name = "casperproof_build_schema"
-path = "bin/build_schema.rs"
-test = false
 
 [profile.release]
 codegen-units = 1

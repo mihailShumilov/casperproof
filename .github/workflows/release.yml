@@ -1,0 +1,87 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Release — on a `v*` tag, build all images (matrix) and cut a GitHub release.
+# Image push to a registry is wired but commented (enable once a registry +
+# credentials are configured — see the `push:` notes below).
+# ─────────────────────────────────────────────────────────────────────────────
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # create the GitHub release
+  packages: write # push images to GHCR (when enabled)
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  # ── Build each image in parallel ───────────────────────────────────────────
+  images:
+    name: Build image (${{ matrix.image.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - { name: web,         dockerfile: docker/Dockerfile.web,        build_args: "" }
+          - { name: marketing,   dockerfile: docker/Dockerfile.marketing,  build_args: "" }
+          - { name: agent,       dockerfile: docker/Dockerfile.node,       build_args: "APP=@casperproof/agent" }
+          - { name: x402-server, dockerfile: docker/Dockerfile.node,       build_args: "APP=@casperproof/x402-server" }
+          - { name: mcp-server,  dockerfile: docker/Dockerfile.node,       build_args: "APP=@casperproof/mcp-server" }
+          - { name: contracts,   dockerfile: docker/Dockerfile.contracts,  build_args: "" }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── Registry login (uncomment to push to GHCR) ─────────────────────────
+      # - name: Log in to GHCR
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ${{ env.REGISTRY }}
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.image.name }}
+          tags: |
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.image.dockerfile }}
+          build-args: ${{ matrix.image.build_args }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          # Flip to `true` once the GHCR login step above is enabled.
+          push: false
+          load: true
+
+  # ── Create the GitHub release once all images build ────────────────────────
+  release:
+    name: GitHub Release
+    needs: images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

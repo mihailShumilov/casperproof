@@ -1,0 +1,70 @@
+# syntax=docker/dockerfile:1.7
+# ─────────────────────────────────────────────────────────────────────────────
+# Dockerfile.web — Next.js dApp (apps/web → app.casperproof.com).
+#
+# Builds the standalone output (`output: 'standalone'` in next.config.mjs — see
+# docker/README.md → SETUP_NEEDED) and runs it with plain `node server.js`, no
+# pnpm/runtime install needed. Multi-stage; the runner is non-root and minimal.
+# ─────────────────────────────────────────────────────────────────────────────
+
+ARG NODE_IMAGE=node:20.18.1-slim
+
+# ── base: corepack + pnpm ────────────────────────────────────────────────────
+FROM ${NODE_IMAGE} AS base
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+WORKDIR /app
+
+# ── deps: full workspace install (cached on lockfile) ────────────────────────
+FROM base AS deps
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
+COPY apps ./apps
+COPY packages ./packages
+COPY e2e ./e2e
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# ── builder: build the web app + its workspace deps via turbo ────────────────
+FROM deps AS builder
+# Public env baked at build time (Next inlines NEXT_PUBLIC_* into the bundle).
+ARG NEXT_PUBLIC_APP_URL=http://localhost:3000
+ARG NEXT_PUBLIC_MARKETING_URL=http://localhost:3001
+ARG NEXT_PUBLIC_X402_SERVER_URL=http://localhost:8402
+ARG NEXT_PUBLIC_SITE_URL=https://casperproof.com
+ARG NEXT_PUBLIC_CSPR_CLICK_APP_ID=casperproof
+ARG NEXT_PUBLIC_CSPR_CLICK_APP_NAME=CasperProof
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL} \
+    NEXT_PUBLIC_MARKETING_URL=${NEXT_PUBLIC_MARKETING_URL} \
+    NEXT_PUBLIC_X402_SERVER_URL=${NEXT_PUBLIC_X402_SERVER_URL} \
+    NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL} \
+    NEXT_PUBLIC_CSPR_CLICK_APP_ID=${NEXT_PUBLIC_CSPR_CLICK_APP_ID} \
+    NEXT_PUBLIC_CSPR_CLICK_APP_NAME=${NEXT_PUBLIC_CSPR_CLICK_APP_NAME} \
+    NEXT_TELEMETRY_DISABLED=1
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm turbo run build --filter=@casperproof/web...
+
+# ── runner: serve the standalone bundle with node ────────────────────────────
+FROM ${NODE_IMAGE} AS runner
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tini ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system --gid 1001 nodejs \
+    && useradd --system --uid 1001 --gid nodejs --create-home nextjs
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0
+WORKDIR /app
+
+# Next's standalone output bundles a self-contained server + the minimal
+# node_modules it needs. Static assets and `public/` are copied alongside.
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+
+USER nextjs
+EXPOSE 3000
+ENTRYPOINT ["/usr/bin/tini", "--"]
+# The standalone server entrypoint lives under the app's workspace path.
+CMD ["node", "apps/web/server.js"]

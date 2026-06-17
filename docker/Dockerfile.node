@@ -1,0 +1,73 @@
+# syntax=docker/dockerfile:1.7
+# ─────────────────────────────────────────────────────────────────────────────
+# Dockerfile.node — multi-stage pnpm + Turborepo image for the Node workspaces.
+#
+# Used by the `agent`, `x402-server`, and `mcp-server` services. Pick which
+# workspace to build/run with the `APP` build arg (a pnpm filter scope), e.g.:
+#
+#   docker build -f docker/Dockerfile.node \
+#     --build-arg APP=@casperproof/x402-server \
+#     --build-arg START_SCRIPT=start -t casperproof/x402-server .
+#
+# Stages: base → deps (full install, cached) → builder (turbo build) →
+# runner (non-root, production-only deps + built dist).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Pin both the major and the digest-bearing tag for reproducibility.
+ARG NODE_IMAGE=node:20.18.1-slim
+
+# ── base: corepack + pnpm, shared by every stage ────────────────────────────
+FROM ${NODE_IMAGE} AS base
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+# Pin pnpm to the version declared in package.json `packageManager`.
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+WORKDIR /app
+
+# ── deps: install the full workspace once; cached on lockfile changes ────────
+FROM base AS deps
+# Copy only the manifests + lockfile first so the install layer is reused
+# whenever source (but not dependencies) changes.
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
+COPY apps ./apps
+COPY packages ./packages
+COPY e2e ./e2e
+# A frozen install guarantees the lockfile is authoritative (reproducible).
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+
+# ── builder: turbo build for the requested workspace + its deps ──────────────
+FROM deps AS builder
+ARG APP
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm turbo run build --filter="${APP}..."
+# Produce a pruned, production-only node_modules in an isolated dir so the
+# runner stage stays lean (dev deps / build tooling are dropped).
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile --prod --filter="${APP}..."
+
+# ── runner: minimal non-root runtime ─────────────────────────────────────────
+FROM base AS runner
+ARG APP
+# `tini` reaps zombies and forwards signals for clean container shutdown.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tini ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system --gid 1001 nodejs \
+    && useradd --system --uid 1001 --gid nodejs --create-home casper
+
+ENV NODE_ENV=production
+# `APP` (a pnpm filter scope) is passed straight to `pnpm --filter ... start`
+# at runtime so a single image can host any of the Node services.
+ENV APP=${APP}
+
+# Copy the built workspace (dist + production node_modules) from the builder.
+COPY --from=builder --chown=casper:nodejs /app /app
+
+USER casper
+WORKDIR /app
+
+# `tini` as PID 1; each service overrides nothing — the start script is chosen
+# by the `APP` filter. `start` maps to `node dist/...` in every service.
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["sh", "-c", "pnpm --filter \"${APP}\" run start"]

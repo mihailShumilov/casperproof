@@ -1,0 +1,77 @@
+# syntax=docker/dockerfile:1.7
+# ─────────────────────────────────────────────────────────────────────────────
+# Dockerfile.contracts — Rust nightly + cargo-odra toolchain image.
+#
+# Builds the Odra wasm contracts and runs the TypeScript deploy/seed scripts
+# (`tsx scripts/deploy-testnet.ts`, `scripts/seed-demo.ts`). Both Rust and a
+# pnpm/Node toolchain are installed so the same image powers `make deploy-testnet`
+# and the one-shot `deployer` compose service.
+#
+# Multi-stage: `toolchain` (heavy, cached) → `builder` (wasm) → `runtime`.
+# The cargo registry + git db are mounted as build caches so re-runs are fast.
+# ─────────────────────────────────────────────────────────────────────────────
+
+ARG RUST_IMAGE=rust:1.84-slim-bookworm
+ARG NODE_MAJOR=20
+
+# ── toolchain: pin nightly + wasm target + cargo-odra + node/pnpm ────────────
+FROM ${RUST_IMAGE} AS toolchain
+ARG NODE_MAJOR
+ARG RUST_NIGHTLY=nightly-2026-01-01
+
+ENV DEBIAN_FRONTEND=noninteractive
+# Build prerequisites for cargo-odra + casper wasm tooling, plus Node.js.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl git build-essential pkg-config libssl-dev \
+        wabt binaryen \
+    && curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/* \
+    && corepack enable && corepack prepare pnpm@9.15.4 --activate
+
+# Pin the exact nightly from rust-toolchain.toml with rustfmt/clippy + wasm std.
+RUN rustup toolchain install ${RUST_NIGHTLY} \
+        --component rustfmt clippy \
+        --target wasm32-unknown-unknown \
+    && rustup default ${RUST_NIGHTLY}
+
+# cargo-odra drives `cargo odra build` / `cargo odra test`.
+RUN --mount=type=cache,id=cargo-registry,target=/usr/local/cargo/registry \
+    --mount=type=cache,id=cargo-git,target=/usr/local/cargo/git \
+    cargo install cargo-odra --locked
+
+WORKDIR /app
+
+# ── builder: compile the wasm contracts ──────────────────────────────────────
+FROM toolchain AS builder
+# Bring in the Rust workspace + the TS scripts/manifests the deploy step reads.
+COPY rust-toolchain.toml ./
+COPY contracts ./contracts
+COPY scripts ./scripts
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.json ./
+COPY packages ./packages
+COPY apps ./apps
+COPY e2e ./e2e
+
+# Build wasm. Cache the cargo registry/git + the contracts target dir so
+# repeated builds are incremental.
+RUN --mount=type=cache,id=cargo-registry,target=/usr/local/cargo/registry \
+    --mount=type=cache,id=cargo-git,target=/usr/local/cargo/git \
+    --mount=type=cache,id=contracts-target,target=/app/contracts/target \
+    cd contracts && cargo odra build \
+    && mkdir -p /app/contracts/wasm-out \
+    && cp -r target/*/wasm/* /app/contracts/wasm-out/ 2>/dev/null || true
+
+# Install Node deps used by the deploy/seed scripts (tsx + sdk + commitment).
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    corepack enable && pnpm install --frozen-lockfile
+
+# ── runtime: lean image that can build wasm + run deploy/seed ────────────────
+# We keep the full toolchain here (not a scratch copy) because `deploy-testnet`
+# may invoke `cargo odra build` on demand and the scripts need tsx/Node.
+FROM builder AS runtime
+ENV NODE_ENV=production
+# Default command deploys to testnet (mock mode if no keys), then exits — the
+# compose `deployer` service overrides CMD as needed (deploy then seed).
+CMD ["pnpm", "exec", "tsx", "scripts/deploy-testnet.ts"]

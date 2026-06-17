@@ -155,9 +155,7 @@ impl IntoProblem for CasperProofError {
         let slug = self.slug();
         let code = self.code();
         let status = self.status();
-        let base = Problem::new(status)
-            .type_(type_uri(slug))
-            .code(code);
+        let base = Problem::new(status).type_(type_uri(slug)).code(code);
 
         match self {
             CasperProofError::AttestationNotFound { id } => base
@@ -273,7 +271,10 @@ mod tests {
         let v = json(CasperProofError::AttestationNotFound { id: 7 });
         assert_eq!(v["status"], 404);
         assert_eq!(v["code"], "ATTESTATION_NOT_FOUND");
-        assert_eq!(v["type"], "https://casperproof.com/problems/attestation-not-found");
+        assert_eq!(
+            v["type"],
+            "https://casperproof.com/problems/attestation-not-found"
+        );
         assert_eq!(v["attestation_id"], 7);
         assert_eq!(v["title"], "Attestation not found");
     }
@@ -295,9 +296,15 @@ mod tests {
         for err in [
             CasperProofError::DisputeWindowClosed { id: 1 },
             CasperProofError::AlreadyChallenged { id: 1 },
-            CasperProofError::AttestationNotActive { id: 1, status: "Slashed".into() },
+            CasperProofError::AttestationNotActive {
+                id: 1,
+                status: "Slashed".into(),
+            },
             CasperProofError::PolicyExpired { id: 1 },
-            CasperProofError::VaultInsolvent { required: "9".into(), available: "1".into() },
+            CasperProofError::VaultInsolvent {
+                required: "9".into(),
+                available: "1".into(),
+            },
         ] {
             assert_eq!(err.status(), 409, "{:?}", err);
             assert_eq!(json(err)["status"], 409);
@@ -306,7 +313,9 @@ mod tests {
 
     #[test]
     fn unauthorized_is_403() {
-        let v = json(CasperProofError::Unauthorized { action: "resolve".into() });
+        let v = json(CasperProofError::Unauthorized {
+            action: "resolve".into(),
+        });
         assert_eq!(v["status"], 403);
         assert_eq!(v["action"], "resolve");
     }
@@ -338,7 +347,12 @@ mod tests {
 
     #[test]
     fn payload_unavailable_is_502() {
-        assert_eq!(json(CasperProofError::PayloadUnavailable { uri: "s3://x".into() })["status"], 502);
+        assert_eq!(
+            json(CasperProofError::PayloadUnavailable {
+                uri: "s3://x".into()
+            })["status"],
+            502
+        );
     }
 
     #[test]
@@ -346,7 +360,10 @@ mod tests {
         let body = to_problem_json(&CasperProofError::Internal {
             detail: "secret db:5432 connection string".into(),
         });
-        assert!(!body.contains("db:5432"), "internal cause must not serialize");
+        assert!(
+            !body.contains("db:5432"),
+            "internal cause must not serialize"
+        );
         let v: Value = serde_json::from_str(&body).unwrap();
         assert_eq!(v["status"], 500);
         assert_eq!(v["code"], "INTERNAL_ERROR");
@@ -356,18 +373,37 @@ mod tests {
     fn every_variant_has_unique_code_and_slug() {
         let errs = [
             CasperProofError::AttestationNotFound { id: 1 },
-            CasperProofError::InsufficientStake { required: "1".into(), provided: "0".into() },
+            CasperProofError::InsufficientStake {
+                required: "1".into(),
+                provided: "0".into(),
+            },
             CasperProofError::DisputeWindowClosed { id: 1 },
             CasperProofError::AlreadyChallenged { id: 1 },
             CasperProofError::Unauthorized { action: "x".into() },
-            CasperProofError::AttestationNotActive { id: 1, status: "Slashed".into() },
-            CasperProofError::TamperedPayload { id: 1, onchain_hash: "a".into(), recomputed_hash: "b".into() },
+            CasperProofError::AttestationNotActive {
+                id: 1,
+                status: "Slashed".into(),
+            },
+            CasperProofError::TamperedPayload {
+                id: 1,
+                onchain_hash: "a".into(),
+                recomputed_hash: "b".into(),
+            },
             CasperProofError::PayloadUnavailable { uri: "u".into() },
             CasperProofError::PolicyNotFound { id: 1 },
             CasperProofError::PolicyExpired { id: 1 },
-            CasperProofError::TriggerNotCovered { policy_id: 1, trigger: "t".into() },
-            CasperProofError::VaultInsolvent { required: "1".into(), available: "0".into() },
-            CasperProofError::PaymentRequired { price_usd: "0.01".into(), pay_to: "t".into() },
+            CasperProofError::TriggerNotCovered {
+                policy_id: 1,
+                trigger: "t".into(),
+            },
+            CasperProofError::VaultInsolvent {
+                required: "1".into(),
+                available: "0".into(),
+            },
+            CasperProofError::PaymentRequired {
+                price_usd: "0.01".into(),
+                pay_to: "t".into(),
+            },
             CasperProofError::Internal { detail: "d".into() },
         ];
         let codes: std::collections::HashSet<_> = errs.iter().map(|e| e.code()).collect();

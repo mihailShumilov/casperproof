@@ -1,0 +1,128 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CI — lint + typecheck, Rust contract checks/tests, and the TS >90% coverage
+# gate. Runs on every push and PR to main.
+# ─────────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "20"
+  RUST_NIGHTLY: nightly-2026-01-01
+
+jobs:
+  # ── Lint + typecheck the TypeScript workspaces ─────────────────────────────
+  lint:
+    name: Lint & typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint + typecheck
+        run: pnpm turbo run lint typecheck
+
+      - name: Prettier check
+        run: pnpm format:check
+
+  # ── Rust: fmt, clippy, and contract + commitment-parity tests ──────────────
+  contracts:
+    name: Contracts (fmt / clippy / test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust ${{ env.RUST_NIGHTLY }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_NIGHTLY }}
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+
+      - name: Cache cargo registry + target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            contracts/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('contracts/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install cargo-odra
+        run: cargo install cargo-odra --locked
+
+      - name: cargo fmt --check
+        working-directory: contracts
+        run: cargo fmt --all --check
+
+      - name: cargo clippy (deny warnings)
+        working-directory: contracts
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: cargo test (contracts + commitment parity)
+        working-directory: contracts
+        run: cargo test
+
+  # ── TypeScript test suite with the >90% coverage gate ──────────────────────
+  coverage:
+    name: TS coverage (>90% gate)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The shared vitest preset enforces lines/branches/functions/statements
+      # >= 90 per package — this step FAILS if any package is under threshold.
+      - name: Run coverage (fails under 90%)
+        run: pnpm turbo run test:coverage
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            **/coverage/lcov.info
+            **/coverage/coverage-summary.json
+          if-no-files-found: ignore
+          retention-days: 7

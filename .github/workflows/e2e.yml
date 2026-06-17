@@ -1,0 +1,94 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# E2E — spin up the Docker stack and run the Playwright demo flow against it.
+#
+# Full compose is heavy, so this is gated: it runs on manual dispatch and only
+# on PRs carrying the `e2e` label (not on every push).
+# ─────────────────────────────────────────────────────────────────────────────
+name: E2E
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled, synchronize, opened]
+
+# Only run when explicitly dispatched or when the PR has the `e2e` label.
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: Playwright (full stack)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'e2e')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env from example (offline / mock defaults)
+        run: cp .env.example .env
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @casperproof/e2e run install:browsers
+
+      # Bring up the runtime services the e2e flow needs (mock mode, no secrets).
+      # Ollama model pull is skipped offline; the agent falls back to deterministic.
+      - name: Start stack
+        run: |
+          docker compose up -d --build \
+            minio minio-init x402-server mcp-server web marketing
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "waiting for web + x402 to answer..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3000/ >/dev/null \
+               && curl -sf http://localhost:8402/health >/dev/null; then
+              echo "stack is up"; exit 0
+            fi
+            sleep 5
+          done
+          echo "stack did not become healthy in time"; docker compose logs; exit 1
+
+      - name: Run Playwright e2e
+        env:
+          E2E_BASE_URL: http://localhost:3000
+        run: pnpm --filter @casperproof/e2e test
+
+      - name: Dump compose logs on failure
+        if: failure()
+        run: docker compose logs --no-color || true
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose down -v || true
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          if-no-files-found: ignore
+          retention-days: 7
