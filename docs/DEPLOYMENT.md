@@ -39,11 +39,19 @@ Defined in `docker-compose.yml`. All env values are sourced from `.env`.
 | `minio`       | `minio/minio`                                         | `29900` (S3), `29901` (console) | S3-compatible payload store.                                                                                    |
 | `minio-init`  | `minio/mc`                                            | —                               | One-shot: creates the payload bucket, sets public-read, then exits.                                             |
 | `deployer`    | `docker/Dockerfile.contracts`                         | —                               | One-shot: WASM build + testnet deploy (mock unless keys present); writes hashes to a shared volume, then exits. |
-| `agent`       | `docker/Dockerfile.node` (`@casperproof/agent`)       | —                               | Zero-cost runtime: risk-scorer, attestor, verifier, Ollama loop.                                                |
-| `x402-server` | `docker/Dockerfile.node` (`@casperproof/x402-server`) | `29402`                         | x402-gated resource server (Fastify).                                                                           |
-| `mcp-server`  | `docker/Dockerfile.node` (`@casperproof/mcp-server`)  | `29405`                         | MCP tools (HTTP transport in compose).                                                                          |
+| `agent`       | `docker/Dockerfile.node` (`@casperproof/agent`)       | —                               | Zero-cost runtime; loops one deterministic attest→verify cycle every 30s.                                       |
+| `x402-server` | `docker/Dockerfile.node` (`@casperproof/x402-server`) | `29402`                         | x402-gated resource server (Fastify): `/health`, `/attestation/:id`, `/verify`.                                 |
+| `mcp-server`  | `docker/Dockerfile.node` (`@casperproof/mcp-server`)  | — (stdio)                       | MCP tools over the **stdio** transport (an MCP client launches/pipes it); runs with `stdin_open`+`tty`.         |
 | `web`         | `docker/Dockerfile.web`                               | `29300`                         | Next.js dApp dashboard.                                                                                         |
 | `marketing`   | `docker/Dockerfile.marketing`                         | `29301` (→ container `80`)      | Static marketing site (nginx).                                                                                  |
+
+> **Ports** use a unique `29xxx` block to avoid colliding with other local stacks. They are
+> parameterized in `docker-compose.yml` (`${WEB_PORT:-29300}`, `${MINIO_API_PORT:-29900}`, …) so
+> any can be overridden in `.env`. In-container ports stay standard (ollama `11434`, minio
+> `9000`); the on-network URLs (`http://ollama:11434`, `http://minio:9000`) are unchanged.
+
+> **Runtime detail:** the Node services exec `node "$ENTRY"` directly (no pnpm/corepack at
+> runtime). The `agent` overrides its `command` to loop the one-shot CLI cycle.
 
 Quick links after `make up`:
 
@@ -51,10 +59,21 @@ Quick links after `make up`:
 - Marketing → http://localhost:29301
 - x402 server → http://localhost:29402 (`/health` for a readiness probe)
 - MinIO console → http://localhost:29901
+- MCP server → no HTTP port (stdio); an MCP client runs `node apps/mcp-server/dist/server.js`.
 
 Startup ordering uses health/completion conditions: `agent` waits for `ollama` healthy and
 `minio-init` complete; `x402-server`/`mcp-server` wait for `minio-init`; `web` waits for the
 servers.
+
+> **Fast local boot:** `make up` builds **every** image, including the `deployer`
+> (`Dockerfile.contracts` = Rust nightly + `cargo install cargo-odra` + `cargo odra build`) — a
+> long first build. The stack runs fully in mock mode without it, so for a quick boot start only
+> the long-lived services and run the deployer on demand:
+>
+> ```bash
+> docker compose up -d --build ollama minio minio-init agent x402-server mcp-server web marketing
+> make deploy-testnet
+> ```
 
 ## Production overlay
 
@@ -120,6 +139,20 @@ Every value has a working local default (from `.env.example`); only the secrets 
 | `NODE_ENV`  | `development` | `production` under the prod overlay. |
 | `LOG_LEVEL` | `info`        |                                      |
 
+### Host ports (unique 29xxx block)
+
+Host-published ports for `make up`, chosen to avoid colliding with other local stacks.
+In-container ports are unchanged. Override any if `29xxx` is also taken.
+
+| Var                  | Default | Maps to (container) |
+| -------------------- | ------- | ------------------- |
+| `WEB_PORT`           | `29300` | web `3000`          |
+| `MARKETING_PORT`     | `29301` | marketing `80`      |
+| `X402_SERVER_PORT`   | `29402` | x402 `29402`        |
+| `OLLAMA_PORT`        | `29434` | ollama `11434`      |
+| `MINIO_API_PORT`     | `29900` | minio `9000`        |
+| `MINIO_CONSOLE_PORT` | `29901` | minio `9001`        |
+
 ### Casper network / deploy
 
 | Var                         | Default                                   | Notes                                                    |
@@ -149,20 +182,22 @@ Every value has a working local default (from `.env.example`); only the secrets 
 
 ### x402 facilitator
 
-| Var                    | Default                                      | Notes                                                             |
-| ---------------------- | -------------------------------------------- | ----------------------------------------------------------------- |
-| `X402_FACILITATOR_URL` | `https://facilitator.testnet.casper.network` | Empty ⇒ mock verifier.                                            |
-| `X402_PRICE_USD`       | `0.01`                                       | Price per gated request (string).                                 |
-| `X402_PAY_TO`          | `casperproof-treasury`                       | Account that receives the micropayment.                           |
-| `X402_SERVER_PORT`     | `29402`                                      |                                                                   |
-| `X402_MOCK`            | _(unset)_                                    | `true` forces the mock verifier even if a facilitator URL is set. |
+| Var                    | Default                | Notes                                                                                                                                                                        |
+| ---------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `X402_FACILITATOR_URL` | _(empty)_              | **Empty ⇒ local mock verifier** (offline `402 → pay → serve`). Set to the Casper facilitator URL (e.g. `https://facilitator.testnet.casper.network`) for real micropayments. |
+| `X402_PRICE_USD`       | `0.01`                 | Price per gated request (string).                                                                                                                                            |
+| `X402_PAY_TO`          | `casperproof-treasury` | Account that receives the micropayment.                                                                                                                                      |
+| `X402_SERVER_PORT`     | `29402`                | Server listen port (also the host-published port).                                                                                                                           |
+| `X402_MOCK`            | _(unset)_              | `true` forces the mock verifier even if a facilitator URL is set.                                                                                                            |
+
+In production (`NODE_ENV=production`) with neither a facilitator URL nor `X402_MOCK=true`, the
+server **fails closed** (denies gated requests) rather than serving them ungated.
 
 ### MCP server
 
-| Var               | Default | Notes                                              |
-| ----------------- | ------- | -------------------------------------------------- |
-| `MCP_SERVER_PORT` | `29405` |                                                    |
-| `MCP_TRANSPORT`   | `stdio` | Set to `http` in compose so the dApp can reach it. |
+| Var             | Default | Notes                                                                                                                                                                 |
+| --------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MCP_TRANSPORT` | `stdio` | The server speaks the **stdio** transport; the compose service runs it with `stdin_open`+`tty`. No HTTP port is published — an MCP client launches/pipes the process. |
 
 ### Agent runtime (zero-cost)
 
