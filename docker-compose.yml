@@ -138,7 +138,14 @@ services:
       dockerfile: docker/Dockerfile.node
       args:
         APP: "@casperproof/agent"
+        ENTRY: "packages/agent/dist/cli.js"
     image: casperproof/agent:local
+    # The agent CLI runs one deterministic attest→verify cycle and exits; loop it
+    # on an interval so the worker stays alive and keeps exercising the flow.
+    command:
+      - sh
+      - -c
+      - 'while true; do node packages/agent/dist/cli.js || true; sleep 30; done'
     networks: [casperproof]
     env_file: [.env]
     environment:
@@ -171,6 +178,7 @@ services:
       dockerfile: docker/Dockerfile.node
       args:
         APP: "@casperproof/x402-server"
+        ENTRY: "apps/x402-server/dist/server.js"
     image: casperproof/x402-server:local
     networks: [casperproof]
     env_file: [.env]
@@ -210,23 +218,24 @@ services:
       dockerfile: docker/Dockerfile.node
       args:
         APP: "@casperproof/mcp-server"
+        ENTRY: "apps/mcp-server/dist/server.js"
     image: casperproof/mcp-server:local
+    # The MCP server speaks the stdio transport (an MCP client launches + pipes it).
+    # Keep stdin open + a tty so the long-lived container doesn't get EOF and exit.
+    stdin_open: true
+    tty: true
     networks: [casperproof]
     env_file: [.env]
     environment:
       NODE_ENV: ${NODE_ENV}
       LOG_LEVEL: ${LOG_LEVEL}
-      MCP_SERVER_PORT: ${MCP_SERVER_PORT}
-      # Containerized MCP runs over HTTP so the dApp can reach it.
-      MCP_TRANSPORT: http
+      MCP_TRANSPORT: stdio
       CSPR_CLOUD_REST_URL: ${CSPR_CLOUD_REST_URL}
       CSPR_CLOUD_TOKEN: ${CSPR_CLOUD_TOKEN}
       S3_ENDPOINT: ${S3_ENDPOINT}
       S3_BUCKET: ${S3_BUCKET}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY}
       S3_SECRET_KEY: ${S3_SECRET_KEY}
-    ports:
-      - "${MCP_SERVER_PORT}:${MCP_SERVER_PORT}"
     depends_on:
       minio-init:
         condition: service_completed_successfully

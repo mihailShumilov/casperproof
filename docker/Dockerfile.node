@@ -57,8 +57,12 @@ RUN apt-get update \
     && useradd --system --uid 1001 --gid nodejs --create-home casper
 
 ENV NODE_ENV=production
-# `APP` (a pnpm filter scope) is passed straight to `pnpm --filter ... start`
-# at runtime so a single image can host any of the Node services.
+# `ENTRY` is the built JS entry point for this service (e.g.
+# `apps/x402-server/dist/server.js`). We exec `node` directly at runtime — no pnpm
+# / corepack — so the container never tries to resolve a package manager online
+# (corepack's runtime version lookup fails offline / under signature drift).
+ARG ENTRY
+ENV ENTRY=${ENTRY}
 ENV APP=${APP}
 
 # Copy the built workspace (dist + production node_modules) from the builder.
@@ -67,7 +71,7 @@ COPY --from=builder --chown=casper:nodejs /app /app
 USER casper
 WORKDIR /app
 
-# `tini` as PID 1; each service overrides nothing — the start script is chosen
-# by the `APP` filter. `start` maps to `node dist/...` in every service.
+# `tini` as PID 1 for signals + zombie reaping; run the service entry directly
+# with node. Services may override `command` (e.g. the agent's loop).
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["sh", "-c", "pnpm --filter \"${APP}\" run start"]
+CMD ["sh", "-c", "exec node \"${ENTRY}\""]
