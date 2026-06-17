@@ -1,0 +1,38 @@
+{
+  "name": "@casperproof/commitment",
+  "version": "0.1.0",
+  "description": "CasperProof trust anchor: blake2b-256 commitment scheme + canonical JSON + golden vectors (§8).",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./golden-vectors.json": "./golden-vectors.json"
+  },
+  "files": ["dist", "golden-vectors.json"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "clean": "rm -rf dist coverage .turbo *.tsbuildinfo",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "gen:golden": "tsx src/gen-golden.ts"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.7.1"
+  },
+  "devDependencies": {
+    "@casperproof/config": "workspace:*",
+    "@vitest/coverage-v8": "^2.1.8",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

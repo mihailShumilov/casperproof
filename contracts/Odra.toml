@@ -1,0 +1,11 @@
+[[contracts]]
+fqn = "casperproof_contracts::AttestationRegistry"
+
+[[contracts]]
+fqn = "casperproof_contracts::Insurance"
+
+[[contracts]]
+fqn = "casperproof_contracts::StakeToken"
+
+[[contracts]]
+fqn = "casperproof_contracts::MockUsdc"

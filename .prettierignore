@@ -1,0 +1,12 @@
+node_modules
+dist
+.next
+out
+coverage
+.turbo
+pnpm-lock.yaml
+contracts/target
+docs/api
+docs/rustdoc
+playwright-report
+test-results

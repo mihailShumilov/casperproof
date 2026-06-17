@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.turbo/
+*.tsbuildinfo
+coverage/
+.nyc_output/
+
+# Rust / Casper
+contracts/target/
+contracts/wasm/
+contracts/.casper/
+**/*.rs.bk
+Cargo.lock.orig
+
+# Env & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+keys/
+secret_key.pem
+public_key.pem
+public_key_hex
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Test artifacts
+playwright-report/
+test-results/
+e2e/.cache/
+
+# Docker local state
+docker/data/
+.minio-data/
+.ollama-data/
+
+# Generated docs
+docs/api/
+docs/rustdoc/

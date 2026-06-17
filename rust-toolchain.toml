@@ -1,0 +1,8 @@
+# Odra's proc-macro crate requires a nightly toolchain (uses unstable `box_patterns`).
+# Pinned to a dated nightly for reproducibility; this snapshot ships rustfmt, clippy,
+# and the wasm32-unknown-unknown std needed by `cargo odra build`.
+[toolchain]
+channel = "nightly-2026-01-01"
+components = ["rustfmt", "clippy"]
+targets = ["wasm32-unknown-unknown"]
+profile = "minimal"

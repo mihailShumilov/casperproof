@@ -1,0 +1,53 @@
+[package]
+name = "casperproof-contracts"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "CasperProof Odra contracts: attestation_registry (oracle) + insurance + CEP-18 tokens."
+authors = ["CasperProof"]
+repository = "https://github.com/mihailShumilov/casperproof"
+
+[dependencies]
+odra = { version = "2", default-features = false }
+odra-modules = { version = "2", default-features = false }
+
+[dev-dependencies]
+odra-test = { version = "2", default-features = false }
+# Host-only deps used solely by the cross-language golden-vector parity test in
+# `commitment.rs`. The compiled contract never hashes on-chain (bytes-only rule, §8).
+blake2 = "0.10"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hex = "0.4"
+
+[build-dependencies]
+odra-build = { version = "2", default-features = false }
+
+[lib]
+crate-type = ["rlib"]
+doctest = false
+
+# The odra package is also the workspace root; the host-side `problem` crate
+# (RFC 7807 problem-details mapping for the contract error taxonomy) is a member
+# so it is built/tested with the rest of the Rust code but never compiled to wasm.
+[workspace]
+members = ["problem"]
+
+[[bin]]
+name = "casperproof_build_contract"
+path = "bin/build_contract.rs"
+test = false
+
+[[bin]]
+name = "casperproof_build_schema"
+path = "bin/build_schema.rs"
+test = false
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+overflow-checks = true
+
+[profile.dev]
+overflow-checks = true
