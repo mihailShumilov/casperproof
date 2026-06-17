@@ -12,6 +12,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Emit a self-contained server bundle for the Docker image (docker/Dockerfile.web).
+  output: 'standalone',
   // Lint is a separate `pnpm lint` task; don't fail the production build on it.
   eslint: { ignoreDuringBuilds: true },
   // Type errors must still fail the build.

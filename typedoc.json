@@ -1,0 +1,23 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "packages/commitment/src/index.ts",
+    "packages/sdk/src/index.ts",
+    "packages/agent/src/index.ts"
+  ],
+  "out": "docs/api",
+  "name": "CasperProof API",
+  "tsconfig": "tsconfig.json",
+  "entryPointStrategy": "resolve",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "excludeExternals": true,
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "sort": ["source-order"],
+  "navigationLinks": {
+    "Repository": "https://github.com/mihailShumilov/casperproof",
+    "Docs": "https://casperproof.com"
+  }
+}
