@@ -97,6 +97,15 @@ make seed             # seeds demo attestations + policies
 [`docs/`](./docs) — ARCHITECTURE, COMMITMENT, CONTRACTS, DEPLOYMENT, DEMO_SCRIPT, ADRs.
 Per-package READMEs live alongside each package.
 
+## Submission
+
+Built for the **Casper Agentic Buildathon 2026**. The DoraHacks submission package lives in
+[`docs/submission/`](./docs/submission): the [BUIDL writeup](./docs/submission/BUIDL.md), the
+[3-minute demo script](./docs/submission/DEMO_SCRIPT.md), the
+[CSPR.fans voting pack](./docs/submission/VOTING_PACK.md), and the
+[submission checklist](./docs/submission/CHECKLIST.md). _Testnet-only, unaudited — pending the
+testnet deploy and demo video (see [`SETUP_NEEDED.md`](./SETUP_NEEDED.md))._
+
 ## License
 
 MIT — see [`LICENSE`](./LICENSE). Originality statement in [`NOTICE.md`](./NOTICE.md).
