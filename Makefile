@@ -14,8 +14,8 @@ SHELL := /usr/bin/env bash
 COMPOSE      := docker compose
 COMPOSE_PROD := docker compose -f docker-compose.yml -f docker-compose.prod.yml
 
-.PHONY: help install up up-prod down logs deploy-testnet seed test coverage lint \
-        build config clean
+.PHONY: help install up up-prod down logs deploy-testnet deploy-testnet-local \
+        livenet-build seed test coverage lint build config clean
 
 ## help: Show this help (default target).
 help:
@@ -51,9 +51,17 @@ down:
 logs:
 	$(COMPOSE) logs -f --tail=100
 
-## deploy-testnet: Build wasm + deploy contracts (mock unless testnet keys set).
+## deploy-testnet: Deploy contracts via the deployer container (mock unless testnet keys set).
 deploy-testnet:
 	$(COMPOSE) run --rm deployer pnpm exec tsx scripts/deploy-testnet.ts
+
+## deploy-testnet-local: Deploy from the host (needs cargo + nightly); live runs the Odra livenet bin.
+deploy-testnet-local:
+	pnpm exec tsx scripts/deploy-testnet.ts
+
+## livenet-build: Compile the Odra livenet deploy binary (verify before a live deploy).
+livenet-build:
+	cd contracts && cargo build --features livenet --bin livenet
 
 ## seed: Seed demo attestations + insurance policies into the deployed contracts.
 seed:

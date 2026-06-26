@@ -4,13 +4,15 @@ The single step-by-step guide to take CasperProof from **mock mode** to a **live
 deployment** with a hosted dApp, then fill every `TODO(deploy)` placeholder in the submission
 package. _Testnet-only, unaudited — not for mainnet value._
 
-> **Read this first — the honest state of the deploy path.**
-> Today the repo runs end-to-end **only in mock mode**. The on-chain **write path is not yet
-> implemented**: `scripts/deploy-testnet.ts` and the SDK "live" backend (`packages/sdk/src/rest-backend.ts`)
-> return **deterministic placeholder hashes** for every write, and `casper-js-sdk` is intentionally
-> not a dependency (see [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1, §6). CSPR.cloud **reads**
-> are live; **writes/deploys are stubs.** Supplying secrets alone will **not** put contracts
-> on-chain — the deploy/signing code must be written first (see [Phase 1](#phase-1--code-i-write-the-real-deploy-path-mine)).
+> **State of the deploy path (updated).**
+> The real deploy is now **implemented**: a Rust **Odra livenet binary** (`contracts/bin/livenet.rs`,
+> `--features livenet`) deploys the four contracts and runs the on-chain demo arc using Odra's native
+> signing/submission (ADR [`0007`](../adr/0007-livenet-deploy-via-odra.md)). `scripts/deploy-testnet.ts`
+> keeps the zero-secret **mock** path and, in **live** mode, spawns the binary and captures the real
+> package hashes → `.env.local`. Verified to **compile** here (odra `2.8.1` / `odra-casper-livenet-env
+> 2.8.1`); the live run itself needs a funded key + node access on the deploy machine (Phase 3).
+> The TS SDK in-dApp write path (`casper-js-sdk` + CSPR.click) is a documented follow-up — not needed
+> for on-chain activity, which the binary produces.
 
 ---
 
@@ -18,17 +20,17 @@ package. _Testnet-only, unaudited — not for mainnet value._
 
 | Phase | Owner | What |
 | --- | --- | --- |
-| **1. Implement real deploy + signing** | **Me (Claude)** | Wire `casper-js-sdk` (or `casper-client`) into the deploy script + SDK write path; deploy ordering; CEP-18 allowance flows; capture real hashes. Pure code in this repo. |
+| **1. Implement real deploy + signing** | **Me (Claude)** | ✅ **Done** — Odra livenet binary (`contracts/bin/livenet.rs`) deploys the 4 contracts in order, sets CEP-18 allowances, runs the demo arc, reports real package hashes; `deploy-testnet.ts` parses them → `.env.local`. Compiles clean (ADR [`0007`](../adr/0007-livenet-deploy-via-odra.md)). |
 | **2. Provision accounts + secrets** | **You** | Create & **fund** a testnet key (faucet has a human captcha); get a CSPR.cloud token; (optional) CSPR.click app id; choose where it runs. |
-| **3. Build WASM + deploy + seed** | **Me, if I can reach the network from where I run; otherwise you run my exact commands** | `cargo odra build` → deploy 4 contracts → `make seed` → capture package hashes + 3 cspr.live tx links. |
+| **3. Deploy + seed** | **Me on your VPS (SSH), or you run my exact commands** | `make livenet-build` → set the two secrets → `make deploy-testnet-local` → capture package hashes + demo-tx links. |
 | **4. Host the dApp** | **Me on your server (SSH) / you via Docker** | `make up-prod` behind nginx + TLS, DNS for `app.casperproof.com`. |
 | **5. Fill submission placeholders** | **Me** | Replace every `TODO(deploy)` / `TODO(video)` / `TODO(cspr.fans)` across `docs/submission/`. |
 | **6. Record video + create CSPR.fans listing** | **You** | The faucet captcha, the screen recording, and the CSPR.fans/CSPR.click account actions are yours. |
 
-**Can we do "you give me `.env` and I deploy everything"?** Almost — with two caveats: (a) I must
-write the deploy code first (Phase 1); (b) the **faucet funding** and **CSPR.cloud signup** are
-human steps you can't delegate. Once you hand me a **funded key PEM + CSPR.cloud token** and a place
-to run (this environment if it has network, or your server/VPS), I can drive the rest.
+**Can we do "you give me `.env` and I deploy everything"?** Now yes, with one caveat: the **faucet
+funding** and **CSPR.cloud signup** are human steps you can't delegate (Phase 2). The deploy code is
+written (Phase 1 ✅). Once you hand me a **funded key PEM + CSPR.cloud token** and SSH to a VPS, I can
+drive build → deploy → seed → host → fill placeholders end-to-end.
 
 ---
 
@@ -142,24 +144,25 @@ variable reference (every var + default) is in [`../DEPLOYMENT.md`](../DEPLOYMEN
 
 ---
 
-## Phase 1 — Code (I write the real deploy path) [mine]
+## Phase 1 — Code (the real deploy path) [✅ done]
 
-Before any secret matters, these must be implemented (I'll do them as separate, tested commits):
+Implemented via Odra's native livenet env (ADR [`0007`](../adr/0007-livenet-deploy-via-odra.md)):
 
-1. **Add `casper-js-sdk`** to the deploy script + SDK (or shell out to `casper-client put-deploy`).
-2. **Contract deploy + install** in dependency order, capturing each **package hash** from the
-   receipt and writing real values to `.env.local`:
-   1. `StakeToken` (CEP-18, 9 decimals, initial supply → deployer)
-   2. `MockUsdc` (CEP-18, 6 decimals, initial supply → deployer)
-   3. `AttestationRegistry.init(stake_token, min_stake, challenge_bond, dispute_window, treasury, resolver, reward_bps)`
-   4. `Insurance.init(usdc_token, registry, premium_bps, claim_model_id)`
-3. **SDK write path** — real deploy construction + signing + submission for `submitAttestation`,
-   `challenge`, `resolve`, `createPolicy`, `submitClaim`, `stake`, `unstake`, including the CEP-18
-   **`approve` → `transfer_from`** allowance flow each one needs.
-4. **Capture tx deploy hashes** from `make seed` and emit the three `cspr.live` links.
-5. (Optional) **CSPR.cloud streaming** for the live dashboard (else the dApp polls reads).
+- **`contracts/bin/livenet.rs`** (`--features livenet`) — deploys the 4 contracts in dependency
+  order (`StakeToken` → `MockUsdc` → `AttestationRegistry` → `Insurance`) with the init args below,
+  sets the CEP-18 allowances, seeds vault capital, and runs the demo arc (attest → buy policy →
+  claim → tamper-attest → challenge → slash), printing `CP_RESULT <KEY>=<VALUE>` lines.
+- **`scripts/deploy-testnet.ts`** — mock path unchanged; live path spawns the binary, maps the
+  `ODRA_CASPER_LIVENET_*` env, and writes the real package hashes (+ best-effort demo-tx links) to
+  `.env.local`.
+- **§8 hashes** stay in the single TS implementation; the binary takes them via `CP_*` env (with
+  deterministic fallbacks), so no canonicalization is duplicated in Rust.
+- Verified: `make livenet-build` compiles against odra `2.8.1` / `odra-casper-livenet-env 2.8.1`.
 
-Suggested demo deploy parameters (config choices, consistent with the demo script):
+The TS SDK in-dApp write path (`casper-js-sdk` + CSPR.click signing) is a **follow-up** — not
+required for on-chain activity (the binary produces it); the dApp reads live state over CSPR.cloud.
+
+Deploy parameters (config defaults baked into the binary; override via `CP_*` env):
 
 | Param | Value | Meaning |
 | --- | --- | --- |
@@ -193,25 +196,36 @@ Helper that prints what to fund: `pnpm fund:testnet` (`scripts/fund-testnet.ts`)
 
 ---
 
-## Phase 3 — Build, deploy, seed
+## Phase 3 — Deploy + seed
 
 ```bash
-# Build WASM + deploy the 4 contracts (real, because secrets are set):
-make deploy-testnet
-#   → writes real ATTESTATION_REGISTRY_HASH / INSURANCE_HASH / STAKE_TOKEN_HASH / USDC_TOKEN_HASH
-#     to .env.local
+# 0. (once) verify the deploy binary compiles on this machine:
+make livenet-build
 
-# Run the demo arc on-chain (3 transactions): attest → claim → tamper → slash
-make seed
-#   → prints the submit_attestation / claim / resolve deploy hashes
+# 1. Dry-run — print the exact command + env mapping without touching the chain:
+CP_DRY_RUN=true make deploy-testnet-local
+
+# 2. Deploy the 4 contracts + run the on-chain demo arc (real, because the 2 secrets are set).
+#    The demo arc produces the three headline txs: submit_attestation, claim, resolve(slash).
+make deploy-testnet-local
+#   → writes real ATTESTATION_REGISTRY_HASH / INSURANCE_HASH / STAKE_TOKEN_HASH / USDC_TOKEN_HASH
+#     and best-effort `# TX <step>=<hash> -> <cspr.live>` lines to .env.local
+
+# Deploy-only (skip the demo arc), e.g. for a first smoke test:
+CP_LIVENET_STEP=deploy make deploy-testnet-local
 ```
 
-Verify on the explorer (https://testnet.cspr.live): each package hash resolves to a contract, and
-the three deploys show as `Success`.
+`make deploy-testnet-local` runs on the host (needs cargo + the nightly toolchain — both on the
+VPS). `make deploy-testnet` does the same inside the `deployer` Docker container if you prefer.
 
-> **If WASM can't build where I run** (sandbox CDN block), build it on your machine/CI once with
-> `cd contracts && cargo odra build` (or `docker build -f docker/Dockerfile.contracts`), then the
-> deploy step consumes the `.wasm` artifacts.
+Verify on the explorer (https://testnet.cspr.live): each package hash resolves to a contract, and
+the `submit_attestation` / `claim` / `resolve` transactions show as `Success` under the deployer
+account. Record those three as the cspr.live submission links.
+
+> **Tx-link note:** package hashes are captured deterministically. The three demo-tx hashes are
+> scraped best-effort from the binary's logs; if any are missing, read them from the deployer
+> account's transaction list on the explorer. The `casper-client` keygen/faucet steps in Phase 2
+> are the only places `casper-client` is needed — the deploy itself uses the Odra livenet binary.
 
 ---
 
