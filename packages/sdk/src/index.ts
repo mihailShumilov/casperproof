@@ -26,6 +26,26 @@ export { RestBackend, createRestBackend } from './rest-backend.js';
 export { resolveConfig } from './config.js';
 
 export {
+  approveCall,
+  submitAttestationCall,
+  challengeCall,
+  resolveCall,
+  finalizeCall,
+  buyPolicyCall,
+  claimCall,
+  stakeCall,
+  unstakeCall,
+} from './onchain.js';
+export type {
+  AbiArg,
+  AbiArgType,
+  OnchainContract,
+  ContractCall,
+  SubmitAttestationCallArgs,
+  BuyPolicyCallArgs,
+} from './onchain.js';
+
+export {
   CasperProofSdkError,
   ERROR_CODES,
   PROBLEM_BASE,
