@@ -248,6 +248,35 @@ make up-prod                 # prod overlay: nginx fronts marketing + web on :80
 nginx routing (from [`../DEPLOYMENT.md`](../DEPLOYMENT.md#production-overlay)):
 `casperproof.com` → marketing, `app.casperproof.com` → web (Next.js).
 
+### Live in-dApp writes (sign on-chain via CSPR.click)
+
+Built and unit-tested (the dApp can sign real transactions in the browser), gated by env so the
+offline demo is untouched:
+
+- **`@casperproof/casper-sdk`** exposes a typed contract-call ABI (`submitAttestationCall`,
+  `challengeCall`, … + `approveCall`) — pure, 100% tested.
+- **`apps/web/src/lib/onchain-tx.ts`** turns a call into a `casper-js-sdk` `TransactionV1`
+  (`buildTransactionJson`); **`writes.ts`** signs + submits it via CSPR.click `send()`.
+- Turn it on by setting, in `.env` (then rebuild the web image): `NEXT_PUBLIC_CSPR_CLICK_APP_ID`
+  and the `NEXT_PUBLIC_*_HASH` package hashes (copy from `.env.local` after Phase 3). When unset,
+  the dApp stays on the zero-secret mock path.
+
+**Last mile — needs a real wallet + the deployed contracts (I can't browser-test it here):**
+
+1. Mount the **CSPR.click provider/script** in the dApp so `window.csprclick` is available (per
+   CSPR.click docs; we read it through `getCsprClick()`), and connect a wallet.
+2. Wire the view buttons to `signAndSendCall(challengeCall(id), publicKey)` etc. with the mock
+   call as fallback — **challenge / resolve / claim / stake** need no payload and are the natural
+   first live actions.
+3. A live **`submit_attestation`** additionally needs the payload uploaded to the object store (a
+   small server attestor endpoint) so verification can refetch it — until then, drive submits from
+   the server attestor / livenet binary and let the dApp read live state.
+4. Confirm the CLValue encoding (esp. the CEP-18 `approve` spender `Address`→`Key`) against the
+   deployed contracts on a first real signature.
+
+I'll do steps 1–2 (and 3 if you want browser submit) on the VPS once contracts are live and a
+wallet is connected.
+
 ---
 
 ## Phase 5 — Fill the submission placeholders [mine]

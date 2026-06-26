@@ -11,6 +11,10 @@ All notable changes to this project are documented here. The format is based on
 - Real Casper Testnet deploy via an Odra livenet binary (`contracts/bin/livenet.rs`, `livenet`
   feature): deploys the 4 contracts + runs the on-chain demo arc; `scripts/deploy-testnet.ts` live
   mode captures real package hashes into `.env.local`. ADR `0007`. Mock mode unchanged.
+- Live in-dApp write path (env-gated, mock fallback): a typed contract-call ABI in
+  `@casperproof/casper-sdk` (`submitAttestationCall`/`challengeCall`/… + `approveCall`), a
+  `casper-js-sdk` transaction builder (`apps/web/.../onchain-tx.ts`), and CSPR.click
+  sign+submit (`csprclick.ts`/`writes.ts`). Unit-tested; in-browser signing validated on deploy.
 - `make deploy-testnet-local` / `make livenet-build`; submission deploy runbook
   (`docs/submission/DEPLOY_RUNBOOK.md`) and the DoraHacks submission package under `docs/submission/`.
 - Monorepo scaffold (pnpm + Turborepo for TS, Cargo workspace for Odra contracts).
