@@ -26,7 +26,8 @@ test('submit → tamper & verify FAIL → challenge → resolve → slash', asyn
   // The step-1 card shows the new id, commitment, and an Active badge.
   const step1 = page.locator('.cp-card', { hasText: '1 · Submit attestation' }).first();
   await expect(step1.getByText('Active')).toBeVisible();
-  await expect(step1.getByText(SLASH_DEFAULTS.stakeCspr)).toBeVisible();
+  // The staked amount, scoped to the Stake definition value (the card prose also says "3 CSPR").
+  await expect(step1.locator('dt:has-text("Stake") + dd')).toHaveText(SLASH_DEFAULTS.stakeCspr);
 
   // 2 · Tamper & verify — the payload is pre-filled tampered, so verify FAILs.
   const step2 = page.locator('.cp-card', { hasText: '2 · Tamper & verify' }).first();

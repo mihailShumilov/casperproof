@@ -31,6 +31,16 @@ All notable changes to this project are documented here. The format is based on
 - Full dockerization (`docker compose up`), Makefile, GitHub Actions CI/e2e/release.
 - Documentation set (`docs/` + ADRs), deploy/seed scripts, Playwright e2e, `SETUP_NEEDED.md`.
 
+### Fixed
+
+- Playwright e2e suite now passes 11/11 against a real chromium run. Hardened brittle locators
+  exposed once the dApp DOM grew: scope attestation-id assertions to `.list-item__id` (the live
+  feed renders the same `#id · model` text), scope the verdict assertion to the `.cp-verdict--*`
+  modifier (the pill's glyph defeats exact-text matching), match the verify row by its
+  `.list-item__id` (not a `hasText` filter that also matched the feed card), use `exact` for the
+  "Verify" toggle, scope solvency tiles to `.cp-stattile__label` (the Recharts axis repeats the
+  labels as SVG `<tspan>`), and read the staked amount from the `Stake` definition value.
+
 ### Security
 
 - `Insurance.claim` binds the backing attestation to the configured `claim_model_id`.

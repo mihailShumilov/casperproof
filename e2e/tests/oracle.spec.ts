@@ -34,8 +34,11 @@ test('submit an attestation and see it in the list and live feed', async ({ page
   await connectWallet(page);
   const id = await submitOracleAttestation(page);
 
-  // The attestation appears in the list with its model id.
-  await expect(page.getByText(`#${id} · ${ORACLE_DEFAULTS.modelId}`)).toBeVisible();
+  // The attestation appears in the list with its model id (scope to the list row id,
+  // not the live feed, which also renders "#id · …").
+  await expect(
+    page.locator('.list-item__id', { hasText: `#${id} · ${ORACLE_DEFAULTS.modelId}` }),
+  ).toBeVisible();
 
   // The live feed streams an AttestationSubmitted event for the submit.
   const feed = page.locator('.cp-card', { hasText: 'Live feed' }).first();

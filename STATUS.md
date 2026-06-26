@@ -19,7 +19,7 @@ agent-insurance** demo. Built for the Casper Agentic Buildathon 2026.
 | **Marketing** (`apps/marketing`)         | ✅ done            | Next.js static export; full SEO/OG/sitemap; live numbers via SDK; 29 tests.                                                                                                                                                                     |
 | **Dockerization**                        | ✅ done            | `docker/` images + `docker-compose.yml` (+ prod overlay), `Makefile`; `cp .env.example .env && make up` boots ollama/minio/agent/x402/mcp/web/marketing + one-shot deployer.                                                                    |
 | **CI**                                   | ✅ done            | `.github/workflows/`: ci (lint+typecheck+cargo test+TS coverage gate), e2e (compose+Playwright), release.                                                                                                                                       |
-| **E2E**                                  | ✅ specs written   | Playwright `e2e/` covers the full demo arc; runs in CI (`playwright install chromium`).                                                                                                                                                         |
+| **E2E**                                  | ✅ done + passing  | Playwright `e2e/` covers the full demo arc — **11/11 specs pass locally** (chromium) and in CI (`playwright install chromium`).                                                                                                                 |
 | **Docs**                                 | ✅ done            | README + per-package READMEs + `docs/` (ARCHITECTURE/COMMITMENT/CONTRACTS/DEPLOYMENT/DEMO_SCRIPT/API + 6 ADRs) + typedoc config.                                                                                                                |
 | **Testnet deploy**                       | ⏳ mock (no keys)  | `scripts/deploy-testnet.ts` runs a deterministic mock deploy; real deploy needs the secrets in `SETUP_NEEDED.md`.                                                                                                                               |
 
@@ -44,7 +44,8 @@ make test               # contracts (cargo test) + TS (turbo) suites
   x402 27 (100% / 96%) · web 27 · marketing 29.
 - **Integration:** `pnpm seed` runs attest×3 → verify PASS → buy policy → claim paid → tamper →
   verify FAIL → challenge → slash, all green in mock mode.
-- **E2E:** Playwright specs for the full flow; executed in CI where browser binaries install.
+- **E2E:** Playwright — full demo flow across Oracle / Insurance / Slash; **11/11 specs pass**
+  locally (chromium) and in CI (`playwright install chromium`).
 
 ## Zero-cost / offline guarantees
 
@@ -81,7 +82,9 @@ Both submission gates (§9) ran as fresh specialist sub-agents and returned **GO
   in-memory tamper demo can flip bytes at a fixed key.)
 - **QA gate — GO.** 40 Rust tests + ~400 TS tests pass; every threshold-gated package clears
   **>90% line + branch**; repo-wide typecheck + Prettier are clean; the `make seed` arc
-  completes with a paid claim and one slash. E2E specs are validated; browser execution runs in
-  CI (`playwright install chromium`).
+  completes with a paid claim and one slash. The Playwright E2E suite passes **11/11** locally
+  (chromium) and in CI (`playwright install chromium`). The Odra livenet deploy binary compiles
+  clean (`cargo check --features livenet`, real Casper backend); the on-chain demo arc it drives
+  is the same one the MockVM tests cover.
 
 Testnet-only, unaudited — not for mainnet value (see `SECURITY.md` / `SETUP_NEEDED.md`).
