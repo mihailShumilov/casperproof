@@ -30,6 +30,10 @@ it. **Legend:** ✅ done · 🟡 pending (needs a real value) · ⚙️ runs in 
 
 ## On-chain deploy artifacts (all pending — blocked on testnet deploy)
 
+> Step-by-step procedure, server sizing, and the exact `.env` to fill: [`DEPLOY_RUNBOOK.md`](./DEPLOY_RUNBOOK.md).
+> Note: the on-chain **write path is not yet implemented** (mock hashes only) — it must be coded
+> before secrets matter. See the runbook's Phase 1.
+
 | Item | Status | Placeholder | Source of truth |
 | --- | --- | --- | --- |
 | `AttestationRegistry` package hash | 🟡 pending | `TODO(deploy): real package hash` | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1 |
