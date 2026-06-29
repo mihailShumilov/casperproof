@@ -1,18 +1,36 @@
 # CasperProof — Testnet Deploy & Hosting Runbook
 
-The single step-by-step guide to take CasperProof from **mock mode** to a **live Casper Testnet
-deployment** with a hosted dApp, then fill every `TODO(deploy)` placeholder in the submission
-package. _Testnet-only, unaudited — not for mainnet value._
+The step-by-step guide that took CasperProof from **mock mode** to a **live Casper Testnet
+deployment** with a hosted dApp. _Testnet-only, unaudited — not for mainnet value._
 
-> **State of the deploy path (updated).**
-> The real deploy is now **implemented**: a Rust **Odra livenet binary** (`contracts/bin/livenet.rs`,
-> `--features livenet`) deploys the four contracts and runs the on-chain demo arc using Odra's native
-> signing/submission (ADR [`0007`](../adr/0007-livenet-deploy-via-odra.md)). `scripts/deploy-testnet.ts`
-> keeps the zero-secret **mock** path and, in **live** mode, spawns the binary and captures the real
-> package hashes → `.env.local`. Verified to **compile** here (odra `2.8.1` / `odra-casper-livenet-env
-> 2.8.1`); the live run itself needs a funded key + node access on the deploy machine (Phase 3).
-> The TS SDK in-dApp write path (`casper-js-sdk` + CSPR.click) is a documented follow-up — not needed
-> for on-chain activity, which the binary produces.
+> **State of the deploy path — done.**
+> CasperProof is **live on `casper-test`** (Casper 2.2.2): the four contracts are installed and the
+> three demo-arc txs are on-chain. The Odra **livenet binary** (`contracts/bin/livenet.rs`,
+> `--features livenet`) compiles (odra `2.8.1`) but is **incompatible** with the current testnet
+> (casper-client 4.x `TransactionV1` serialization rejected by node 2.2.2). The deploy was done with a
+> **casper-js-sdk v5** script instead — see the next section for exactly how, and `SETUP_NEEDED.md` §1
+> + [`CHECKLIST.md`](./CHECKLIST.md) for the real hashes/links. `scripts/deploy-testnet.ts` still keeps
+> the zero-secret **mock** path for offline runs.
+
+> ## How it was actually deployed (Casper 2.2.2 / Condor)
+> The released **odra 2.8.x livenet binary does NOT work against the current testnet**: its
+> casper-client 4.x `TransactionV1` serialization is rejected by node 2.2.2 ("invalid pricing
+> mode"); the fix exists only in unreleased odra git HEAD (casper-client 5.0.0). The contracts were
+> instead deployed with a **casper-js-sdk v5** script:
+> - `apps/web/deploy-onchain.cjs` — installs the 4 contracts (`SessionBuilder` + the odra install-arg
+>   convention `odra_cfg_*` + init args), reads each package hash from the deployer account's
+>   `<Name>_package_hash` named key (raw RPC `state_get_account_info`).
+> - `apps/web/arc-onchain.cjs` — runs the on-chain demo arc (approve, seed vault, attest, buy policy,
+>   claim, challenge, resolve/slash) via `ContractCallBuilder`.
+> - Node: the **public** `https://node.testnet.casper.network` (cspr.cloud's node proxy 404s on the
+>   SSE `/events` the deploy watcher needs).
+> - **Mandatory wasm post-processing:** `cargo odra build` then
+>   `wasm-opt --signext-lowering --llvm-memory-copy-fill-lowering` (Casper VM rejects bulk-memory /
+>   sign-ext). Needs the wasm build harness `contracts/bin/build_contract.rs` + the contract lib `no_std`.
+> - Gotcha: Casper `get_block_time()` is **milliseconds**; policy `expiry` must be ms.
+>
+> Deployed hashes + the 3 demo-tx links live in `deploy-out/{onchain,arc}.json` and are filled into
+> [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1 + [`CHECKLIST.md`](./CHECKLIST.md).
 
 ---
 
@@ -20,17 +38,16 @@ package. _Testnet-only, unaudited — not for mainnet value._
 
 | Phase | Owner | What |
 | --- | --- | --- |
-| **1. Implement real deploy + signing** | **Me (Claude)** | ✅ **Done** — Odra livenet binary (`contracts/bin/livenet.rs`) deploys the 4 contracts in order, sets CEP-18 allowances, runs the demo arc, reports real package hashes; `deploy-testnet.ts` parses them → `.env.local`. Compiles clean (ADR [`0007`](../adr/0007-livenet-deploy-via-odra.md)). |
-| **2. Provision accounts + secrets** | **You** | Create & **fund** a testnet key (faucet has a human captcha); get a CSPR.cloud token; (optional) CSPR.click app id; choose where it runs. |
-| **3. Deploy + seed** | **Me on your VPS (SSH), or you run my exact commands** | `make livenet-build` → set the two secrets → `make deploy-testnet-local` → capture package hashes + demo-tx links. |
-| **4. Host the dApp** | **Me on your server (SSH) / you via Docker** | `make up-prod` behind nginx + TLS, DNS for `app.casperproof.com`. |
-| **5. Fill submission placeholders** | **Me** | Replace every `TODO(deploy)` / `TODO(video)` / `TODO(cspr.fans)` across `docs/submission/`. |
-| **6. Record video + create CSPR.fans listing** | **You** | The faucet captcha, the screen recording, and the CSPR.fans/CSPR.click account actions are yours. |
+| **1. Implement real deploy + signing** | Builder | ✅ **Done** — deployed with a **casper-js-sdk v5** script (`apps/web/deploy-onchain.cjs` installs, `apps/web/arc-onchain.cjs` demo arc); the Odra livenet binary compiles (ADR [`0007`](../adr/0007-livenet-deploy-via-odra.md)) but is rejected by node 2.2.2, so the js-sdk path is the working one. |
+| **2. Provision accounts + secrets** | You | ✅ **Done** — funded testnet key + CSPR.cloud token provisioned; CSPR.click app id still optional/pending. |
+| **3. Deploy + seed** | Builder | ✅ **Done** — 4 contracts installed + the 3 demo-arc txs on-chain; hashes/links captured to `deploy-out/{onchain,arc}.json`. |
+| **4. Host the dApp** | Builder | ✅ **Done** — `app.casperproof.com` (dApp) + `casperproof.com` (marketing), Cloudflare-fronted HTTPS (verified 200). |
+| **5. Fill submission placeholders** | Builder | ✅ **Done** — package hashes + the 3 cspr.live links filled across `docs/submission/`; `TODO(video)` / `TODO(cspr.fans)` / `TODO(cspr.click)` remain. |
+| **6. Record video + create CSPR.fans listing** | You | Pending — the screen recording and the CSPR.fans/CSPR.click account actions. |
 
-**Can we do "you give me `.env` and I deploy everything"?** Now yes, with one caveat: the **faucet
-funding** and **CSPR.cloud signup** are human steps you can't delegate (Phase 2). The deploy code is
-written (Phase 1 ✅). Once you hand me a **funded key PEM + CSPR.cloud token** and SSH to a VPS, I can
-drive build → deploy → seed → host → fill placeholders end-to-end.
+The faucet funding and CSPR.cloud signup were the only non-delegable human steps (Phase 2). With
+those provisioned, build → deploy → seed → host → fill-placeholders ran end-to-end; the deployer
+account is `0172d6cdabe89d79827153d6c4974e28d11d17c4ef05267bf63541fff600dc6aa4`.
 
 ---
 
@@ -71,9 +88,9 @@ Outbound HTTPS/WSS to:
 - `https://testnet.cspr.live` (faucet/explorer, browser)
 - crates.io + npm registry + GitHub (first build only)
 
-> ⚠️ This Claude sandbox has previously had **GitHub/CDN blocked** ([`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §6),
-> so building WASM and reaching the Casper node **from here may fail**. If so, Phase 3 runs on your
-> machine/VPS (I provide exact commands) or over SSH.
+> ⚠️ The build sandbox has previously had **GitHub/CDN blocked** ([`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §6),
+> so building WASM and reaching the Casper node **from there may fail**. If so, the deploy runs on a
+> normal dev machine/VPS or over SSH.
 
 ### Server sizing
 
@@ -279,34 +296,33 @@ wallet is connected.
 
 ---
 
-## Phase 5 — Fill the submission placeholders [mine]
+## Phase 5 — Fill the submission placeholders [✅ done]
 
-Once Phase 3/4 succeed, I replace these across `docs/submission/` (tracked in
+With Phase 3/4 complete, the on-chain values are filled across `docs/submission/` (tracked in
 [`CHECKLIST.md`](./CHECKLIST.md)):
 
-- 4× `TODO(deploy): real package hash` ← `.env.local`
-- 3× `TODO(deploy): real cspr.live link` ← `make seed` output
-- `TODO(video): hosted demo video URL` ← your recording
-- `TODO(cspr.fans): listing URL` ← your listing
-- `TODO(cspr.click): app id` ← if you registered one
+- ✅ 4× package hash ← `deploy-out/onchain.json` (filled in `SETUP_NEEDED.md` §1 + `CHECKLIST.md`)
+- ✅ 3× cspr.live link ← `deploy-out/arc.json` (`submit_attestation` / `claim` / `resolve`)
+- ⏳ `TODO(video): hosted demo video URL` ← the recording
+- ⏳ `TODO(cspr.fans): listing URL` ← the listing
+- ⏳ `TODO(cspr.click): app id` ← if a CSPR.click app is registered
 
 ---
 
-## What to hand me to start
+## What's left
 
-1. **Go/no-go on Phase 1** — should I implement the real deploy + signing code now? (Recommended yes.)
-2. **A funded testnet key PEM + CSPR.cloud token** (when ready, via a secure channel) — or tell me
-   you'll run Phase 3 yourself and I'll hand you the exact commands.
-3. **Where it runs** — this environment, your Mac, or a VPS (SSH or you-run-commands).
+Phases 1–5 are done (contracts live, dApp hosted, on-chain values filled). The only remaining items
+are human-provided assets that can't be automated:
 
-I cannot do for you: the faucet captcha, the CSPR.cloud/CSPR.click/CSPR.fans account signups, or the
-screen recording. Everything else I can build and drive.
+1. **Demo video** — the screen recording (`TODO(video)`), per [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md).
+2. **CSPR.fans listing** — the community-vote listing (`TODO(cspr.fans)`).
+3. **CSPR.click app id** — optional, to enable the in-dApp live-wallet write path (`TODO(cspr.click)`).
 
 ---
 
-## Fallback: stay in mock mode
+## Offline mode (still available)
 
-If a live deploy isn't feasible before the deadline, the project still demos fully in mock mode
-(`make up` + `make seed`) and the submission package already documents that honestly. The only items
-that would remain `TODO(deploy)` are the on-chain links — which is the eligibility risk called out in
-[`CHECKLIST.md`](./CHECKLIST.md) (Final Round wants on-chain activity). _Testnet-only, unaudited._
+The live deploy is done, but the project also demos fully in **mock mode** (`make up` + `make seed`)
+with zero secrets and no network — useful for offline development and the test suites. The Final
+Round on-chain-activity requirement is **satisfied** by the live `casper-test` deploy (hashes/links in
+[`CHECKLIST.md`](./CHECKLIST.md)). _Testnet-only, unaudited._

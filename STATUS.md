@@ -21,7 +21,7 @@ agent-insurance** demo. Built for the Casper Agentic Buildathon 2026.
 | **CI**                                   | ✅ done            | `.github/workflows/`: ci (lint+typecheck+cargo test+TS coverage gate), e2e (compose+Playwright), release.                                                                                                                                       |
 | **E2E**                                  | ✅ done + passing  | Playwright `e2e/` covers the full demo arc — **11/11 specs pass locally** (chromium) and in CI (`playwright install chromium`).                                                                                                                 |
 | **Docs**                                 | ✅ done            | README + per-package READMEs + `docs/` (ARCHITECTURE/COMMITMENT/CONTRACTS/DEPLOYMENT/DEMO_SCRIPT/API + 6 ADRs) + typedoc config.                                                                                                                |
-| **Testnet deploy**                       | ⏳ mock (no keys)  | `scripts/deploy-testnet.ts` runs a deterministic mock deploy; real deploy needs the secrets in `SETUP_NEEDED.md`.                                                                                                                               |
+| **Testnet deploy**                       | ✅ live on `casper-test` | 4 contracts installed on Casper 2.2.2 via a casper-js-sdk v5 script + the 3 demo-arc txs on-chain; hashes/links in `deploy-out/onchain.json` + `deploy-out/arc.json` and `SETUP_NEEDED.md` §1. Live dApp at https://app.casperproof.com.        |
 
 ## How to run
 
@@ -55,9 +55,13 @@ make test               # contracts (cargo test) + TS (turbo) suites
 
 ## What's stubbed / pending (see `SETUP_NEEDED.md`)
 
-1. **Casper Testnet deploy** — needs `CASPER_SECRET_KEY_PATH` + `CSPR_CLOUD_TOKEN`; until then,
-   deterministic mock package hashes. Real deploy signing needs `casper-js-sdk`/`casper-client`
-   (intentionally unbundled to keep the build offline).
+1. **Casper Testnet deploy — done.** The four contracts are **live on `casper-test`** (Casper 2.2.2)
+   and the three demo-arc txs are on-chain — deployed with a **casper-js-sdk v5** script
+   (`apps/web/deploy-onchain.cjs` installs, `apps/web/arc-onchain.cjs` demo arc), not the Odra
+   livenet binary (whose casper-client 4.x `TransactionV1` serialization is rejected by 2.2.2). The
+   wasm is post-processed with `wasm-opt --signext-lowering --llvm-memory-copy-fill-lowering`. Hashes
+   and CSPR.live links: `deploy-out/onchain.json` + `deploy-out/arc.json` and `SETUP_NEEDED.md` §1.
+   Live hosted demo: https://app.casperproof.com (dApp) + https://casperproof.com (marketing).
 2. **Live data** — `CSPR_CLOUD_TOKEN` flips the SDK to live reads + streaming.
 3. **Real x402 micropayments** — `X402_FACILITATOR_URL`.
 4. **Real object storage** — `S3_*` (else in-memory).

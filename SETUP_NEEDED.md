@@ -12,7 +12,13 @@ deploy/seed scripts emit the real ones.
 
 ## 1. Casper Testnet deploy (real on-chain contracts)
 
-Required to replace the deterministic mock package hashes with real ones.
+**Done.** CasperProof is **live on Casper testnet** (network `casper-test`, Casper 2.2.2). The four
+contracts are installed and the three demo-arc writes are on-chain — the real package hashes and
+CSPR.live links are recorded below (and in [`deploy-out/onchain.json`](deploy-out/onchain.json) /
+[`deploy-out/arc.json`](deploy-out/arc.json)). Deployer account:
+`0172d6cdabe89d79827153d6c4974e28d11d17c4ef05267bf63541fff600dc6aa4`.
+
+The secrets below are what's needed to re-run a deploy from scratch:
 
 | Secret                        | Env var                  | Where to get it                                          |
 | ----------------------------- | ------------------------ | -------------------------------------------------------- |
@@ -21,34 +27,49 @@ Required to replace the deterministic mock package hashes with real ones.
 
 - **Faucet (testnet CSPR for gas):** https://testnet.cspr.live/tools/faucet
 - **Explorer:** https://testnet.cspr.live
-- Run: `make deploy-testnet-local` (host) or `make deploy-testnet` (Docker). With the two secrets
-  set, this runs the **Odra livenet binary** (`contracts/bin/livenet.rs`, `--features livenet`),
-  which deploys the four contracts + runs the on-chain demo arc and writes the **real** package
-  hashes to `.env.local`. Without the secrets it runs a deterministic **mock deploy** so downstream
-  services still bind to something. Step-by-step: [`docs/submission/DEPLOY_RUNBOOK.md`](docs/submission/DEPLOY_RUNBOOK.md).
+- **Working deploy path:** a **casper-js-sdk v5** script — `apps/web/deploy-onchain.cjs` does the
+  four installs, `apps/web/arc-onchain.cjs` runs the on-chain demo arc. The released Odra 2.8.x
+  **livenet binary** (`contracts/bin/livenet.rs`) is **incompatible** with the current Casper 2.2.2
+  testnet (its casper-client 4.x `TransactionV1` serialization is rejected), so the js-sdk script is
+  used instead. The compiled wasm is post-processed with
+  `wasm-opt --signext-lowering --llvm-memory-copy-fill-lowering` because the Casper VM rejects
+  bulk-memory/sign-ext ops. Step-by-step: [`docs/submission/DEPLOY_RUNBOOK.md`](docs/submission/DEPLOY_RUNBOOK.md).
+- Without the secrets, `make deploy-testnet` still runs a deterministic **mock deploy** so downstream
+  services bind to something offline.
 
-### Deployed addresses (fill in after a real deploy)
+### Deployed addresses (live on `casper-test`)
 
-`make deploy-testnet` writes these into `.env.local` (one-shot `deployer` container). Copy the
-real package hashes here once a live deploy succeeds:
+Real package hashes from the live deploy (also in [`deploy-out/onchain.json`](deploy-out/onchain.json)):
 
-| Contract                    | Env var                     | Value                                     |
-| --------------------------- | --------------------------- | ----------------------------------------- |
-| `AttestationRegistry`       | `ATTESTATION_REGISTRY_HASH` | `<SET: package hash from deploy receipt>` |
-| `Insurance`                 | `INSURANCE_HASH`            | `<SET: package hash from deploy receipt>` |
-| `StakeToken` (CEP-18 STAKE) | `STAKE_TOKEN_HASH`          | `<SET: package hash from deploy receipt>` |
-| `MockUsdc` (CEP-18 USDC)    | `USDC_TOKEN_HASH`           | `<SET: package hash from deploy receipt>` |
+| Contract                    | Env var                     | Value                                                                   |
+| --------------------------- | --------------------------- | ----------------------------------------------------------------------- |
+| `AttestationRegistry`       | `ATTESTATION_REGISTRY_HASH` | `hash-7ff02eedc0159d2ad2567d939812a56f52979e6f07a11f6741e6ceb72c1658e7` |
+| `Insurance`                 | `INSURANCE_HASH`            | `hash-97734727898835d7f99b280f5705e878d54e7ad5ade90620ed8b0fc74f6d9d07` |
+| `StakeToken` (CEP-18 STAKE) | `STAKE_TOKEN_HASH`          | `hash-54aa1e56d38f5f3f1ec4488ff2304d9c81520ff99dcbfd20f59d053a7d578dfd` |
+| `MockUsdc` (CEP-18 USDC)    | `USDC_TOKEN_HASH`           | `hash-369561bdba8e59e2716124bc0bcbad7e7eb035cb44d275aa54fc94b182b6f229` |
+
+Explorer (drop the `hash-` prefix): `https://testnet.cspr.live/contract-package/<64hex>` — e.g.
+[AttestationRegistry](https://testnet.cspr.live/contract-package/7ff02eedc0159d2ad2567d939812a56f52979e6f07a11f6741e6ceb72c1658e7).
+Install txs: [AttestationRegistry](https://testnet.cspr.live/transaction/05c2ce231cdd6fc55dd8c2a86436ae0b431a0f8944dd07a42c48b4abae5e85ee) ·
+[Insurance](https://testnet.cspr.live/transaction/c9a08188db9b15760715035326afa8e128ef1e65e6f155d89175b0b196037ac8) ·
+[StakeToken](https://testnet.cspr.live/transaction/08566ebb66d9eafcc7c8fbf28650929d985ccc5e3526fcfdd54e32c6c89e3f46) ·
+[MockUsdc](https://testnet.cspr.live/transaction/958c6e24c630455ba0b9cfc0d06f49fb611a538e6d3cd9d787091d28e826df45).
 
 ### On-chain demo transactions (CSPR.live links)
 
-The demo produces three on-chain writes (`submit_attestation`, `claim`, `resolve`/slash). After
-running `make seed` against a live deploy, record their CSPR.live deploy links here:
+The demo arc produces three on-chain writes (`submit_attestation`, `claim`, `resolve`/slash). Their
+live CSPR.live links (also in [`deploy-out/arc.json`](deploy-out/arc.json)):
 
-| Tx                         | CSPR.live link                              |
-| -------------------------- | ------------------------------------------- |
-| `submit_attestation`       | `<SET: https://testnet.cspr.live/deploy/…>` |
-| `claim` (insurance payout) | `<SET: https://testnet.cspr.live/deploy/…>` |
-| `resolve` (slash)          | `<SET: https://testnet.cspr.live/deploy/…>` |
+| Tx                         | CSPR.live link                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `submit_attestation`       | https://testnet.cspr.live/transaction/fcf7e82bf36d71d4ea42b116ead4e889e3f83af4c59f2b4d4bb9f743b9c0e8fa              |
+| `claim` (insurance payout) | https://testnet.cspr.live/transaction/14073730f6156cb14f6416cf309dfb203261745c95d7ecb5300c8a2f83dfabe0              |
+| `resolve` (slash)          | https://testnet.cspr.live/transaction/29744fd1253cf76ac6206ae8afd27c1b82ebc91556fd7e344bc73bd4f6fb30ea              |
+
+### Live hosted demo
+
+Cloudflare-fronted HTTPS (verified HTTP 200): dApp **https://app.casperproof.com** · marketing
+**https://casperproof.com**.
 
 ## 2. x402 facilitator (real micropayments)
 
@@ -91,7 +112,7 @@ below are run on a normal dev machine or in CI, where they work.
 | Item                                   | Status in sandbox     | What a human / CI does                                                                                                                                                                                                                       |
 | -------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cargo odra build` → contract **wasm** | not produced here     | Run on a machine with network for the Casper backend crates; `make deploy-testnet` / `docker build -f docker/Dockerfile.contracts` does this. Contracts are fully verified via `cargo test` (MockVM, 30 tests) + the commitment parity test. |
-| Real on-chain **deploy signing**       | implemented (opt-in)  | Done via the Odra livenet binary (`contracts/bin/livenet.rs`, `livenet` feature) — `scripts/deploy-testnet.ts` spawns it in live mode. Compiles here; the live run needs the §1 secrets + node access on the deploy machine. The TS SDK `casper-js-sdk` in-dApp write path is a follow-up. |
+| Real on-chain **deploy signing**       | done (on testnet)     | Deployed to `casper-test` via a **casper-js-sdk v5** script (`apps/web/deploy-onchain.cjs` installs, `apps/web/arc-onchain.cjs` demo arc). The Odra livenet binary (`contracts/bin/livenet.rs`) compiles but its casper-client 4.x `TransactionV1` serialization is rejected by Casper 2.2.2, so the js-sdk path is used. Real hashes/links in §1. |
 | **Playwright** browser binaries        | could not download    | `pnpm --filter @casperproof/e2e exec playwright install chromium` then `pnpm --filter @casperproof/e2e test` (CI `e2e.yml` does this). Specs are written + typechecked against the real dApp DOM.                                            |
 | **Ollama** model pull                  | n/a (no model pulled) | `docker compose up ollama` pulls `${OLLAMA_MODEL}` (default `llama3.1:8b`) on first run. The agent runs fully without it via `LLM_BACKEND=none` (deterministic).                                                                             |
 | `cargo odra new` template              | failed (GitHub)       | Not needed — the contract crate is already scaffolded.                                                                                                                                                                                       |

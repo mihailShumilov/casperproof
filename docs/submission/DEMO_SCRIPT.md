@@ -5,12 +5,14 @@ A tightened, spoken walkthrough for the submission video. Condensed from the ful
 economic-security climax (tamper → verify FAIL → challenge → slash).
 
 The whole flow runs on the **local stack in mock mode** — no secrets, no live network, and the demo
-never depends on LLM quality. For a live testnet recording, set the secrets in
-[`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) and `make deploy-testnet` first; the three deploy
-links then live in that file.
+never depends on LLM quality. The contracts are also **live on `casper-test`** (Casper 2.2.2), so the
+recording can instead use the hosted dApp at **https://app.casperproof.com**; the three on-chain
+demo-arc txs are linked in the steps table below and in
+[`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1.
 
 > **Label on screen / in the description:** _Testnet-only, unaudited prototype — Casper Agentic
-> Buildathon 2026._ Contracts are not yet deployed to testnet in this recording (mock mode).
+> Buildathon 2026._ Contracts are deployed to `casper-test`; the recording can run on the live dApp
+> (**app.casperproof.com**) or the local stack.
 
 ## Pre-roll setup (not recorded)
 
@@ -95,10 +97,10 @@ tx #3.)_
 
 | # | Action | Where | Contract call | Live link |
 | - | --- | --- | --- | --- |
-| 1 | Attest | `/oracle` → Submit attestation | `submit_attestation` | `TODO(deploy): real cspr.live link` |
-| 2 | Claim payout | `/insurance` → Simulate trigger | `claim` | `TODO(deploy): real cspr.live link` |
-| 3 | Slash | `/slash` → Resolve fraudulent | `resolve(id, true)` | `TODO(deploy): real cspr.live link` |
+| 1 | Attest | `/oracle` → Submit attestation | `submit_attestation` | https://testnet.cspr.live/transaction/fcf7e82bf36d71d4ea42b116ead4e889e3f83af4c59f2b4d4bb9f743b9c0e8fa |
+| 2 | Claim payout | `/insurance` → Simulate trigger | `claim` | https://testnet.cspr.live/transaction/14073730f6156cb14f6416cf309dfb203261745c95d7ecb5300c8a2f83dfabe0 |
+| 3 | Slash | `/slash` → Resolve fraudulent | `resolve(id, true)` | https://testnet.cspr.live/transaction/29744fd1253cf76ac6206ae8afd27c1b82ebc91556fd7e344bc73bd4f6fb30ea |
 
-CSPR.live deploy links are populated only for live testnet runs — see
-[`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1. Hosted video URL: `TODO(video): hosted demo
-video URL`.
+These are the live `casper-test` demo-arc txs (also in
+[`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1 / [`../../deploy-out/arc.json`](../../deploy-out/arc.json)).
+Hosted video URL: `TODO(video): hosted demo video URL`.

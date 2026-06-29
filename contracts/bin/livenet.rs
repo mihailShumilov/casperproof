@@ -102,6 +102,12 @@ fn step(name: &str) {
 // ── main ─────────────────────────────────────────────────────────────────────
 
 fn main() {
+    // Surface odra's `log::error!` deploy diagnostics (real RPC/node errors are otherwise
+    // swallowed into a generic ContractDeploymentError). Defaults to `info` if RUST_LOG unset.
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
+        .try_init()
+        .ok();
+
     let env = odra_casper_livenet_env::env();
 
     // Gas budgets (motes). Deploys install wasm and cost more than entry-point calls.
