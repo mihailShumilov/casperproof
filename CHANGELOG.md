@@ -16,7 +16,7 @@ All notable changes to this project are documented here. The format is based on
   `casper-js-sdk` transaction builder (`apps/web/.../onchain-tx.ts`), and CSPR.click
   sign+submit (`csprclick.ts`/`writes.ts`). Unit-tested; in-browser signing validated on deploy.
 - `make deploy-testnet-local` / `make livenet-build`; submission deploy runbook
-  (`docs/submission/DEPLOY_RUNBOOK.md`) and the DoraHacks submission package under `docs/submission/`.
+  and the DoraHacks submission package under `docs/submission/`.
 - Monorepo scaffold (pnpm + Turborepo for TS, Cargo workspace for Odra contracts).
 - Claude Code build team: 9 specialist sub-agents + 4 repo skills (`.claude/`).
 - `packages/commitment`: blake2b-256 commitment scheme with canonical JSON + golden vectors.
@@ -29,7 +29,7 @@ All notable changes to this project are documented here. The format is based on
 - `apps/x402-server`, `apps/mcp-server`, `apps/web` (dApp), `apps/marketing`.
 - `apps/x402-server`: x402-gated `GET /attestation/:id` + `POST /verify` (mock + facilitator).
 - Full dockerization (`docker compose up`), Makefile, GitHub Actions CI/e2e/release.
-- Documentation set (`docs/` + ADRs), deploy/seed scripts, Playwright e2e, `SETUP_NEEDED.md`.
+- Documentation set (`docs/` + ADRs), deploy/seed scripts, Playwright e2e.
 
 ### Fixed
 

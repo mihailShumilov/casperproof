@@ -8,7 +8,7 @@
  * Write paths (submit, challenge, resolve, claim, stake, unstake) require signing a Casper
  * deploy. `casper-js-sdk` is **not** a dependency of this package, so — exactly as in mock
  * mode — these methods compute the commitment locally and return a deterministic placeholder
- * deploy hash. Wiring real signing is tracked in `SETUP_NEEDED.md`; the read surface is fully
+ * deploy hash. Wiring real signing is tracked in `docs/DEPLOYMENT.md`; the read surface is fully
  * live.
  *
  * Event streaming (`subscribeEvents`) is a documented stub here: real live events arrive over
@@ -204,7 +204,7 @@ export class RestBackend implements Backend {
     return { address, score, tier };
   }
 
-  // ── Writes (deterministic placeholder deploy hashes; see SETUP_NEEDED) ──────
+  // ── Writes (deterministic placeholder deploy hashes; see docs/DEPLOYMENT.md) ──────
 
   async submitAttestation(args: SubmitAttestationArgs): Promise<SubmitAttestationResult> {
     // Hashes are computed locally via @casperproof/commitment regardless of mode (§8 anchor).
@@ -258,7 +258,7 @@ export class RestBackend implements Backend {
 
   subscribeEvents(_handler: EventHandler): Unsubscribe {
     // Live events arrive over the CSPR.cloud streaming WebSocket; wiring is tracked in
-    // SETUP_NEEDED.md. Until then this is a documented no-op subscription.
+    // docs/DEPLOYMENT.md. Until then this is a documented no-op subscription.
     void _handler;
     return () => {
       /* no-op */

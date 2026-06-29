@@ -76,10 +76,10 @@ _(266 characters; ~267 Twitter-weighted — under the 280 limit.)_
 
 ### Placeholders to fill before posting
 - `TODO(cspr.fans): listing URL` — the CSPR.fans project page (replace in every post above).
-- `TODO(video): hosted demo video URL` — the walkthrough video (see [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md)).
+- `TODO(video): hosted demo video URL` — the walkthrough video.
 - Social handle for the project, if a dedicated account is created (posts currently tag
   `@Casper_Network` only).
 
-All claims above trace to [`../../STATUS.md`](../../STATUS.md) / [`BUIDL.md`](./BUIDL.md). Keep the
+All claims above trace to [`BUIDL.md`](./BUIDL.md). Keep the
 "testnet-only, unaudited" framing in any long-form description per
 [`../../SECURITY.md`](../../SECURITY.md).

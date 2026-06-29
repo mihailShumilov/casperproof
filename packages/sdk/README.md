@@ -147,7 +147,7 @@ real** in both modes; they are computed from the canonical commitment scheme and
 > **Real deploy signing requires `casper-js-sdk`**, which is intentionally not a dependency of
 > this package. Until it is wired in, write methods return deterministic placeholder deploy
 > hashes in both modes, and live event streaming over CSPR.cloud is a no-op stub. See
-> `SETUP_NEEDED.md` at the repo root.
+> [`../../docs/DEPLOYMENT.md`](../../docs/DEPLOYMENT.md).
 
 ## Scripts
 

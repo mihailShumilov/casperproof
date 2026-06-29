@@ -63,7 +63,7 @@ To typecheck the specs without running them:
 pnpm --filter @casperproof/e2e exec tsc --noEmit -p tsconfig.json
 ```
 
-## SETUP_NEEDED
+## Going live
 
 - **Chromium browser binary.** `playwright install chromium` downloads the
   browser from the Playwright CDN. In a network-restricted sandbox that download

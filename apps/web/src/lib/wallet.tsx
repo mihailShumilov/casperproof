@@ -8,7 +8,7 @@
  * (connect / disconnect / active account) without any network or wallet.
  *
  * ──────────────────────────────────────────────────────────────────────────
- * SETUP_NEEDED — wiring the real CSPR.click SDK
+ * Going live — wiring the real CSPR.click SDK
  * ──────────────────────────────────────────────────────────────────────────
  * To go live, install `@make-software/csprclick-ui` + `@make-software/csprclick-core-client`
  * and set `NEXT_PUBLIC_CSPR_CLICK_APP_ID`. Replace the body of `connect()` /

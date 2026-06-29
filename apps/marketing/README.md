@@ -109,7 +109,7 @@ time, so the figures are baked into the static HTML — zero client fetch.
 - Responsive grids (4 → 2 → 1 columns); fluid hero type via `clamp()`.
 - No remote fonts/images; ~88 kB first-load JS. Built for Lighthouse ≥ 95.
 
-## SETUP_NEEDED
+## Going live
 
 - **CSPR.fans listing** — `NEXT_PUBLIC_CSPR_FANS_URL` defaults to
   `https://cspr.fans`. Set it to the real project-vote URL once the listing is

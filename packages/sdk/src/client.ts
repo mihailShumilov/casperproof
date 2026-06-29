@@ -169,7 +169,7 @@ export class CasperProofSdk {
   /**
    * Subscribe to live contract events (`AttestationSubmitted`, `Challenged`, `Resolved`,
    * `ClaimPaid`). In mock mode this replays recent local events and emits new ones as they
-   * occur; in live mode events arrive over CSPR.cloud streaming (see `SETUP_NEEDED.md`).
+   * occur; in live mode events arrive over CSPR.cloud streaming (see `docs/DEPLOYMENT.md`).
    *
    * @returns An unsubscribe function.
    */
