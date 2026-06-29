@@ -1,6 +1,7 @@
 import { Header } from '../components/Header';
 import { Hero } from '../components/Hero';
 import { Problem } from '../components/Problem';
+import { Losses } from '../components/Losses';
 import { HowItWorks } from '../components/HowItWorks';
 import { LiveNumbers } from '../components/LiveNumbers';
 import { Builders } from '../components/Builders';
@@ -42,6 +43,7 @@ export default async function HomePage(): Promise<JSX.Element> {
       <main id="main">
         <Hero />
         <Problem />
+        <Losses />
         <HowItWorks />
         <LiveNumbers data={stats} />
         <Builders />

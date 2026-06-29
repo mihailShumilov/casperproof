@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="CasperProof risk assessment">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0b0e"/>
+      <stop offset="1" stop-color="#121419"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff2d2d"/>
+      <stop offset="1" stop-color="#2fd47a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="6" fill="url(#accent)"/>
+  <g transform="translate(80,90)">
+    <rect x="0" y="0" width="44" height="44" rx="10" fill="#ff2d2d"/>
+    <text x="22" y="31" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" font-weight="700" fill="#ffffff">◆</text>
+    <text x="64" y="32" font-family="system-ui, sans-serif" font-size="28" font-weight="700" fill="#e8eaed">CasperProof</text>
+  </g>
+  <text x="80" y="270" font-family="system-ui, sans-serif" font-size="76" font-weight="800" fill="#e8eaed" letter-spacing="-2">Risk assessment</text>
+  <text x="80" y="350" font-family="system-ui, sans-serif" font-size="34" font-weight="500" fill="#9aa0aa">15 on-chain factors · stake-backed · verifiable on Casper</text>
+  <g transform="translate(80,430)" font-family="ui-monospace, monospace" font-size="22" fill="#5d636e">
+    <text x="0" y="0">Transaction &amp; Behavior</text>
+    <text x="320" y="0">Protocol &amp; DeFi</text>
+    <text x="560" y="0">Security &amp; History</text>
+    <text x="850" y="0">Identity &amp; Portfolio</text>
+  </g>
+  <g transform="translate(940,120)">
+    <circle cx="80" cy="80" r="78" fill="none" stroke="#1a1d24" stroke-width="12"/>
+    <circle cx="80" cy="80" r="78" fill="none" stroke="#2fd47a" stroke-width="12" stroke-linecap="round" stroke-dasharray="368 490" transform="rotate(-90 80 80)"/>
+    <text x="80" y="74" text-anchor="middle" font-family="ui-monospace, monospace" font-size="52" font-weight="700" fill="#e8eaed">73</text>
+    <text x="80" y="112" text-anchor="middle" font-family="ui-monospace, monospace" font-size="16" font-weight="700" fill="#2fd47a" letter-spacing="4">SCORE</text>
+  </g>
+  <text x="80" y="560" font-family="system-ui, sans-serif" font-size="22" fill="#9aa0aa">app.casperproof.com · Proof your agents can't fake.</text>
+</svg>
