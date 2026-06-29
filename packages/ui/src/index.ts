@@ -37,6 +37,22 @@ export type { CodeBlockProps } from './components/CodeBlock.js';
 export { ThemeProvider } from './components/ThemeProvider.js';
 export type { ThemeProviderProps } from './components/ThemeProvider.js';
 
+// Animated primitives
+export { RingGauge } from './components/RingGauge.js';
+export type { RingGaugeProps } from './components/RingGauge.js';
+
+export { Reveal } from './components/Reveal.js';
+export type { RevealProps } from './components/Reveal.js';
+
+// Hooks + motion + risk helpers
+export { useCountUp } from './useCountUp.js';
+export type { UseCountUpOptions } from './useCountUp.js';
+
+export { prefersReducedMotion } from './motion.js';
+
+export { tierForScore, tierColor, tierBg } from './risk.js';
+export type { Tier } from './risk.js';
+
 // Tokens + helpers
 export {
   tokens,

@@ -9,8 +9,10 @@ import { usePathname } from 'next/navigation';
 import { WalletButton } from './WalletButton';
 
 const LINKS: { href: string; label: string }[] = [
+  { href: '/attest', label: 'Assess' },
   { href: '/oracle', label: 'Oracle' },
   { href: '/insurance', label: 'Insurance' },
+  { href: '/staking', label: 'Stake' },
   { href: '/slash', label: 'Slash demo' },
 ];
 

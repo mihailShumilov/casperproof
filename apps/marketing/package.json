@@ -10,7 +10,7 @@
     "dev": "next dev -p 29301",
     "start": "next start -p 29301",
     "clean": "rm -rf .next out coverage .turbo",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"

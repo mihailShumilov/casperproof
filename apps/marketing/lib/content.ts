@@ -45,6 +45,7 @@ export interface TeamLink {
 /** In-page anchor navigation. */
 export const NAV_LINKS: NavLink[] = [
   { label: 'Problem', href: '#problem' },
+  { label: 'Losses', href: '#losses' },
   { label: 'How it works', href: '#how-it-works' },
   { label: 'Live numbers', href: '#live-numbers' },
   { label: 'For builders', href: '#builders' },
@@ -63,6 +64,17 @@ export const PROBLEMS: { title: string; body: string }[] = [
     body: 'When an agent is wrong — a bad oracle print, an exploited integration, a governance attack — the loss lands on whoever depended on it. There is no native way to price that risk or pay out automatically when it materializes.',
   },
 ];
+
+/** "Real money lost" — honest framing copy for the losses section. */
+export const LOSSES = {
+  eyebrow: 'Real money lost',
+  title: "Unverifiable inputs cost DeFi billions — Casper's agent economy is next.",
+  lead: "Every exploit below trusted an input it couldn't prove. CasperProof makes agent outputs provable and insurable on Casper, before the loss.",
+  incidentsLabel: 'Cited, real incidents — auto-scrolling; pauses on hover or focus.',
+  feedTitle: 'Uncovered agent losses',
+  feedNote:
+    'Illustrative simulation: synthetic events generated on an interval to picture an unprotected agent economy. These are not real Casper Network transactions.',
+} as const;
 
 /** "How it works" — three steps. */
 export const HOW_IT_WORKS: HowItWorksStep[] = [

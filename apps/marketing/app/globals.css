@@ -326,3 +326,227 @@
 .mk-stack-sm > * + * {
   margin-top: var(--cp-space-sm);
 }
+
+/* --- Losses (real money lost) ---------------------------------------- */
+
+/* Count-up stat band. */
+.mk-loss-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cp-space-xl);
+  margin-bottom: var(--cp-space-2xl);
+}
+
+@media (max-width: 900px) {
+  .mk-loss-band {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .mk-loss-band {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mk-loss-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cp-space-xs);
+  padding: var(--cp-space-lg);
+  background-color: var(--cp-color-surface);
+  border: 1px solid var(--cp-color-border);
+  border-left: 3px solid var(--cp-color-fail);
+  border-radius: var(--cp-radius-lg);
+}
+
+.mk-loss-stat__value {
+  font-family: var(--cp-font-mono);
+  font-weight: var(--cp-fontweight-bold);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--cp-color-fail);
+}
+
+.mk-loss-stat__label {
+  font-size: var(--cp-fontsize-sm);
+  font-weight: var(--cp-fontweight-medium);
+  color: var(--cp-color-text);
+}
+
+.mk-loss-stat__note {
+  font-size: var(--cp-fontsize-xs);
+  color: var(--cp-color-textMuted);
+}
+
+.mk-loss-stat__source {
+  margin-top: var(--cp-space-xs);
+  font-size: var(--cp-fontsize-xs);
+  color: var(--cp-color-textFaint);
+  text-decoration: none;
+}
+.mk-loss-stat__source:hover {
+  color: var(--cp-color-textMuted);
+  text-decoration: underline;
+}
+
+/* Incident marquee. */
+.mk-loss-incidents-label {
+  margin: 0 0 var(--cp-space-md);
+  font-size: var(--cp-fontsize-sm);
+  color: var(--cp-color-textMuted);
+}
+
+.mk-loss-marquee {
+  margin-bottom: var(--cp-space-2xl);
+  padding-block: var(--cp-space-xs);
+}
+/* Pause the scroll for keyboard users too (hover is handled in the UI base). */
+.mk-loss-marquee:focus-within .cp-marquee__track {
+  animation-play-state: paused;
+}
+
+.mk-loss-incident {
+  flex: 0 0 auto;
+  width: 19rem;
+  margin-inline-end: var(--cp-space-lg);
+  padding: var(--cp-space-lg);
+  background-color: var(--cp-color-surface);
+  border: 1px solid var(--cp-color-border);
+  border-radius: var(--cp-radius-lg);
+  white-space: normal;
+}
+
+.mk-loss-incident__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-space-sm);
+  margin-bottom: var(--cp-space-sm);
+}
+
+.mk-loss-incident__name {
+  font-weight: var(--cp-fontweight-semibold);
+}
+
+.mk-loss-incident__amount {
+  margin: 0 0 var(--cp-space-xs);
+  font-family: var(--cp-font-mono);
+  font-weight: var(--cp-fontweight-bold);
+  font-size: var(--cp-fontsize-xl);
+  color: var(--cp-color-fail);
+}
+
+.mk-loss-incident__date {
+  margin: 0 0 var(--cp-space-sm);
+  font-size: var(--cp-fontsize-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cp-color-textMuted);
+}
+
+.mk-loss-incident__cause {
+  margin: 0 0 var(--cp-space-md);
+  font-size: var(--cp-fontsize-sm);
+  color: var(--cp-color-textMuted);
+}
+
+.mk-loss-incident__source {
+  font-size: var(--cp-fontsize-xs);
+  color: var(--cp-color-textFaint);
+  text-decoration: none;
+}
+.mk-loss-incident__source:hover {
+  color: var(--cp-color-accent);
+  text-decoration: underline;
+}
+
+/* Small neutral tag (incident category + feed type). */
+.mk-loss-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--cp-space-sm);
+  border: 1px solid var(--cp-color-border);
+  border-radius: var(--cp-radius-full);
+  background-color: var(--cp-color-surfaceRaised);
+  font-size: 0.6875rem;
+  font-weight: var(--cp-fontweight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cp-color-textMuted);
+  white-space: nowrap;
+}
+
+/* Illustrative live feed. */
+.mk-loss-feed {
+  padding: var(--cp-space-lg);
+}
+
+.mk-loss-feed__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cp-space-md);
+  margin-bottom: var(--cp-space-xs);
+}
+
+.mk-loss-feed__note {
+  margin: 0 0 var(--cp-space-lg);
+  font-size: var(--cp-fontsize-sm);
+  color: var(--cp-color-textMuted);
+}
+
+.mk-loss-feed__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mk-loss-feed__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cp-space-md);
+  padding-block: var(--cp-space-sm);
+  border-top: 1px solid var(--cp-color-border);
+  font-size: var(--cp-fontsize-sm);
+}
+.mk-loss-feed__row:first-child {
+  border-top: none;
+}
+
+.mk-loss-feed__time {
+  width: 5rem;
+  font-family: var(--cp-font-mono);
+  font-size: var(--cp-fontsize-xs);
+  color: var(--cp-color-textFaint);
+}
+
+.mk-loss-feed__addr {
+  font-family: var(--cp-font-mono);
+  color: var(--cp-color-textMuted);
+}
+
+.mk-loss-feed__amount {
+  margin-left: auto;
+  font-family: var(--cp-font-mono);
+  font-weight: var(--cp-fontweight-bold);
+  color: var(--cp-color-fail);
+}
+
+.mk-loss-uncovered {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--cp-space-sm);
+  border: 1px solid var(--cp-color-fail);
+  border-radius: var(--cp-radius-full);
+  background-color: var(--cp-color-failMuted);
+  font-size: 0.625rem;
+  font-weight: var(--cp-fontweight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--cp-color-fail);
+  white-space: nowrap;
+}

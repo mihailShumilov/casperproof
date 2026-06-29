@@ -440,6 +440,78 @@ body {
   letter-spacing: 0.05em;
 }
 
+/* --- Animated primitives -------------------------------------------- */
+
+/* RingGauge: block SVG so it sits on its own line. */
+.cp-ring {
+  display: block;
+}
+
+/* Pulse: opacity breathing for live / pending indicators. */
+@keyframes cp-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+.cp-pulse {
+  animation: cp-pulse 1.6s ease-in-out infinite;
+}
+
+/* Fade-in: a one-shot CSS entrance (the JS-free counterpart to <Reveal>). */
+@keyframes cp-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.cp-fade-in {
+  animation: cp-fade-in 0.4s ease-out both;
+}
+
+/* Spin: utility wrapper around the existing cp-spin keyframe. */
+.cp-spin {
+  animation: cp-spin 0.7s linear infinite;
+}
+
+/* Marquee: continuous horizontal scroll with edge fade + pause-on-hover. */
+@keyframes cp-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.cp-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.cp-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: cp-marquee 40s linear infinite;
+}
+/* Pause on hover, or explicitly via the helper class. */
+.cp-marquee:hover .cp-marquee__track,
+.cp-marquee--paused .cp-marquee__track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-pulse,
+  .cp-fade-in,
+  .cp-spin,
+  .cp-marquee__track {
+    animation: none !important;
+  }
+}
+
 /* Visually hidden but available to assistive tech. */
 .cp-sr-only {
   position: absolute;
