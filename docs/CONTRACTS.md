@@ -215,21 +215,26 @@ See ADR [`0006`](./adr/0006-rfc7807-errors.md) for why RFC 7807.
 
 ## Deployed addresses
 
-`make deploy-testnet` writes the package hashes into `.env.local`. Until a real testnet deploy is
-run with the required secrets, the deploy script emits **deterministic mock placeholder hashes**
-(`hash-<blake2b256("casperproof:<network>:<name>")>`) so the rest of the stack boots. Replace the
-placeholders below with the real values after a live deploy — see
-[`../SETUP_NEEDED.md`](../SETUP_NEEDED.md).
+`make deploy-testnet` writes the package hashes into `.env.local`; with no testnet secrets the
+deploy script emits deterministic mock placeholder hashes so the rest of the stack still boots. The
+contracts below are **live on Casper testnet** (network `casper-test`, Casper 2.2.2). The canonical
+machine-readable record is [`../deploy-out/onchain.json`](../deploy-out/onchain.json) (package
+hashes + install txs) and [`../deploy-out/arc.json`](../deploy-out/arc.json) (the demo-arc txs).
+Explorer base: `https://testnet.cspr.live/transaction/<hash>`.
 
-| Contract              | Env var                     | Package hash                |
-| --------------------- | --------------------------- | --------------------------- |
-| `AttestationRegistry` | `ATTESTATION_REGISTRY_HASH` | `TBD — see SETUP_NEEDED.md` |
-| `Insurance`           | `INSURANCE_HASH`            | `TBD — see SETUP_NEEDED.md` |
-| `StakeToken`          | `STAKE_TOKEN_HASH`          | `TBD — see SETUP_NEEDED.md` |
-| `MockUsdc`            | `USDC_TOKEN_HASH`           | `TBD — see SETUP_NEEDED.md` |
+| Contract              | Env var                     | Package hash                                                              | Install tx                                                                                                                          |
+| --------------------- | --------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `AttestationRegistry` | `ATTESTATION_REGISTRY_HASH` | `hash-7ff02eedc0159d2ad2567d939812a56f52979e6f07a11f6741e6ceb72c1658e7` | [`05c2ce…e85ee`](https://testnet.cspr.live/transaction/05c2ce231cdd6fc55dd8c2a86436ae0b431a0f8944dd07a42c48b4abae5e85ee) |
+| `Insurance`           | `INSURANCE_HASH`            | `hash-97734727898835d7f99b280f5705e878d54e7ad5ade90620ed8b0fc74f6d9d07` | [`c9a081…7ac8`](https://testnet.cspr.live/transaction/c9a08188db9b15760715035326afa8e128ef1e65e6f155d89175b0b196037ac8) |
+| `StakeToken`          | `STAKE_TOKEN_HASH`          | `hash-54aa1e56d38f5f3f1ec4488ff2304d9c81520ff99dcbfd20f59d053a7d578dfd` | [`08566e…3f46`](https://testnet.cspr.live/transaction/08566ebb66d9eafcc7c8fbf28650929d985ccc5e3526fcfdd54e32c6c89e3f46) |
+| `MockUsdc`            | `USDC_TOKEN_HASH`           | `hash-369561bdba8e59e2716124bc0bcbad7e7eb035cb44d275aa54fc94b182b6f229` | [`958c6e…df45`](https://testnet.cspr.live/transaction/958c6e24c630455ba0b9cfc0d06f49fb611a538e6d3cd9d787091d28e826df45) |
 
-On-chain demo transactions (CSPR.live deploy links — `submit_attestation`, `claim`, slash
-`resolve`): `TBD — see SETUP_NEEDED.md`. Explorer base: https://testnet.cspr.live.
+On-chain demo transactions (CSPR.live deploy links):
+[`submit_attestation`](https://testnet.cspr.live/transaction/fcf7e82bf36d71d4ea42b116ead4e889e3f83af4c59f2b4d4bb9f743b9c0e8fa) ·
+[`claim`](https://testnet.cspr.live/transaction/14073730f6156cb14f6416cf309dfb203261745c95d7ecb5300c8a2f83dfabe0) ·
+slash [`resolve`](https://testnet.cspr.live/transaction/29744fd1253cf76ac6206ae8afd27c1b82ebc91556fd7e344bc73bd4f6fb30ea).
+Deployer account: `account-hash-eaf61079ba6dedf1591205cd0572600b50969ff5783716ca22e77202e3fe4df8`
+(pubkey `0172d6cdabe89d79827153d6c4974e28d11d17c4ef05267bf63541fff600dc6aa4`).
 
 ## Documentation generation (rustdoc)
 

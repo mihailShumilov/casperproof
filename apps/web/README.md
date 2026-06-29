@@ -94,7 +94,7 @@ fields, `aria-current` on the active nav link, `aria-live` on the feed,
 stylesheet, and `prefers-reduced-motion` honoured (UI stylesheet + the feed
 animation).
 
-## SETUP_NEEDED (going live)
+## Going live
 
 The dApp is wired for mock mode by default. To run against real Casper testnet
 infrastructure:
@@ -111,7 +111,8 @@ infrastructure:
   change. Live events then arrive over CSPR.cloud streaming through the same
   `subscribeEvents` handler in `LiveFeed`.
 - **Deploy keys** — the on-chain write paths need a PEM secret key and deployed
-  contract hashes; see the repo-root deploy scripts and `SETUP_NEEDED.md`.
+  contract hashes; see the repo-root deploy scripts and
+  [`../../docs/DEPLOYMENT.md`](../../docs/DEPLOYMENT.md).
 
 The unit suite here covers the pure helpers and the wallet reducer/context; the
 full attest → verify → claim → slash demo flow is exercised by Playwright in

@@ -2,7 +2,8 @@
 
 CasperProof runs as a Docker Compose stack with one-command bring-up. Everything works offline in
 mock mode with **no secrets**; real Casper Testnet data, micropayments, and storage are opt-in
-via env vars (see [`../SETUP_NEEDED.md`](../SETUP_NEEDED.md)).
+via env vars (see the [Environment variable reference](#environment-variable-reference) below and
+[`../.env.example`](../.env.example)).
 
 ## Local (Docker)
 
@@ -124,8 +125,11 @@ Required env vars for a real testnet deploy (otherwise mock):
 | `CASPER_SECRET_KEY_PATH` | PEM secret key for the deploy account. |
 | `CSPR_CLOUD_TOKEN`       | CSPR.cloud access token.               |
 
-Fund the deploy account at the faucet first: https://testnet.cspr.live/tools/faucet. Missing
-secrets and the resulting placeholders are recorded in [`../SETUP_NEEDED.md`](../SETUP_NEEDED.md).
+Fund the deploy account at the faucet first: https://testnet.cspr.live/tools/faucet. With either
+secret missing, the scripts fall back to mock mode and write deterministic placeholder hashes to
+`.env.local`. The live testnet deploy is recorded in
+[`../deploy-out/onchain.json`](../deploy-out/onchain.json) — see [`CONTRACTS.md`](./CONTRACTS.md)
+for the package hashes and CSPR.live links.
 
 ## Environment variable reference
 

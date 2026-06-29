@@ -3,7 +3,7 @@
 # Dockerfile.web — Next.js dApp (apps/web → app.casperproof.com).
 #
 # Builds the standalone output (`output: 'standalone'` in next.config.mjs — see
-# docker/README.md → SETUP_NEEDED) and runs it with plain `node server.js`, no
+# docker/README.md → Going live) and runs it with plain `node server.js`, no
 # pnpm/runtime install needed. Multi-stage; the runner is non-root and minimal.
 # ─────────────────────────────────────────────────────────────────────────────
 

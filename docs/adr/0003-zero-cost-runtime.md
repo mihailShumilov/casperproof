@@ -36,7 +36,7 @@ mock SDK.
 - `cp .env.example .env && make up` works offline with no secrets; CI and the test suite run the
   same way.
 - Reproducible proofs make the golden-vector parity test and the e2e demo flow stable.
-- Going live is purely additive: supply tokens/keys (see
-  [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md)) and the same code switches to live mode.
+- Going live is purely additive: supply tokens/keys (the env vars in
+  [`../DEPLOYMENT.md`](../DEPLOYMENT.md)) and the same code switches to live mode.
 - Determinism caps what the "AI" can claim — the value is the verifiable trust layer, not model
   cleverness, which is exactly the product thesis.

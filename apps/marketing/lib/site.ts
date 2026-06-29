@@ -26,7 +26,7 @@ export const APP_URL = stripTrailingSlash(env('NEXT_PUBLIC_APP_URL', 'http://loc
 /**
  * The CSPR.fans community-vote listing.
  *
- * SETUP_NEEDED: replace the default with the real CSPR.fans project URL once
+ * Going live: replace the default with the real CSPR.fans project URL once
  * the listing is live (set `NEXT_PUBLIC_CSPR_FANS_URL`).
  */
 export const CSPR_FANS_URL = env('NEXT_PUBLIC_CSPR_FANS_URL', 'https://cspr.fans');

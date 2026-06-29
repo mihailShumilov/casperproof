@@ -177,7 +177,7 @@ async function main(): Promise<void> {
     writeEnvLocal(outPath, network, 'mock', addresses);
     console.log(`\n  Wrote ${CONTRACTS.length} package hashes to ${outPath}:`);
     for (const name of CONTRACTS) console.log(`    ${ENV_KEYS[name]} = ${addresses[ENV_KEYS[name]]}`);
-    console.log('\n  ⚠ MOCK addresses — not on-chain. See SETUP_NEEDED.md to deploy for real.');
+    console.log('\n  ⚠ MOCK addresses — not on-chain. See docs/DEPLOYMENT.md to deploy for real.');
     console.log(existsSync(outPath) ? '\n✓ deploy step complete.\n' : '\n✗ failed to write .env.local\n');
     return;
   }

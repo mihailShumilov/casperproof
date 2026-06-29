@@ -42,7 +42,7 @@ pnpm --filter @casperproof/x402-server dev     # tsx watch
 pnpm --filter @casperproof/x402-server test     # vitest (100% lines, >90% branches)
 ```
 
-## SETUP_NEEDED
+## Going live
 
 - Real payments require a reachable `X402_FACILITATOR_URL` (the Casper x402 facilitator).
 - Live attestation reads require `CSPR_CLOUD_TOKEN` (the SDK flips to live mode automatically).

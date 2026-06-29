@@ -96,9 +96,9 @@ make seed             # seed demo attestations + insurance policies
 ```
 
 Both run the `deployer` image. With no `CASPER_SECRET_KEY_PATH` /
-`CSPR_CLOUD_TOKEN`, the scripts run in **mock mode** and record any missing
-secrets in `SETUP_NEEDED.md`. The deployer writes the deployed contract hashes
-into the shared `contracts-out` volume (`.env.local`).
+`CSPR_CLOUD_TOKEN`, the scripts run in **mock mode** (the live-deploy env vars are
+documented in [`../docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md)). The deployer writes
+the deployed contract hashes into the shared `contracts-out` volume (`.env.local`).
 
 ## Production overlay
 
@@ -145,7 +145,7 @@ Run `make help` for the self-documenting list:
 - **`release.yml`** — on a `v*` tag, builds all images (matrix) with GHA layer
   cache and cuts a GitHub release. Registry push is wired but commented.
 
-## Notes & SETUP_NEEDED
+## Notes & going live
 
 The local stack is verified to boot end-to-end with **no secrets**: all 7 services
 come up (the 5 with healthchecks report `healthy`), the dApp + marketing serve over
@@ -164,7 +164,7 @@ Implementation notes wired into the compose stack:
   is empty by default ⇒ the local mock payment verifier** (offline `402 → pay → serve`).
   Set it to the Casper facilitator URL for real micropayments. ✔
 
-Only real-infrastructure items remain (see `../SETUP_NEEDED.md`):
+Only real-infrastructure items remain (see [`../docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md)):
 
 - **Testnet deploy (real, not mock):** `CASPER_SECRET_KEY_PATH` (PEM) + `CSPR_CLOUD_TOKEN`.
   Get test CSPR from https://testnet.cspr.live/tools/faucet. Local `make up` needs none.

@@ -67,7 +67,7 @@ make up          # boots ollama, minio, agent, x402, mcp, web, marketing
 Deploy contracts to Casper Testnet and seed the demo:
 
 ```bash
-make deploy-testnet   # builds wasm + deploys (needs testnet keys; see SETUP_NEEDED.md)
+make deploy-testnet   # builds wasm + deploys (needs testnet keys; see docs/DEPLOYMENT.md)
 make seed             # seeds demo attestations + policies
 ```
 
@@ -94,17 +94,17 @@ make seed             # seeds demo attestations + policies
 
 ## Documentation
 
-[`docs/`](./docs) — ARCHITECTURE, COMMITMENT, CONTRACTS, DEPLOYMENT, DEMO_SCRIPT, ADRs.
+[`docs/`](./docs) — ARCHITECTURE, COMMITMENT, CONTRACTS, DEPLOYMENT, ADRs.
 Per-package READMEs live alongside each package.
 
 ## Submission
 
 Built for the **Casper Agentic Buildathon 2026**. The DoraHacks submission package lives in
-[`docs/submission/`](./docs/submission): the [BUIDL writeup](./docs/submission/BUIDL.md), the
-[3-minute demo script](./docs/submission/DEMO_SCRIPT.md), the
-[CSPR.fans voting pack](./docs/submission/VOTING_PACK.md), and the
-[submission checklist](./docs/submission/CHECKLIST.md). _Testnet-only, unaudited — pending the
-testnet deploy and demo video (see [`SETUP_NEEDED.md`](./SETUP_NEEDED.md))._
+[`docs/submission/`](./docs/submission): the [BUIDL writeup](./docs/submission/BUIDL.md) and the
+[CSPR.fans voting pack](./docs/submission/VOTING_PACK.md). The four contracts and the three demo
+transactions are live on `casper-test` ([`deploy-out/onchain.json`](./deploy-out/onchain.json) +
+[`deploy-out/arc.json`](./deploy-out/arc.json)); see [`docs/CONTRACTS.md`](./docs/CONTRACTS.md) for
+the package hashes and CSPR.live links. _Testnet-only, unaudited; demo video pending._
 
 ## License
 

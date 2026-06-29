@@ -8,7 +8,7 @@
  * Deterministic mock deploy hashes are computed as `blake2b256(label || le_u64(counter) ||
  * utf8(canonical(payload)))` via `@casperproof/commitment` — so the same write produces the
  * same hash, which keeps tests and the demo reproducible. Real signing requires
- * `casper-js-sdk`, which is intentionally not a dependency here (see `SETUP_NEEDED.md`).
+ * `casper-js-sdk`, which is intentionally not a dependency here (see `docs/DEPLOYMENT.md`).
  */
 import {
   blake2b256,

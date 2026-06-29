@@ -33,5 +33,5 @@ the key, which powers the tamper demo.
 - The tamper demo is honest: it mutates bytes at a fixed URI (something a real attacker would do
   to the off-chain copy), and the verifier catches it because the recomputed hash no longer
   matches the on-chain commitment.
-- Real storage needs credentials (see [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md)); without
-  them everything runs in-memory.
+- Real storage needs credentials (the `S3_*` env vars in [`../DEPLOYMENT.md`](../DEPLOYMENT.md));
+  without them everything runs in-memory.

@@ -5,7 +5,7 @@
  * backend replays recent local events to new subscribers and pushes new ones as
  * writes happen across the app, so this list streams in real time as the user
  * submits attestations, challenges, resolves, and files claims. In live mode the
- * same handler receives CSPR.cloud streaming events (see SETUP_NEEDED).
+ * same handler receives CSPR.cloud streaming events (see docs/DEPLOYMENT.md).
  *
  * Nothing here is fabricated — every row is an actual `CasperProofEvent` emitted
  * by the SDK.

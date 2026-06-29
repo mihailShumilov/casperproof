@@ -3,7 +3,7 @@
 # Dockerfile.marketing — static marketing site (apps/marketing → casperproof.com).
 #
 # `next build` with `output: 'export'` emits a fully static `out/` directory
-# (see docker/README.md → SETUP_NEEDED for the next.config requirement). That
+# (see docker/README.md → Going live for the next.config requirement). That
 # directory is served by a tiny nginx image — no Node at runtime.
 # ─────────────────────────────────────────────────────────────────────────────
 
