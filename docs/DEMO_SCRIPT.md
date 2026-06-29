@@ -5,6 +5,13 @@ mock mode (no secrets) — the demo never depends on LLM quality or live network
 real `apps/web` pages; the on-chain writes are the three demo transactions
 (`submit_attestation`, `claim`, slash `resolve`).
 
+> **For the actual recording, use the timed, scene-by-scene script:**
+> [`submission/DEMO_SCRIPT.md`](submission/DEMO_SCRIPT.md) (~4 min). It records on the **live hosted
+> demo** (https://app.casperproof.com + https://casperproof.com), leads with the marketing
+> "Real money lost" section, makes the **animated attestation pipeline** (`/attest`) the centerpiece,
+> and adds the shareable result (`/attestation/[id]`) and **staking** (`/staking`) — the features
+> added since this beat sheet was first written. The contracts are now live on `casper-test`.
+
 ## Setup (before recording)
 
 ```bash
