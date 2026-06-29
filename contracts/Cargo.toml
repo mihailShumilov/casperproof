@@ -27,6 +27,14 @@ path = "bin/livenet.rs"
 required-features = ["livenet"]
 test = false
 
+# wasm build harness — `cargo odra build` compiles each contract to wasm by building this
+# bin for `wasm32-unknown-unknown` per `ODRA_MODULE` (odra emits the contract entrypoints
+# from the `use casperproof_contracts;` import). On the host it is a no-op `main`.
+[[bin]]
+name = "casperproof_contracts_build_contract"
+path = "bin/build_contract.rs"
+test = false
+
 [build-dependencies]
 # Used by `build.rs` to emit the `odra_module` cfg + flags for `cargo odra build`.
 odra-build = { version = "2", default-features = false }
