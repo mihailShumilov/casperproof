@@ -6,8 +6,13 @@ _Proof your agents can't fake._
 Built for the **Casper Agentic Buildathon 2026** (Qualification Round, June 1–30, 2026).
 
 > **Status:** Testnet-only, **unaudited** — not for mainnet value. See [`../../SECURITY.md`](../../SECURITY.md).
-> Contracts are **not yet deployed to testnet**; on-chain addresses/links in this submission are
-> marked `TODO(deploy)` and tracked in [`CHECKLIST.md`](./CHECKLIST.md) → [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1.
+> Contracts are **live on Casper testnet** (network `casper-test`, Casper 2.2.2): `AttestationRegistry`
+> [`hash-7ff0…58e7`](https://testnet.cspr.live/contract-package/7ff02eedc0159d2ad2567d939812a56f52979e6f07a11f6741e6ceb72c1658e7),
+> `Insurance` [`hash-9773…9d07`](https://testnet.cspr.live/contract-package/97734727898835d7f99b280f5705e878d54e7ad5ade90620ed8b0fc74f6d9d07),
+> `StakeToken` [`hash-54aa…8dfd`](https://testnet.cspr.live/contract-package/54aa1e56d38f5f3f1ec4488ff2304d9c81520ff99dcbfd20f59d053a7d578dfd),
+> `MockUsdc` [`hash-3695…f229`](https://testnet.cspr.live/contract-package/369561bdba8e59e2716124bc0bcbad7e7eb035cb44d275aa54fc94b182b6f229).
+> Live dApp: **https://app.casperproof.com** · site: **https://casperproof.com**. Full hashes + the
+> three on-chain demo txs in [`CHECKLIST.md`](./CHECKLIST.md) → [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1.
 
 ---
 
@@ -93,7 +98,7 @@ when the corresponding credential/URL is supplied (see [`../../SETUP_NEEDED.md`]
 | **dApp** (Oracle / Insurance / Slash + live feed) | ✅ **Live; mock CSPR.click connector** | `apps/web`; 27 tests; real wallet via `NEXT_PUBLIC_CSPR_CLICK_APP_ID` |
 | **Marketing site** | ✅ **Live (static export)** | `apps/marketing`; 29 tests |
 | **Contract WASM build** (`cargo odra build`) | ⚙️ **Runs in CI / dev machine** | Not produced in the build sandbox (CDN/GitHub blocked); logic fully verified via MockVM ([`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §6) |
-| **Testnet deploy + on-chain txs** | 🔴 **Mock (no keys)** | `scripts/deploy-testnet.ts` emits **deterministic mock package hashes**; real deploy needs `CASPER_SECRET_KEY_PATH` + `CSPR_CLOUD_TOKEN` ([`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1) |
+| **Testnet deploy + on-chain txs** | ✅ **Live on `casper-test`** | 4 contracts installed + 3 demo txs (`submit_attestation`/`claim`/`resolve`) on-chain via a casper-js-sdk v5 script; hashes/links in [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1 + [`CHECKLIST.md`](./CHECKLIST.md) |
 | **CSPR.cloud reads/streaming** | 🔴 **Mock by default** | In-memory fixtures + local event emitter; live with `CSPR_CLOUD_TOKEN` |
 | **x402 micropayments** | 🔴 **Mock by default** | Local verifier accepts a signed `X-PAYMENT`; live with `X402_FACILITATOR_URL` |
 | **Object storage** | 🔴 **In-memory / MinIO** | Live with `S3_*` (Cloudflare R2 / AWS S3) |
@@ -120,9 +125,9 @@ package clearing **>90% line + branch**; both submission gates (security review 
 
 ## What we'd ship next (roadmap)
 
-1. **Real testnet deploy** — wire deploy signing (`casper-js-sdk` / `casper-client`), publish the
-   four package hashes, and run the three demo transactions on-chain
-   ([`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1).
+1. **Harden the live deploy path** — the four contracts and the three demo txs are already on
+   `casper-test` (via a casper-js-sdk v5 script; [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1);
+   next is a CI-driven redeploy and wiring the in-dApp write path against the live packages.
 2. **Live x402 facilitator + CSPR.click wallet** on testnet (replace the mock verifier/connector).
 3. **More model adapters and trigger types** — beyond the risk-scorer and claim-oracle, and beyond
    the `exploit` / `oracle_failure` / `agent_error` / `governance_attack` taxonomy.
@@ -145,10 +150,12 @@ from understanding on Casper-native primitives — see [`../../NOTICE.md`](../..
 ## Repo & links
 
 - **Repository:** https://github.com/mihailShumilov/casperproof
+- **Live dApp:** https://app.casperproof.com · **Marketing:** https://casperproof.com
 - **Demo video:** `TODO(video): hosted demo video URL` — see [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md)
 - **CSPR.fans listing:** `TODO(cspr.fans): listing URL` — see [`VOTING_PACK.md`](./VOTING_PACK.md)
-- **On-chain demo txs (cspr.live):** `TODO(deploy): real cspr.live link` (×3 — `submit_attestation`,
-  `claim`, slash `resolve`) — tracked in [`CHECKLIST.md`](./CHECKLIST.md)
+- **On-chain demo txs (cspr.live):** [`submit_attestation`](https://testnet.cspr.live/transaction/fcf7e82bf36d71d4ea42b116ead4e889e3f83af4c59f2b4d4bb9f743b9c0e8fa) ·
+  [`claim`](https://testnet.cspr.live/transaction/14073730f6156cb14f6416cf309dfb203261745c95d7ecb5300c8a2f83dfabe0) ·
+  slash [`resolve`](https://testnet.cspr.live/transaction/29744fd1253cf76ac6206ae8afd27c1b82ebc91556fd7e344bc73bd4f6fb30ea) — tracked in [`CHECKLIST.md`](./CHECKLIST.md)
 
 ## License
 
@@ -165,5 +172,6 @@ and the requirement that projects have a **fully functional prototype generating
 to be eligible in the Final Round — were confirmed from official Casper Network announcements and
 the DoraHacks listing via web search, not from the live detail page. CasperProof targets the
 **Agentic AI** track (with a DeFi & Payments angle via the x402-gated verification and the insurance
-vault). The on-chain-activity requirement is the open gating item, tracked as `TODO(deploy)` in
-[`CHECKLIST.md`](./CHECKLIST.md).
+vault). The on-chain-activity requirement is **satisfied** — four contracts are installed on
+`casper-test` and the three demo transactions are on-chain (hashes/links in
+[`CHECKLIST.md`](./CHECKLIST.md)).

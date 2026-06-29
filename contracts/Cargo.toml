@@ -13,11 +13,14 @@ odra-modules = { version = "2", default-features = false }
 # Livenet deploy/seed (host-only, behind the `livenet` feature; never compiled to wasm).
 odra-casper-livenet-env = { version = "2", optional = true }
 hex = { version = "0.4", optional = true }
+# Surfaces odra's `log::error!` deploy diagnostics (else the real RPC error is swallowed
+# into a generic ContractDeploymentError).
+env_logger = { version = "0.11", optional = true }
 
 [features]
 default = []
 # Enables the `livenet` binary (`bin/livenet.rs`) that deploys to a real Casper network.
-livenet = ["dep:odra-casper-livenet-env", "dep:hex"]
+livenet = ["dep:odra-casper-livenet-env", "dep:hex", "dep:env_logger"]
 
 # Host-only deploy + demo-seed binary. Built only with `--features livenet`; excluded from
 # `cargo odra build` (wasm) and from `cargo test`.

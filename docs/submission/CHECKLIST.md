@@ -22,31 +22,36 @@ it. **Legend:** ✅ done · 🟡 pending (needs a real value) · ⚙️ runs in 
 | 6   | Source code / GitHub repo                            | ✅ done             | https://github.com/mihailShumilov/casperproof (public, MIT)                                                                                                                           |
 | 7   | Open-source license                                  | ✅ done             | MIT — [`../../LICENSE`](../../LICENSE); originality in [`../../NOTICE.md`](../../NOTICE.md)                                                                                           |
 | 8   | Demo video                                           | 🟡 pending          | `TODO(video): hosted demo video URL` — script ready in [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md); record after testnet deploy. Source: [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §5 |
-| 9   | Live demo / app URL                                  | 🟡 pending          | Local stack runs now (`make up` → http://localhost:29300). Public `app.casperproof.com` not yet hosted.                                                                               |
+| 9   | Live demo / app URL                                  | ✅ done             | dApp **https://app.casperproof.com** · marketing **https://casperproof.com** (Cloudflare-fronted HTTPS, verified 200). Local stack also runs via `make up` → http://localhost:29300.  |
 | 10  | Team members                                         | ✅ done             | Mihail Shumilov (solo) — [`BUIDL.md`](./BUIDL.md) Team section                                                                                                                        |
 | 11  | Progress / milestones during hackathon               | ✅ done             | [`../../STATUS.md`](../../STATUS.md) + [`../../CHANGELOG.md`](../../CHANGELOG.md)                                                                                                     |
 | 12  | Logo / cover image                                   | 🟡 pending          | Brand favicon exists (`apps/web/public`); production **OG image** pending — [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §5                                                       |
-| 13  | On-chain activity (Final Round eligibility)          | 🟡 pending          | **Contracts not yet deployed to testnet.** Deploy + run the 3 demo txs — [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1                                                          |
+| 13  | On-chain activity (Final Round eligibility)          | ✅ done             | **Deployed to `casper-test` (Casper 2.2.2).** 4 contracts installed + the 3 demo txs (`submit_attestation`, `claim`, `resolve`/slash) on-chain — see the artifacts table below and [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1 |
 
-## On-chain deploy artifacts (all pending — blocked on testnet deploy)
+## On-chain deploy artifacts (live on `casper-test`, Casper 2.2.2)
 
-> Step-by-step procedure, server sizing, and the exact `.env` to fill: [`DEPLOY_RUNBOOK.md`](./DEPLOY_RUNBOOK.md).
-> Note: the on-chain **write path is implemented** — the Odra livenet deploy binary
-> (`contracts/bin/livenet.rs`) and the typed SDK/dApp contract-call path both compile and are
-> unit-tested (`cargo check --features livenet` is clean against the real Casper backend). The only
-> remaining step is **running** it with a funded key + `CSPR_CLOUD_TOKEN` to capture real hashes/tx
-> links. See the runbook's Phase 1.
+> Deployer account: `0172d6cdabe89d79827153d6c4974e28d11d17c4ef05267bf63541fff600dc6aa4`.
+> Captured artifacts: [`../../deploy-out/onchain.json`](../../deploy-out/onchain.json) (installs) and
+> [`../../deploy-out/arc.json`](../../deploy-out/arc.json) (demo arc). Step-by-step procedure and the
+> `.env` to fill: [`DEPLOY_RUNBOOK.md`](./DEPLOY_RUNBOOK.md).
+> Note: the released Odra 2.8.x **livenet binary** is incompatible with the current Casper 2.2.2
+> testnet (its casper-client 4.x `TransactionV1` serialization is rejected). The working deploy path
+> is a **casper-js-sdk v5** script (`apps/web/deploy-onchain.cjs` for the 4 installs,
+> `apps/web/arc-onchain.cjs` for the demo arc); the wasm is post-processed with
+> `wasm-opt --signext-lowering --llvm-memory-copy-fill-lowering` because the Casper VM rejects
+> bulk-memory/sign-ext ops. Contracts are Odra 2.8.1, verified via 30 MockVM tests + the TS⇆Rust
+> commitment parity test.
 
-| Item                                | Status              | Placeholder                         | Source of truth                                                                          |
-| ----------------------------------- | ------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------- |
-| `AttestationRegistry` package hash  | 🟡 pending          | `TODO(deploy): real package hash`   | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1                                      |
-| `Insurance` package hash            | 🟡 pending          | `TODO(deploy): real package hash`   | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1                                      |
-| `StakeToken` (STAKE) package hash   | 🟡 pending          | `TODO(deploy): real package hash`   | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1                                      |
-| `MockUsdc` (USDC) package hash      | 🟡 pending          | `TODO(deploy): real package hash`   | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1                                      |
-| `submit_attestation` tx (cspr.live) | 🟡 pending          | `TODO(deploy): real cspr.live link` | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1                                      |
-| `claim` tx (cspr.live)              | 🟡 pending          | `TODO(deploy): real cspr.live link` | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1                                      |
-| `resolve` / slash tx (cspr.live)    | 🟡 pending          | `TODO(deploy): real cspr.live link` | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §1                                      |
-| Contract WASM (`cargo odra build`)  | ⚙️ CI / dev machine | —                                   | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §6 (logic verified via 40 MockVM tests) |
+| Item                                | Status   | Value                                                                | Explorer                                                                                                                                                                                                                            |
+| ----------------------------------- | -------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AttestationRegistry` package hash  | ✅ done  | `hash-7ff02eedc0159d2ad2567d939812a56f52979e6f07a11f6741e6ceb72c1658e7` | [package](https://testnet.cspr.live/contract-package/7ff02eedc0159d2ad2567d939812a56f52979e6f07a11f6741e6ceb72c1658e7) · [install tx](https://testnet.cspr.live/transaction/05c2ce231cdd6fc55dd8c2a86436ae0b431a0f8944dd07a42c48b4abae5e85ee) |
+| `Insurance` package hash            | ✅ done  | `hash-97734727898835d7f99b280f5705e878d54e7ad5ade90620ed8b0fc74f6d9d07` | [package](https://testnet.cspr.live/contract-package/97734727898835d7f99b280f5705e878d54e7ad5ade90620ed8b0fc74f6d9d07) · [install tx](https://testnet.cspr.live/transaction/c9a08188db9b15760715035326afa8e128ef1e65e6f155d89175b0b196037ac8) |
+| `StakeToken` (STAKE) package hash   | ✅ done  | `hash-54aa1e56d38f5f3f1ec4488ff2304d9c81520ff99dcbfd20f59d053a7d578dfd` | [package](https://testnet.cspr.live/contract-package/54aa1e56d38f5f3f1ec4488ff2304d9c81520ff99dcbfd20f59d053a7d578dfd) · [install tx](https://testnet.cspr.live/transaction/08566ebb66d9eafcc7c8fbf28650929d985ccc5e3526fcfdd54e32c6c89e3f46) |
+| `MockUsdc` (USDC) package hash      | ✅ done  | `hash-369561bdba8e59e2716124bc0bcbad7e7eb035cb44d275aa54fc94b182b6f229` | [package](https://testnet.cspr.live/contract-package/369561bdba8e59e2716124bc0bcbad7e7eb035cb44d275aa54fc94b182b6f229) · [install tx](https://testnet.cspr.live/transaction/958c6e24c630455ba0b9cfc0d06f49fb611a538e6d3cd9d787091d28e826df45) |
+| `submit_attestation` tx (cspr.live) | ✅ done  | demo arc tx #1                                                       | [cspr.live](https://testnet.cspr.live/transaction/fcf7e82bf36d71d4ea42b116ead4e889e3f83af4c59f2b4d4bb9f743b9c0e8fa)                                                                                                                |
+| `claim` tx (cspr.live)              | ✅ done  | demo arc tx #2                                                       | [cspr.live](https://testnet.cspr.live/transaction/14073730f6156cb14f6416cf309dfb203261745c95d7ecb5300c8a2f83dfabe0)                                                                                                                |
+| `resolve` / slash tx (cspr.live)    | ✅ done  | demo arc tx #3                                                       | [cspr.live](https://testnet.cspr.live/transaction/29744fd1253cf76ac6206ae8afd27c1b82ebc91556fd7e344bc73bd4f6fb30ea)                                                                                                                |
+| Contract WASM (`cargo odra build`)  | ⚙️ CI / dev machine | wasm-opt post-processed for the Casper VM                            | [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §6 (logic verified via 30 MockVM tests + parity)                                                                                                                                  |
 
 ## Community vote (CSPR.fans)
 
@@ -76,15 +81,14 @@ it. **Legend:** ✅ done · 🟡 pending (needs a real value) · ⚙️ runs in 
 
 ---
 
-## Open TODO placeholders (fill after testnet deploy + video)
+## Open TODO placeholders (remaining before a complete submission)
 
-These are the **only** blockers between this package and a complete submission:
+The testnet deploy and on-chain demo arc are now **done** (see the artifacts table above). The only
+remaining items are human-provided assets:
 
-1. `TODO(deploy): real package hash` ×4 — the four contract package hashes (after `make deploy-testnet` with §1 secrets).
-2. `TODO(deploy): real cspr.live link` ×3 — `submit_attestation`, `claim`, `resolve`/slash deploy links (after `make seed` on the live deploy).
-3. `TODO(video): hosted demo video URL` — record using [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md), then host.
-4. `TODO(cspr.fans): listing URL` — create the CSPR.fans listing, paste into [`VOTING_PACK.md`](./VOTING_PACK.md) posts.
-5. `TODO(cspr.click): app id` — register the CSPR.click app id (for a live-wallet demo).
-6. Production **OG image** + public **app URL** (optional polish — [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §5).
+1. `TODO(video): hosted demo video URL` — record using [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md), then host.
+2. `TODO(cspr.fans): listing URL` — create the CSPR.fans listing, paste into [`VOTING_PACK.md`](./VOTING_PACK.md) posts.
+3. `TODO(cspr.click): app id` — register the CSPR.click app id (for a live-wallet demo).
+4. Production **OG image** (optional polish — [`../../SETUP_NEEDED.md`](../../SETUP_NEEDED.md) §5).
 
-Everything else is ✅ and traceable to repo code/tests. _Testnet-only, unaudited._
+Everything else is ✅ and traceable to repo code/tests + on-chain artifacts. _Testnet-only, unaudited._
