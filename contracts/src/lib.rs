@@ -1,3 +1,9 @@
+// Contracts compile to wasm in a `no_std` environment (odra supplies the runtime via
+// `odra_casper_wasm_env`); `cargo test` builds with `std` for the MockVM suite, and `alloc`
+// backs the String/Vec/Box used through `odra::prelude`.
+#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(test), no_main)]
+
 //! CasperProof Odra contracts.
 //!
 //! - [`commitment`] — shared on-chain commitment types (the trust anchor, §8).
@@ -7,6 +13,8 @@
 //!
 //! `cargo odra build` compiles each contract to wasm in its own no_std environment;
 //! `cargo test` / `cargo odra test` run the modules natively against the MockVM.
+
+extern crate alloc;
 
 pub mod attestation_registry;
 pub mod commitment;
