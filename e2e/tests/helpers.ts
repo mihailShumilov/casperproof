@@ -77,7 +77,9 @@ export async function readHashByLabel(scope: Locator, dtLabel: string): Promise<
  * recomputed hashes present and byte-for-byte equal.
  */
 export async function expectVerifyPass(scope: Locator): Promise<void> {
-  await expect(scope.getByText('PASS', { exact: true })).toBeVisible();
+  // The VerdictPill renders a glyph + label ("✓PASS"), so assert on its modifier class
+  // rather than exact text (and avoid colliding with prose/buttons that contain "PASS").
+  await expect(scope.locator('.cp-verdict--pass')).toBeVisible();
   const onchain = await readHashByLabel(scope, 'On-chain hash');
   const recomputed = await readHashByLabel(scope, 'Recomputed hash');
   expect(recomputed, 'PASS: recomputed hash must equal on-chain hash').toBe(onchain);
@@ -88,7 +90,9 @@ export async function expectVerifyPass(scope: Locator): Promise<void> {
  * recomputed hashes present and *not* equal (tamper detected).
  */
 export async function expectVerifyFail(scope: Locator): Promise<void> {
-  await expect(scope.getByText('FAIL', { exact: true })).toBeVisible();
+  // The VerdictPill renders a glyph + label ("✕FAIL"), so assert on its modifier class
+  // rather than exact text (and avoid colliding with the "Verify (expect FAIL)" button).
+  await expect(scope.locator('.cp-verdict--fail')).toBeVisible();
   const onchain = await readHashByLabel(scope, 'On-chain hash');
   const recomputed = await readHashByLabel(scope, 'Recomputed hash');
   expect(recomputed, 'FAIL: recomputed hash must diverge from on-chain hash').not.toBe(onchain);
@@ -99,11 +103,19 @@ export async function expectVerifyFail(scope: Locator): Promise<void> {
  * its inline verify panel. Returns the row card locator.
  */
 export async function openVerifyPanel(page: Page, attestationId: number): Promise<Locator> {
+  // Match the attestation row card by its `.list-item__id` — the Live feed card also
+  // contains "#id · model" text, so a plain hasText filter would match it too (and it
+  // has no Verify button).
   const row = page
     .locator('.cp-card')
-    .filter({ hasText: `#${attestationId} · ${ORACLE_DEFAULTS.modelId}` })
+    .filter({
+      has: page.locator('.list-item__id', {
+        hasText: `#${attestationId} · ${ORACLE_DEFAULTS.modelId}`,
+      }),
+    })
     .first();
   await expect(row).toBeVisible();
-  await row.getByRole('button', { name: 'Verify' }).click();
+  // `exact` so the toggle ("Verify") isn't confused with the panel's "Verify proof" button.
+  await row.getByRole('button', { name: 'Verify', exact: true }).click();
   return row;
 }

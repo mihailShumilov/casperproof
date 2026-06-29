@@ -10,6 +10,22 @@ repository = "https://github.com/mihailShumilov/casperproof"
 [dependencies]
 odra = { version = "2", default-features = false }
 odra-modules = { version = "2", default-features = false }
+# Livenet deploy/seed (host-only, behind the `livenet` feature; never compiled to wasm).
+odra-casper-livenet-env = { version = "2", optional = true }
+hex = { version = "0.4", optional = true }
+
+[features]
+default = []
+# Enables the `livenet` binary (`bin/livenet.rs`) that deploys to a real Casper network.
+livenet = ["dep:odra-casper-livenet-env", "dep:hex"]
+
+# Host-only deploy + demo-seed binary. Built only with `--features livenet`; excluded from
+# `cargo odra build` (wasm) and from `cargo test`.
+[[bin]]
+name = "livenet"
+path = "bin/livenet.rs"
+required-features = ["livenet"]
+test = false
 
 [build-dependencies]
 # Used by `build.rs` to emit the `odra_module` cfg + flags for `cargo odra build`.

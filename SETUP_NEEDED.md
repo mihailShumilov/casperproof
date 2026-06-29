@@ -21,9 +21,11 @@ Required to replace the deterministic mock package hashes with real ones.
 
 - **Faucet (testnet CSPR for gas):** https://testnet.cspr.live/tools/faucet
 - **Explorer:** https://testnet.cspr.live
-- Run: `make deploy-testnet` (builds wasm via `cargo odra build`, deploys, writes hashes to
-  `.env.local`). Without the two secrets above the deployer runs a **mock deploy** and writes
-  deterministic placeholder hashes so downstream services still bind to something.
+- Run: `make deploy-testnet-local` (host) or `make deploy-testnet` (Docker). With the two secrets
+  set, this runs the **Odra livenet binary** (`contracts/bin/livenet.rs`, `--features livenet`),
+  which deploys the four contracts + runs the on-chain demo arc and writes the **real** package
+  hashes to `.env.local`. Without the secrets it runs a deterministic **mock deploy** so downstream
+  services still bind to something. Step-by-step: [`docs/submission/DEPLOY_RUNBOOK.md`](docs/submission/DEPLOY_RUNBOOK.md).
 
 ### Deployed addresses (fill in after a real deploy)
 
@@ -89,7 +91,7 @@ below are run on a normal dev machine or in CI, where they work.
 | Item                                   | Status in sandbox     | What a human / CI does                                                                                                                                                                                                                       |
 | -------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cargo odra build` → contract **wasm** | not produced here     | Run on a machine with network for the Casper backend crates; `make deploy-testnet` / `docker build -f docker/Dockerfile.contracts` does this. Contracts are fully verified via `cargo test` (MockVM, 30 tests) + the commitment parity test. |
-| Real on-chain **deploy signing**       | not bundled           | `casper-js-sdk` is intentionally **not** a dependency (kept the build lean/offline). Wire it (or `casper-client put-deploy`) in `scripts/deploy-testnet.ts` for live submission; needs the §1 secrets.                                       |
+| Real on-chain **deploy signing**       | implemented (opt-in)  | Done via the Odra livenet binary (`contracts/bin/livenet.rs`, `livenet` feature) — `scripts/deploy-testnet.ts` spawns it in live mode. Compiles here; the live run needs the §1 secrets + node access on the deploy machine. The TS SDK `casper-js-sdk` in-dApp write path is a follow-up. |
 | **Playwright** browser binaries        | could not download    | `pnpm --filter @casperproof/e2e exec playwright install chromium` then `pnpm --filter @casperproof/e2e test` (CI `e2e.yml` does this). Specs are written + typechecked against the real dApp DOM.                                            |
 | **Ollama** model pull                  | n/a (no model pulled) | `docker compose up ollama` pulls `${OLLAMA_MODEL}` (default `llama3.1:8b`) on first run. The agent runs fully without it via `LLM_BACKEND=none` (deterministic).                                                                             |
 | `cargo odra new` template              | failed (GitHub)       | Not needed — the contract crate is already scaffolded.                                                                                                                                                                                       |

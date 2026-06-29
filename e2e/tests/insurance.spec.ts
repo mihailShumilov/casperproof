@@ -63,11 +63,12 @@ test('vault solvency tiles reflect a purchased policy', async ({ page }) => {
   await page.getByRole('button', { name: 'Buy policy' }).click();
   await expect(page.locator('.cp-card', { hasText: /Policy #\d+ ·/ }).first()).toBeVisible();
 
-  // Solvency section renders coverage-out / premiums / free-reserve tiles.
+  // Solvency section renders coverage-out / premiums / free-reserve tiles. Scope to the
+  // StatTile labels — the Recharts axis renders the same names as SVG <tspan> nodes.
   const solvency = page.locator('.cp-card', { hasText: 'Vault solvency' }).first();
-  await expect(solvency.getByText('Coverage out')).toBeVisible();
-  await expect(solvency.getByText('Premiums')).toBeVisible();
-  await expect(solvency.getByText('Free reserve')).toBeVisible();
+  await expect(solvency.locator('.cp-stattile__label', { hasText: 'Coverage out' })).toBeVisible();
+  await expect(solvency.locator('.cp-stattile__label', { hasText: 'Premiums' })).toBeVisible();
+  await expect(solvency.locator('.cp-stattile__label', { hasText: 'Free reserve' })).toBeVisible();
   // With a 50 CSPR seed reserve and a 5 CSPR active policy, the vault stays solvent.
   await expect(solvency.getByText('solvent')).toBeVisible();
 });

@@ -61,7 +61,10 @@ test('full demo flow: connect → score → attest → verify PASS → policy �
   // ── 2 · Submit + attest, then verify PASS (Oracle) ──────────────────────────
   await navTo(page, 'Oracle', 'Oracle');
   const attestationId = await submitOracleAttestation(page);
-  await expect(page.getByText(`#${attestationId} · ${ORACLE_DEFAULTS.modelId}`)).toBeVisible();
+  // Scope to the list row id (the live feed also renders "#id · …").
+  await expect(
+    page.locator('.list-item__id', { hasText: `#${attestationId} · ${ORACLE_DEFAULTS.modelId}` }),
+  ).toBeVisible();
 
   const passRow = await openVerifyPanel(page, attestationId);
   await passRow.getByRole('button', { name: 'Verify proof' }).click();
@@ -101,7 +104,8 @@ test('full demo flow: connect → score → attest → verify PASS → policy �
   await page.getByRole('button', { name: 'Submit attestation' }).click();
   const step1 = page.locator('.cp-card', { hasText: '1 · Submit attestation' }).first();
   await expect(step1.getByText('Active')).toBeVisible();
-  await expect(step1.getByText(SLASH_DEFAULTS.stakeCspr)).toBeVisible();
+  // The staked amount, scoped to the Stake definition value (the card prose also says "3 CSPR").
+  await expect(step1.locator('dt:has-text("Stake") + dd')).toHaveText(SLASH_DEFAULTS.stakeCspr);
 
   const step2 = page.locator('.cp-card', { hasText: '2 · Tamper & verify' }).first();
   await step2.getByRole('button', { name: 'Verify (expect FAIL)' }).click();
