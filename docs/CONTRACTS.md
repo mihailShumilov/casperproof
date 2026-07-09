@@ -222,12 +222,12 @@ machine-readable record is [`../deploy-out/onchain.json`](../deploy-out/onchain.
 hashes + install txs) and [`../deploy-out/arc.json`](../deploy-out/arc.json) (the demo-arc txs).
 Explorer base: `https://testnet.cspr.live/transaction/<hash>`.
 
-| Contract              | Env var                     | Package hash                                                              | Install tx                                                                                                                          |
-| --------------------- | --------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Contract              | Env var                     | Package hash                                                            | Install tx                                                                                                               |
+| --------------------- | --------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `AttestationRegistry` | `ATTESTATION_REGISTRY_HASH` | `hash-7ff02eedc0159d2ad2567d939812a56f52979e6f07a11f6741e6ceb72c1658e7` | [`05c2ce…e85ee`](https://testnet.cspr.live/transaction/05c2ce231cdd6fc55dd8c2a86436ae0b431a0f8944dd07a42c48b4abae5e85ee) |
-| `Insurance`           | `INSURANCE_HASH`            | `hash-97734727898835d7f99b280f5705e878d54e7ad5ade90620ed8b0fc74f6d9d07` | [`c9a081…7ac8`](https://testnet.cspr.live/transaction/c9a08188db9b15760715035326afa8e128ef1e65e6f155d89175b0b196037ac8) |
-| `StakeToken`          | `STAKE_TOKEN_HASH`          | `hash-54aa1e56d38f5f3f1ec4488ff2304d9c81520ff99dcbfd20f59d053a7d578dfd` | [`08566e…3f46`](https://testnet.cspr.live/transaction/08566ebb66d9eafcc7c8fbf28650929d985ccc5e3526fcfdd54e32c6c89e3f46) |
-| `MockUsdc`            | `USDC_TOKEN_HASH`           | `hash-369561bdba8e59e2716124bc0bcbad7e7eb035cb44d275aa54fc94b182b6f229` | [`958c6e…df45`](https://testnet.cspr.live/transaction/958c6e24c630455ba0b9cfc0d06f49fb611a538e6d3cd9d787091d28e826df45) |
+| `Insurance`           | `INSURANCE_HASH`            | `hash-97734727898835d7f99b280f5705e878d54e7ad5ade90620ed8b0fc74f6d9d07` | [`c9a081…7ac8`](https://testnet.cspr.live/transaction/c9a08188db9b15760715035326afa8e128ef1e65e6f155d89175b0b196037ac8)  |
+| `StakeToken`          | `STAKE_TOKEN_HASH`          | `hash-54aa1e56d38f5f3f1ec4488ff2304d9c81520ff99dcbfd20f59d053a7d578dfd` | [`08566e…3f46`](https://testnet.cspr.live/transaction/08566ebb66d9eafcc7c8fbf28650929d985ccc5e3526fcfdd54e32c6c89e3f46)  |
+| `MockUsdc`            | `USDC_TOKEN_HASH`           | `hash-369561bdba8e59e2716124bc0bcbad7e7eb035cb44d275aa54fc94b182b6f229` | [`958c6e…df45`](https://testnet.cspr.live/transaction/958c6e24c630455ba0b9cfc0d06f49fb611a538e6d3cd9d787091d28e826df45)  |
 
 On-chain demo transactions (CSPR.live deploy links):
 [`submit_attestation`](https://testnet.cspr.live/transaction/fcf7e82bf36d71d4ea42b116ead4e889e3f83af4c59f2b4d4bb9f743b9c0e8fa) ·

@@ -91,12 +91,7 @@ describe('computeFactors', () => {
 describe('computeCategories', () => {
   it('rolls the 15 factors up into the four ordered groups', () => {
     const cats = computeCategories(computeFactors('agent-x', 60));
-    expect(cats.map((c) => c.group)).toEqual([
-      'TRANSACTION',
-      'PROTOCOL',
-      'SECURITY',
-      'IDENTITY',
-    ]);
+    expect(cats.map((c) => c.group)).toEqual(['TRANSACTION', 'PROTOCOL', 'SECURITY', 'IDENTITY']);
     // Group weights sum to 100 across all categories.
     expect(cats.reduce((sum, c) => sum + c.weight, 0)).toBe(100);
     for (const c of cats) {

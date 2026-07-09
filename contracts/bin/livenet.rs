@@ -35,9 +35,7 @@ use casperproof_contracts::attestation_registry::{
     AttestationRegistry, AttestationRegistryInitArgs,
 };
 use casperproof_contracts::insurance::{Insurance, InsuranceInitArgs};
-use casperproof_contracts::tokens::{
-    MockUsdc, MockUsdcInitArgs, StakeToken, StakeTokenInitArgs,
-};
+use casperproof_contracts::tokens::{MockUsdc, MockUsdcInitArgs, StakeToken, StakeTokenInitArgs};
 
 // ── env helpers ──────────────────────────────────────────────────────────────
 
@@ -68,7 +66,11 @@ fn env_u64(key: &str, default: u64) -> u64 {
 /// `@casperproof/commitment`, the single canonical implementation) so the on-chain `output_hash`
 /// matches what the off-chain verifier recomputes; the fallback keeps the binary runnable alone.
 fn env_hash(key: &str, fill: u8) -> [u8; 32] {
-    match std::env::var(key).ok().map(|s| s.trim().to_string()).filter(|s| !s.is_empty()) {
+    match std::env::var(key)
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+    {
         Some(h) => {
             let bytes = hex::decode(h.trim_start_matches("0x")).expect("CP hash env must be hex");
             assert_eq!(bytes.len(), 32, "CP hash env `{key}` must be 32 bytes");
@@ -82,7 +84,11 @@ fn env_hash(key: &str, fill: u8) -> [u8; 32] {
 
 /// Read an `Address` (`hash-…`) from an env var, or fall back to `default` (the deployer).
 fn env_addr(key: &str, default: Address) -> Address {
-    match std::env::var(key).ok().map(|s| s.trim().to_string()).filter(|s| !s.is_empty()) {
+    match std::env::var(key)
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+    {
         Some(s) => Address::from_str(&s).expect("CP address env must be a valid `hash-…` address"),
         None => default,
     }
@@ -118,18 +124,31 @@ fn main() {
 
     let deployer = env.caller();
     result("DEPLOYER", &deployer.to_string());
-    result("NETWORK", &env_str("ODRA_CASPER_LIVENET_CHAIN_NAME", "casper-test"));
+    result(
+        "NETWORK",
+        &env_str("ODRA_CASPER_LIVENET_CHAIN_NAME", "casper-test"),
+    );
 
     // ── 1. CEP-18 tokens (deployer receives the full initial supply) ───────────
     let stake_supply = env_u256("CP_STAKE_SUPPLY", "1000000000000000"); // 1e6 STAKE @ 9 decimals
     let usdc_supply = env_u256("CP_USDC_SUPPLY", "1000000000000"); // 1e6 USDC @ 6 decimals
 
     env.set_gas(deploy_gas);
-    let mut stake = StakeToken::deploy(&env, StakeTokenInitArgs { initial_supply: stake_supply });
+    let mut stake = StakeToken::deploy(
+        &env,
+        StakeTokenInitArgs {
+            initial_supply: stake_supply,
+        },
+    );
     result("STAKE_TOKEN_HASH", &stake.address().to_string());
 
     env.set_gas(deploy_gas);
-    let mut usdc = MockUsdc::deploy(&env, MockUsdcInitArgs { initial_supply: usdc_supply });
+    let mut usdc = MockUsdc::deploy(
+        &env,
+        MockUsdcInitArgs {
+            initial_supply: usdc_supply,
+        },
+    );
     result("USDC_TOKEN_HASH", &usdc.address().to_string());
 
     // ── 2. Registry + Insurance ────────────────────────────────────────────────

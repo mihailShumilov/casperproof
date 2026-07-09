@@ -20,7 +20,7 @@ Two options:
    subtly wrong (Casper 2.0 moved from `Deploy` to `Transaction`; CLValue encoding must match the
    contract exactly).
 2. **Use Odra's native livenet env (`odra_casper_livenet_env`, Rust).** `Contract::deploy(&env,
-   InitArgs)` handles deploy construction, signing, submission, and package-hash capture, and the
+InitArgs)` handles deploy construction, signing, submission, and package-hash capture, and the
    returned `HostRef` calls entry points natively — the **same `Deployer`/`HostRef`/`InitArgs` API
    the MockVM tests already use**. Odra maintains it in lockstep with the contracts and the network
    protocol.

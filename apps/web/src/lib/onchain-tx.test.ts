@@ -54,7 +54,9 @@ describe('toCLValue', () => {
 
   it('throws on an unknown type', () => {
     // @ts-expect-error — exercising the runtime guard
-    expect(() => toCLValue({ name: 'x', type: 'nope', value: '1' })).toThrow(/unsupported arg type/);
+    expect(() => toCLValue({ name: 'x', type: 'nope', value: '1' })).toThrow(
+      /unsupported arg type/,
+    );
   });
 });
 
@@ -76,7 +78,11 @@ describe('buildTransaction', () => {
   it('builds buy_policy (string_list arg) and resolve (bool arg)', () => {
     expect(
       buildTransaction(
-        buyPolicyCall({ coverage: '5000000', triggerTypes: ['oracle_failure'], expiry: 4102444800 }),
+        buyPolicyCall({
+          coverage: '5000000',
+          triggerTypes: ['oracle_failure'],
+          expiry: 4102444800,
+        }),
         ctx,
       ),
     ).toBeDefined();

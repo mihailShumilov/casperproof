@@ -18,12 +18,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, prefersReducedMotion } from '@casperproof/ui';
 import { formatMotes } from '@/lib/format';
-import {
-  csprToMotes,
-  isWithdrawable,
-  lockedMotes,
-  type UnstakePhase,
-} from '@/lib/staking';
+import { csprToMotes, isWithdrawable, lockedMotes, type UnstakePhase } from '@/lib/staking';
 
 /** Duration of the animated solvency check (ms). */
 const CHECK_MS = 1100;
@@ -213,9 +208,7 @@ export function UnstakeFlow({
           <p className="stake-unstake__metric stake-unstake__metric--ok">
             ✓ Unstaked {formatMotes(requestedMotes.toString())}
           </p>
-          {deployHash && (
-            <p className="stake-unstake__deploy mono">deploy {shorten(deployHash)}</p>
-          )}
+          {deployHash && <p className="stake-unstake__deploy mono">deploy {shorten(deployHash)}</p>}
           <Button variant="ghost" size="sm" onClick={reset}>
             Unstake more
           </Button>
@@ -223,7 +216,11 @@ export function UnstakeFlow({
       )}
 
       {error && (
-        <p className="notice notice--error" role="alert" style={{ marginTop: 'var(--cp-space-md)' }}>
+        <p
+          className="notice notice--error"
+          role="alert"
+          style={{ marginTop: 'var(--cp-space-md)' }}
+        >
           {error}
         </p>
       )}
@@ -241,9 +238,7 @@ function PhaseBadge({ phase }: { phase: UnstakePhase }): JSX.Element {
     done: { label: 'Complete', cls: 'stake-phase--done', pulse: false },
   };
   const c = map[phase];
-  return (
-    <span className={`stake-phase ${c.cls}${c.pulse ? ' cp-pulse' : ''}`}>{c.label}</span>
-  );
+  return <span className={`stake-phase ${c.cls}${c.pulse ? ' cp-pulse' : ''}`}>{c.label}</span>;
 }
 
 /** Step indicator: Request → Solvency check → Execute, with animated connectors. */
