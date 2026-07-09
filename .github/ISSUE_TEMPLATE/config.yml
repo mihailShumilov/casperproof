@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/mihailShumilov/casperproof/security/advisories/new
+    about: Report privately via a GitHub security advisory. Never open a public issue.
+  - name: Casper Developers (Telegram)
+    url: https://t.me/CSPRDevelopers
+    about: Questions about the Casper stack, CSPR.cloud, or Odra.
+  - name: Casper Network (Discord)
+    url: https://discord.com/invite/caspernetwork
+    about: General Casper Network community discussion.

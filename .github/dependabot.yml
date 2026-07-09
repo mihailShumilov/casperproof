@@ -1,0 +1,73 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Dependabot version updates.
+#
+# Security *alerts* and automated security fixes are enabled at the repository
+# level (Settings → Code security); this file adds scheduled version updates on
+# top of them. Updates are grouped so a quiet week is one PR per ecosystem
+# rather than a dozen.
+# ─────────────────────────────────────────────────────────────────────────────
+version: 2
+
+updates:
+  # ── TypeScript monorepo (pnpm workspace: apps/*, packages/*, e2e) ──────────
+  # The root `pnpm-lock.yaml` covers every workspace member, so a single "/"
+  # entry updates the whole tree.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      # Framework bumps land together — `next`, `react`, and `react-dom` are
+      # peer-locked and must move as a unit.
+      next-react:
+        patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      dev-tooling:
+        dependency-type: development
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "vite"
+          - "eslint*"
+          - "@typescript-eslint/*"
+          - "prettier"
+          - "typescript"
+          - "turbo"
+      production:
+        dependency-type: production
+        exclude-patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+
+  # ── Odra contracts (Cargo workspace root lives in contracts/) ─────────────
+  - package-ecosystem: cargo
+    directory: "/contracts"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      cargo:
+        patterns:
+          - "*"
+
+  # ── GitHub Actions used by ci.yml / e2e.yml / release.yml / codeql.yml ────
+  # Currently pinned to actions that run on the deprecated Node 20 runtime;
+  # this keeps them moving.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns:
+          - "*"
