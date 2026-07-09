@@ -19,15 +19,15 @@
     "@casperproof/casper-sdk": "workspace:*",
     "@casperproof/ui": "workspace:*",
     "clsx": "^2.1.1",
-    "next": "^14.2.23",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "next": "^16.2.10",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@casperproof/config": "workspace:*",
     "@types/node": "^22.10.5",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
     "typescript": "^5.7.3",
     "vitest": "^2.1.8",
     "@vitest/coverage-v8": "^2.1.8"
