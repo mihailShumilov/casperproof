@@ -23,14 +23,14 @@
     "@casperproof/casper-sdk": "workspace:*",
     "@casperproof/agent": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.13.0",
-    "zod": "^3.24.1"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@casperproof/config": "workspace:*",
-    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/coverage-v8": "^4.1.10",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.8",
+    "vitest": "^4.1.10",
     "@types/node": "^22.10.5"
   }
 }
