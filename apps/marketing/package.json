@@ -19,7 +19,7 @@
     "@casperproof/casper-sdk": "workspace:*",
     "@casperproof/ui": "workspace:*",
     "clsx": "^2.1.1",
-    "next": "^14.2.23",
+    "next": "^15.5.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
