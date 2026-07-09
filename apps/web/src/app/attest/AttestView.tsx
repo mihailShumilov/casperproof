@@ -38,8 +38,8 @@ export function AttestView(): JSX.Element {
         <h1>Risk assessment</h1>
         <p>
           Score any agent or address across {FACTORS.length} on-chain factors, then anchor the
-          verdict as a stake-backed attestation. Watch the model run live, then share the
-          percentage result.
+          verdict as a stake-backed attestation. Watch the model run live, then share the percentage
+          result.
         </p>
       </header>
 

@@ -148,7 +148,9 @@ function runLivenet(env: NodeJS.ProcessEnv, contractsDir: string): string {
     maxBuffer: 64 * 1024 * 1024,
   });
   if (proc.error) {
-    throw new Error(`failed to spawn cargo (is the Rust toolchain installed?): ${proc.error.message}`);
+    throw new Error(
+      `failed to spawn cargo (is the Rust toolchain installed?): ${proc.error.message}`,
+    );
   }
   const stdout = proc.stdout ?? '';
   process.stdout.write(stdout);
@@ -170,15 +172,19 @@ async function main(): Promise<void> {
 
   if (!live) {
     if (isTrue(env.CP_FORCE_MOCK)) console.log('  CP_FORCE_MOCK set → forcing mock deploy.');
-    else console.log('  No testnet secrets found → mock deploy (deterministic placeholder hashes).');
+    else
+      console.log('  No testnet secrets found → mock deploy (deterministic placeholder hashes).');
     console.log('  Provide CASPER_SECRET_KEY_PATH + CSPR_CLOUD_TOKEN for a real deploy.');
     const addresses: Record<string, string> = {};
     for (const name of CONTRACTS) addresses[ENV_KEYS[name]] = mockPackageHash(name, network);
     writeEnvLocal(outPath, network, 'mock', addresses);
     console.log(`\n  Wrote ${CONTRACTS.length} package hashes to ${outPath}:`);
-    for (const name of CONTRACTS) console.log(`    ${ENV_KEYS[name]} = ${addresses[ENV_KEYS[name]]}`);
+    for (const name of CONTRACTS)
+      console.log(`    ${ENV_KEYS[name]} = ${addresses[ENV_KEYS[name]]}`);
     console.log('\n  ⚠ MOCK addresses — not on-chain. See docs/DEPLOYMENT.md to deploy for real.');
-    console.log(existsSync(outPath) ? '\n✓ deploy step complete.\n' : '\n✗ failed to write .env.local\n');
+    console.log(
+      existsSync(outPath) ? '\n✓ deploy step complete.\n' : '\n✗ failed to write .env.local\n',
+    );
     return;
   }
 
@@ -219,7 +225,9 @@ async function main(): Promise<void> {
     console.log(
       '\n  (No demo-tx hashes captured from logs — read them from the deployer account on',
     );
-    console.log(`   ${explorer} or re-run with CP_LIVENET_STEP=all. Package hashes above are live.)`);
+    console.log(
+      `   ${explorer} or re-run with CP_LIVENET_STEP=all. Package hashes above are live.)`,
+    );
   }
   console.log('\n✓ live deploy complete.\n');
 }

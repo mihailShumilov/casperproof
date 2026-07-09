@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  INCIDENTS,
-  MARKET_STATS,
-  CATEGORY_LABELS,
-  type LossCategory,
-} from './lossStats.js';
+import { INCIDENTS, MARKET_STATS, CATEGORY_LABELS, type LossCategory } from './lossStats.js';
 
 const CATEGORIES: LossCategory[] = ['oracle', 'bridge', 'flash-loan', 'agent'];
 

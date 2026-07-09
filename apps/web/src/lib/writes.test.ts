@@ -16,11 +16,10 @@ const liveEnv = {
 /** A fake CSPR.click client returning a fixed hash, recording the args it was called with. */
 function fakeClient(result: Partial<Awaited<ReturnType<CsprClickClient['send']>>> = {}) {
   const send = vi.fn(
-    async (
-      _json: object | string,
-      _pk: string,
-      _cb?: (status: string, data: unknown) => void,
-    ) => ({ transactionHash: 'deadbeef', ...result }),
+    async (_json: object | string, _pk: string, _cb?: (status: string, data: unknown) => void) => ({
+      transactionHash: 'deadbeef',
+      ...result,
+    }),
   );
   return { client: { send } as unknown as CsprClickClient, send };
 }

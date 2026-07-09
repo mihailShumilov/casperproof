@@ -5,8 +5,15 @@ import { encodeSeed } from '@/lib/riskFactors';
 import { render, flush, click } from '@/test/render';
 
 vi.mock('next/link', () => ({
-  default: ({ href, children, className }: { href: string; children?: ReactNode; className?: string }) =>
-    createElement('a', { href, className }, children),
+  default: ({
+    href,
+    children,
+    className,
+  }: {
+    href: string;
+    children?: ReactNode;
+    className?: string;
+  }) => createElement('a', { href, className }, children),
 }));
 
 afterEach(() => {

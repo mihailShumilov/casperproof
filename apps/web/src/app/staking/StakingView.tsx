@@ -42,12 +42,14 @@ import {
   withdrawableMotes,
 } from '@/lib/staking';
 
-const LEVEL_BADGE: Record<ReturnType<typeof solvencyLevelFor>, 'active' | 'challenged' | 'slashed'> =
-  {
-    HEALTHY: 'active',
-    CAUTION: 'challenged',
-    CRITICAL: 'slashed',
-  };
+const LEVEL_BADGE: Record<
+  ReturnType<typeof solvencyLevelFor>,
+  'active' | 'challenged' | 'slashed'
+> = {
+  HEALTHY: 'active',
+  CAUTION: 'challenged',
+  CRITICAL: 'slashed',
+};
 
 export function StakingView(): JSX.Element {
   const { isConnected } = useWallet();
@@ -154,7 +156,9 @@ export function StakingView(): JSX.Element {
             label="Solvency ratio"
             value={Number.isFinite(pool.ratio) ? `${ratioCount}x` : '∞'}
             delta={`floor ${formatRatio(Number(MIN_SOLVENCY_RATIO_BPS) / 10_000)}`}
-            deltaDirection={pool.level === 'HEALTHY' ? 'up' : pool.level === 'CRITICAL' ? 'down' : 'neutral'}
+            deltaDirection={
+              pool.level === 'HEALTHY' ? 'up' : pool.level === 'CRITICAL' ? 'down' : 'neutral'
+            }
           />
           <StatTile label="Stakers" value={stakerCount} />
         </div>
@@ -191,8 +195,8 @@ export function StakingView(): JSX.Element {
             </Button>
             {lastStakeHash && (
               <p className="notice notice--success" role="status">
-                ✓ Staked. Pool position now <strong>{formatMotes(userStakedMotes.toString())}</strong>
-                .
+                ✓ Staked. Pool position now{' '}
+                <strong>{formatMotes(userStakedMotes.toString())}</strong>.
               </p>
             )}
             <p className="muted" style={{ fontSize: 'var(--cp-fontsize-xs)' }}>
@@ -206,7 +210,9 @@ export function StakingView(): JSX.Element {
         <Card>
           <h2 className="section-title">My position</h2>
           {!hasStake ? (
-            <p className="empty">No position yet. Stake CSPR to back the vault and earn premiums.</p>
+            <p className="empty">
+              No position yet. Stake CSPR to back the vault and earn premiums.
+            </p>
           ) : (
             <>
               <div className="grid grid--3">
@@ -220,11 +226,7 @@ export function StakingView(): JSX.Element {
                 />
               </div>
               <div className="row" style={{ marginTop: 'var(--cp-space-lg)' }}>
-                <Button
-                  variant="secondary"
-                  onClick={handleClaim}
-                  disabled={pool.rewards <= 0n}
-                >
+                <Button variant="secondary" onClick={handleClaim} disabled={pool.rewards <= 0n}>
                   Claim rewards
                 </Button>
                 {rewardsClaimed && (
@@ -253,7 +255,10 @@ export function StakingView(): JSX.Element {
           onExecute={handleUnstake}
         />
         {!hasStake && (
-          <p className="muted" style={{ fontSize: 'var(--cp-fontsize-xs)', marginTop: 'var(--cp-space-md)' }}>
+          <p
+            className="muted"
+            style={{ fontSize: 'var(--cp-fontsize-xs)', marginTop: 'var(--cp-space-md)' }}
+          >
             Stake first to enable a withdrawal request.
           </p>
         )}
@@ -266,9 +271,9 @@ export function StakingView(): JSX.Element {
             Capital can&apos;t walk out from under live coverage
           </h2>
           <p className="muted">
-            Instead of a fixed unbonding clock, the vault enforces a minimum collateralisation
-            ratio on every withdrawal. You can always pull the free surplus immediately; capital
-            backing outstanding policies unlocks as that coverage expires.
+            Instead of a fixed unbonding clock, the vault enforces a minimum collateralisation ratio
+            on every withdrawal. You can always pull the free surplus immediately; capital backing
+            outstanding policies unlocks as that coverage expires.
           </p>
         </Card>
         <LiveFeed />

@@ -64,9 +64,7 @@ describe('RingGauge', () => {
 
   it('accepts a sub-label override (rendered uppercase)', () => {
     reduceMotion();
-    const { container, unmount } = render(
-      <RingGauge value={50} tier="MEDIUM" label="watch" />,
-    );
+    const { container, unmount } = render(<RingGauge value={50} tier="MEDIUM" label="watch" />);
     expect(container.querySelector('.cp-ring__label')!.textContent).toBe('WATCH');
     unmount();
   });

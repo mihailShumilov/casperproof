@@ -354,7 +354,13 @@ function StepRow({
           className={`attn-step__icon attn-step__icon--${state}`}
           style={state === 'done' ? { color, borderColor: color } : undefined}
         >
-          {state === 'done' ? '✓' : state === 'scanning' ? <span className="attn-step__spin cp-spin" /> : '·'}
+          {state === 'done' ? (
+            '✓'
+          ) : state === 'scanning' ? (
+            <span className="attn-step__spin cp-spin" />
+          ) : (
+            '·'
+          )}
         </span>
         {!last && (
           <span

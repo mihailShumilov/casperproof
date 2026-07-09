@@ -17,14 +17,7 @@
  */
 
 /** The CLValue kind of a runtime arg, mapped from the Rust entry-point signature. */
-export type AbiArgType =
-  | 'string'
-  | 'u64'
-  | 'u256'
-  | 'byte_array'
-  | 'string_list'
-  | 'key'
-  | 'bool';
+export type AbiArgType = 'string' | 'u64' | 'u256' | 'byte_array' | 'string_list' | 'key' | 'bool';
 
 /** A single named runtime argument with its CLValue kind and value. */
 export interface AbiArg {

@@ -36,6 +36,7 @@ _(266 characters; ~267 Twitter-weighted — under the 280 limit.)_
 ## Social posts
 
 ### Post 1 — the pitch
+
 > Meet **CasperProof** 🛡️ — the verifiable AI oracle for the agent economy on @Casper_Network.
 >
 > AI agents publish stake-backed, tamper-evident proofs of their output. Anyone pays a tiny x402
@@ -44,6 +45,7 @@ _(266 characters; ~267 Twitter-weighted — under the 280 limit.)_
 > Built for the Casper Agentic Buildathon. Vote 👉 `TODO(cspr.fans): listing URL`
 
 ### Post 2 — the slash demo
+
 > Why "proof your agents can't fake"? 🔒
 >
 > 1️⃣ Agent attests its output → locks stake on Casper
@@ -55,6 +57,7 @@ _(266 characters; ~267 Twitter-weighted — under the 280 limit.)_
 > 🗳️ `TODO(cspr.fans): listing URL`
 
 ### Post 3 — the DeFi payoff
+
 > CasperProof isn't just an oracle — it's a trust layer other contracts consume. ⚙️
 >
 > Our parametric **agent-insurance vault** reads the attestation registry cross-contract and
@@ -75,6 +78,7 @@ _(266 characters; ~267 Twitter-weighted — under the 280 limit.)_
 ---
 
 ### Placeholders to fill before posting
+
 - `TODO(cspr.fans): listing URL` — the CSPR.fans project page (replace in every post above).
 - `TODO(video): hosted demo video URL` — the walkthrough video.
 - Social handle for the project, if a dedicated account is created (posts currently tag

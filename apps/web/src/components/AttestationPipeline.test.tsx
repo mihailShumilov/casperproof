@@ -33,10 +33,7 @@ describe('AttestationPipeline', () => {
   it('jumps to the summary (gauge + factors + CTA) under reduced motion', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }));
     const { container, unmount } = render(
-      <AttestationPipeline
-        input="account-hash-summary"
-        resultHref="/attestation/encoded-id"
-      />,
+      <AttestationPipeline input="account-hash-summary" resultHref="/attestation/encoded-id" />,
     );
     await flush();
 

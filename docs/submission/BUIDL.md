@@ -12,9 +12,10 @@ Built for the **Casper Agentic Buildathon 2026** (Qualification Round, June 1–
 > `StakeToken` [`hash-54aa…8dfd`](https://testnet.cspr.live/contract-package/54aa1e56d38f5f3f1ec4488ff2304d9c81520ff99dcbfd20f59d053a7d578dfd),
 > `MockUsdc` [`hash-3695…f229`](https://testnet.cspr.live/contract-package/369561bdba8e59e2716124bc0bcbad7e7eb035cb44d275aa54fc94b182b6f229).
 > Live dApp: **https://app.casperproof.com** · site: **https://casperproof.com**. Full package hashes
-> + install txs in [`../../deploy-out/onchain.json`](../../deploy-out/onchain.json) and the three
-> on-chain demo txs in [`../../deploy-out/arc.json`](../../deploy-out/arc.json) (see also
-> [`../CONTRACTS.md`](../CONTRACTS.md)).
+>
+> - install txs in [`../../deploy-out/onchain.json`](../../deploy-out/onchain.json) and the three
+>   on-chain demo txs in [`../../deploy-out/arc.json`](../../deploy-out/arc.json) (see also
+>   [`../CONTRACTS.md`](../CONTRACTS.md)).
 
 ---
 
@@ -41,18 +42,21 @@ The oracle is the core product; insurance is the demonstration, not a parallel t
 ## How it works
 
 ### 1 · Attest
+
 An agent canonicalizes its `input`/`output`, computes a `blake2b-256` commitment (the §8 scheme),
 uploads the full payload to a content-addressed (S3-compatible) store keyed by the payload's own
 hash, and calls `submit_attestation` — locking CEP-18 **STAKE** on-chain. The contract stores
 **hashes + metadata + stake only**; the payload stays off-chain by URI.
 
 ### 2 · Pay & verify
+
 A buyer pays per request (x402) to `GET /attestation/:id` and `POST /verify`. The flow is a real
 `402 Payment Required` (RFC 7807 body) → pay → retry with `X-PAYMENT`. The verifier refetches the
 payload, **recomputes the full commitment** (input + output + model + timestamp), and returns
 **PASS/FAIL** with both the on-chain hash and the recomputed hash side by side.
 
 ### 3 · Challenge & slash
+
 A tampered payload fails verification. Anyone can `challenge` within the dispute window (posting a
 bond); the resolver `resolve(fraudulent)` **slashes** the attestor's stake — split **to the
 challenger and the treasury** — and records `slashed +1` against the attestor's reputation.
@@ -89,22 +93,22 @@ Everything below boots and is exercised by tests with **zero secrets and no netw
 (`cp .env.example .env && make up`). "Mock" means a zero-secret local fallback that flips to live
 when the corresponding credential/URL is supplied (see [`../DEPLOYMENT.md`](../DEPLOYMENT.md)).
 
-| Capability | State | Evidence (traces to repo) |
-| --- | --- | --- |
-| **Commitment scheme** (blake2b-256 + canonical JSON, §8) | ✅ **Live & verified** | `packages/commitment` (TS) + `contracts/src/commitment.rs` (Rust); cross-language golden-vector parity test passes; 30 TS tests + 2 parity tests |
-| **Odra contracts logic** (registry, insurance, CEP-18) | ✅ **Live in MockVM** | `contracts/src`; 40 Rust tests (registry 12, insurance 12, tokens 4, parity 2, RFC 7807 `problem` 9 + doctest); clippy `-D warnings` clean |
-| **Agent runtime** (15-signal risk-scorer, claim-oracle, attestor, verifier, store) | ✅ **Live** | `packages/agent`; 97 tests; `LLM_BACKEND=none` (deterministic) or local Ollama — no paid keys |
-| **SDK** (`@casperproof/casper-sdk`) | ✅ **Live (mock + REST backends)** | `packages/sdk`; 103 tests |
-| **x402 resource server** (`GET /attestation/:id`, `POST /verify`) | ✅ **Live code; mock verifier** | `apps/x402-server`; 27 tests; real facilitator via `X402_FACILITATOR_URL` |
-| **MCP server** (7 tools over stdio) | ✅ **Live** | `apps/mcp-server`; 20 tests |
-| **dApp** (Oracle / Insurance / Slash + live feed) | ✅ **Live; mock CSPR.click connector** | `apps/web`; 27 tests; real wallet via `NEXT_PUBLIC_CSPR_CLICK_APP_ID` |
-| **Marketing site** | ✅ **Live (static export)** | `apps/marketing`; 29 tests |
-| **Contract WASM build** (`cargo odra build`) | ⚙️ **Runs in CI / dev machine** | Not produced in the build sandbox (CDN/GitHub blocked); logic fully verified via MockVM |
-| **Testnet deploy + on-chain txs** | ✅ **Live on `casper-test`** | 4 contracts installed + 3 demo txs (`submit_attestation`/`claim`/`resolve`) on-chain via a casper-js-sdk v5 script; hashes/links in [`../../deploy-out/onchain.json`](../../deploy-out/onchain.json) + [`../../deploy-out/arc.json`](../../deploy-out/arc.json) |
-| **CSPR.cloud reads/streaming** | 🔴 **Mock by default** | In-memory fixtures + local event emitter; live with `CSPR_CLOUD_TOKEN` |
-| **x402 micropayments** | 🔴 **Mock by default** | Local verifier accepts a signed `X-PAYMENT`; live with `X402_FACILITATOR_URL` |
-| **Object storage** | 🔴 **In-memory / MinIO** | Live with `S3_*` (Cloudflare R2 / AWS S3) |
-| **E2E (Playwright)** | ⚙️ **Specs written; run in CI** | `e2e/`; browser binaries install in CI (`playwright install chromium`) |
+| Capability                                                                         | State                                  | Evidence (traces to repo)                                                                                                                                                                                                                                       |
+| ---------------------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Commitment scheme** (blake2b-256 + canonical JSON, §8)                           | ✅ **Live & verified**                 | `packages/commitment` (TS) + `contracts/src/commitment.rs` (Rust); cross-language golden-vector parity test passes; 30 TS tests + 2 parity tests                                                                                                                |
+| **Odra contracts logic** (registry, insurance, CEP-18)                             | ✅ **Live in MockVM**                  | `contracts/src`; 40 Rust tests (registry 12, insurance 12, tokens 4, parity 2, RFC 7807 `problem` 9 + doctest); clippy `-D warnings` clean                                                                                                                      |
+| **Agent runtime** (15-signal risk-scorer, claim-oracle, attestor, verifier, store) | ✅ **Live**                            | `packages/agent`; 97 tests; `LLM_BACKEND=none` (deterministic) or local Ollama — no paid keys                                                                                                                                                                   |
+| **SDK** (`@casperproof/casper-sdk`)                                                | ✅ **Live (mock + REST backends)**     | `packages/sdk`; 103 tests                                                                                                                                                                                                                                       |
+| **x402 resource server** (`GET /attestation/:id`, `POST /verify`)                  | ✅ **Live code; mock verifier**        | `apps/x402-server`; 27 tests; real facilitator via `X402_FACILITATOR_URL`                                                                                                                                                                                       |
+| **MCP server** (7 tools over stdio)                                                | ✅ **Live**                            | `apps/mcp-server`; 20 tests                                                                                                                                                                                                                                     |
+| **dApp** (Oracle / Insurance / Slash + live feed)                                  | ✅ **Live; mock CSPR.click connector** | `apps/web`; 27 tests; real wallet via `NEXT_PUBLIC_CSPR_CLICK_APP_ID`                                                                                                                                                                                           |
+| **Marketing site**                                                                 | ✅ **Live (static export)**            | `apps/marketing`; 29 tests                                                                                                                                                                                                                                      |
+| **Contract WASM build** (`cargo odra build`)                                       | ⚙️ **Runs in CI / dev machine**        | Not produced in the build sandbox (CDN/GitHub blocked); logic fully verified via MockVM                                                                                                                                                                         |
+| **Testnet deploy + on-chain txs**                                                  | ✅ **Live on `casper-test`**           | 4 contracts installed + 3 demo txs (`submit_attestation`/`claim`/`resolve`) on-chain via a casper-js-sdk v5 script; hashes/links in [`../../deploy-out/onchain.json`](../../deploy-out/onchain.json) + [`../../deploy-out/arc.json`](../../deploy-out/arc.json) |
+| **CSPR.cloud reads/streaming**                                                     | 🔴 **Mock by default**                 | In-memory fixtures + local event emitter; live with `CSPR_CLOUD_TOKEN`                                                                                                                                                                                          |
+| **x402 micropayments**                                                             | 🔴 **Mock by default**                 | Local verifier accepts a signed `X-PAYMENT`; live with `X402_FACILITATOR_URL`                                                                                                                                                                                   |
+| **Object storage**                                                                 | 🔴 **In-memory / MinIO**               | Live with `S3_*` (Cloudflare R2 / AWS S3)                                                                                                                                                                                                                       |
+| **E2E (Playwright)**                                                               | ⚙️ **Specs written; run in CI**        | `e2e/`; browser binaries install in CI (`playwright install chromium`)                                                                                                                                                                                          |
 
 Aggregate: **~400 TypeScript tests** across packages and **40 Rust tests**, every threshold-gated
 package clearing **>90% line + branch**; both submission gates (security review + QA) returned
