@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# CodeQL — static analysis for the TypeScript monorepo and the Odra contracts.
+#
+# Both languages use `build-mode: none`: CodeQL builds its database straight
+# from source, so this job never has to reproduce the pnpm install or the
+# pinned nightly `cargo odra build`. Results land in the Security tab.
+# ─────────────────────────────────────────────────────────────────────────────
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Mondays 07:00 UTC — catches newly published queries against unchanged code.
+    - cron: "0 7 * * 1"
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write # upload SARIF results
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: javascript-typescript
+            build-mode: none
+          # Rust is GA in CodeQL and supports `none` only — it has no `manual`
+          # build mode.
+          - language: rust
+            build-mode: none
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

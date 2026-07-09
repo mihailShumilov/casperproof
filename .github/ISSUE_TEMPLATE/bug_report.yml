@@ -1,0 +1,80 @@
+name: Bug report
+description: Something in the contracts, agent runtime, SDK, or dApp behaves incorrectly.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. **Do not report security vulnerabilities here** — see
+        [SECURITY.md](https://github.com/mihailShumilov/casperproof/blob/main/SECURITY.md)
+        for private disclosure.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the monorepo?
+      options:
+        - contracts (Odra / attestation_registry / insurance / CEP-18)
+        - packages/commitment (blake2b-256 commitment scheme)
+        - packages/agent (risk-scorer, claim-oracle, attestor, verifier)
+        - packages/sdk (@casperproof/casper-sdk)
+        - apps/web (dApp dashboard)
+        - apps/marketing
+        - apps/x402-server
+        - apps/mcp-server
+        - build / CI / Docker
+        - other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      description: Was the stack running against mock fixtures or live Casper testnet?
+      options:
+        - mock (default — no CSPR_CLOUD_TOKEN)
+        - live (casper-test)
+        - not applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you get instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. cp .env.example .env
+        2. make up
+        3. Open http://localhost:29300 and ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or transaction hashes
+      description: |
+        Paste console output, a failing test name, or a `casper-test` deploy hash.
+        This is rendered as a code block, so no backticks needed.
+      render: shell
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        OS:            macOS 15.5
+        Node:          20.x (see .nvmrc)
+        pnpm:          9.15.4
+        Rust:          nightly-2026-01-01 (see rust-toolchain.toml)
+        Commit:        <git rev-parse --short HEAD>
