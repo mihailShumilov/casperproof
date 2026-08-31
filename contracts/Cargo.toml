@@ -46,7 +46,7 @@ odra-build = { version = "2", default-features = false }
 odra-test = { version = "2", default-features = false }
 # Host-only deps used solely by the cross-language golden-vector parity test in
 # `commitment.rs`. The compiled contract never hashes on-chain (bytes-only rule, §8).
-blake2 = "0.10"
+blake2 = "0.11"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 hex = "0.4"
